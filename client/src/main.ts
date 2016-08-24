@@ -3,16 +3,20 @@ import * as THREE from 'three';
 var scene, camera, renderer;
 
 let size = 16;
-let data = new Uint8Array(size * size * size).map((_, idx) => Math.sin(idx/10) + Math.cos(idx/20) > 0 ? 1 : 0);
+let data = new Uint8Array(size * size * size).map((_, idx) => Math.sin(idx/10) + Math.cos(idx/20) > 0 ? (Math.random()*2+1)|0 : 0);
 
 let getPoint = (x, y, z) => {
     if (x < 0 || y < 0 || z < 0 || x >= size || y >= size || z >= size) return 0;
     return data[z * size * size + y * size + x];
 };
 
-let buildChunk2 = () => {
+let buildChunk = () => {
     let i = 0;
+    let tri = 0;
+
+    let mats = new Float32Array(size*size*size*8);
     let verts = new Float32Array(size*size*size*32);
+
     for (let z = 0; z < size; z++) {
         let oz = z - size / 2;
         for (let y = 0; y < size; y++) {
@@ -46,6 +50,13 @@ let buildChunk2 = () => {
                         verts[i++] = ox - 0.5;
                         verts[i++] = oy - 0.5;
                         verts[i++] = oz + 0.5;
+
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
                     }
                     if (!getPoint(x, y, z - 1)) {
                         verts[i++] = ox - 0.5;
@@ -72,6 +83,13 @@ let buildChunk2 = () => {
                         verts[i++] = ox - 0.5;
                         verts[i++] = oy + 0.5;
                         verts[i++] = oz - 0.5;
+
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
                     }
                     if (!getPoint(x, y + 1, z)) {
                         verts[i++] = ox - 0.5;
@@ -98,6 +116,13 @@ let buildChunk2 = () => {
                         verts[i++] = ox - 0.5;
                         verts[i++] = oy + 0.5;
                         verts[i++] = oz + 0.5;
+
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
                     }
                     if (!getPoint(x, y - 1, z)) {
                         verts[i++] = ox - 0.5;
@@ -124,6 +149,13 @@ let buildChunk2 = () => {
                         verts[i++] = ox - 0.5;
                         verts[i++] = oy - 0.5;
                         verts[i++] = oz - 0.5;
+
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
                     }
                     if (!getPoint(x + 1, y, z)) {
 
@@ -151,6 +183,13 @@ let buildChunk2 = () => {
                         verts[i++] = ox + 0.5;
                         verts[i++] = oy - 0.5;
                         verts[i++] = oz - 0.5;
+
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
                     }
 
                     if (!getPoint(x - 1, y, z)) {
@@ -179,40 +218,31 @@ let buildChunk2 = () => {
                         verts[i++] = oy - 0.5;
                         verts[i++] = oz + 0.5;
 
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
+                        mats[tri++] = val;
                     }
                 }
             }
         }
     }
 
-    return verts.slice(0, i);
+    return [mats.slice(0, tri), verts.slice(0, i)];
 };
 
 console.time('verts');
-let verts = buildChunk2();
-console.timeEnd('verts');
-console.time('verts');
-let verts = buildChunk2();
-console.timeEnd('verts');
-console.time('verts');
-let verts = buildChunk2();
-console.timeEnd('verts');
-console.time('verts');
-let verts = buildChunk2();
-console.timeEnd('verts');
-console.time('verts');
-let verts = buildChunk2();
-console.timeEnd('verts');
-console.time('verts');
-let verts = buildChunk2();
+let [mats, verts] = buildChunk();
 console.timeEnd('verts');
 
-console.log(verts.length);
+console.log(mats);
 
 var geometry = new THREE.BufferGeometry();
 // create a simple square shape. We duplicate the top left and bottom right
 // vertices because each vertex needs to appear once per triangle.
-var vertices = Float32Array.from(verts);
+var vertices = verts;
 /*new Float32Array([
  -1.0, -1.0, 1.0,
  1.0, -1.0, 1.0,
@@ -225,13 +255,17 @@ var vertices = Float32Array.from(verts);
 
 // itemSize = 3 because there are 3 values (components) per vertex
 geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+geometry.addAttribute('material', new THREE.BufferAttribute(mats, 1));
 geometry.computeVertexNormals();
 
 var material = new THREE.ShaderMaterial({
-
     uniforms: {
-        time: {value: 1.0},
-        resolution: {value: new THREE.Vector2()}
+        texture: {
+            value: new THREE.TextureLoader().load( 'assets/textures.png', tex => {
+                tex.minFilter = THREE.NearestFilter;
+                tex.magFilter = THREE.NearestFilter;
+            })
+        }
     },
     vertexShader: document.getElementById('vertexShader').textContent,
     fragmentShader: document.getElementById('fragmentShader').textContent
@@ -244,12 +278,13 @@ var mesh = new THREE.Mesh(geometry, material);
 init();
 animate();
 
+
 function init() {
 
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
-    camera.position.z = 30;
+    camera.position.z = 20;
 
     //geometry = new THREE.BoxGeometry( 200, 200, 200 );
     //material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
@@ -268,8 +303,8 @@ function animate() {
 
     requestAnimationFrame(animate);
 
-    mesh.rotation.x += 0.01;
-    mesh.rotation.y += 0.02;
+    //mesh.rotation.x += 0.01;
+    mesh.rotation.y += 0.005;
 
     renderer.render(scene, camera);
 
