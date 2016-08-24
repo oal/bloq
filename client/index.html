@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bloq</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<script id="vertexShader" type="x-shader/x-vertex">
+	varying vec2 vUv;
+
+	varying vec3 pos;
+
+	float rand(vec3 pos){
+        return fract(sin(dot(pos.xy, vec2(17.5623,49.2314))) * 79523.3521);
+    }
+
+    void main()
+    {
+        pos = position;
+        float noise = rand(position)/5.0;
+        vec3 noisePos = vec3(position.x + noise, position.y + noise, position.z + noise);
+        vUv = uv;
+        vec4 mvPosition = modelViewMatrix * vec4( noisePos, 1.0 );
+        gl_Position = projectionMatrix * mvPosition;
+    }
+</script>
+
+<script id="fragmentShader" type="x-shader/x-fragment">
+	/*uniform float time;
+    uniform vec2 resolution;
+
+    uniform sampler2D texture;
+
+    varying vec2 vUv;*/
+	varying vec3 pos;
+
+    void main( void ) {
+
+        /*vec2 position = -1.0 + 2.0 * vUv;
+
+        float a = atan( position.y, position.x );
+        float r = sqrt( dot( position, position ) );
+
+        vec2 uv;
+        uv.x = cos( a ) / r;
+        uv.y = sin( a ) / r;
+        uv /= 10.0;
+        uv += time * 0.05;
+
+        vec3 color = texture2D( texture, uv ).rgb;*/
+
+        gl_FragColor = vec4( 0.5+pos.x/16.0, 0.5+pos.y/16.0, 0.5+pos.z/16.0, 1.0 );
+
+    }
+
+</script>
+
+<script src="dist/game.js"></script>
+
+</body>
+</html>
