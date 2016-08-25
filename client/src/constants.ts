@@ -1,0 +1,1 @@
+export const TERRAIN_CHUNK_SIZE = 16;
