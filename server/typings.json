@@ -1,6 +1,8 @@
 {
   "globalDependencies": {
+    "es6-collections": "registry:dt/es6-collections#0.5.1+20160316155526",
     "node": "registry:dt/node#6.0.0+20160823142437",
-    "node-uuid": "registry:dt/node-uuid#0.0.0+20160316155526"
+    "node-uuid": "registry:dt/node-uuid#0.0.0+20160316155526",
+    "ws": "registry:dt/ws#0.0.0+20160724122153"
   }
 }
