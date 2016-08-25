@@ -1,5 +1,6 @@
 {
   "globalDependencies": {
+    "node-uuid": "registry:dt/node-uuid#0.0.0+20160316155526",
     "three": "registry:dt/three#0.0.0+20160802154944"
   }
 }
