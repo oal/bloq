@@ -53,6 +53,10 @@ export default class EntityManager {
         });
     }
 
+    getEntities(componentType: string): Map<string, Component> {
+        return this.components.get(componentType);
+    }
+
     addComponent(entity: string, component: Component) {
         let typeName = component.typeName();
         this.components.get(typeName).set(entity, component);

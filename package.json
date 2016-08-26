@@ -1,0 +1,24 @@
+{
+  "name": "bloq",
+  "version": "0.0.1",
+  "description": "Game",
+  "main": "index.js",
+  "scripts": {
+    "serve-client": "./node_modules/.bin/webpack-dev-server --config webpack.client.config.js",
+    "watch-server": "./node_modules/.bin/webpack --watch --config webpack.server.config.js",
+    "serve-server": "nodemon dist/server/server.js"
+  },
+  "author": "Olav Andreas Lindekleiv",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "three": "^0.80.1",
+    "ts-loader": "^0.8.2",
+    "typescript": "^1.8.10",
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.15.0",
+    "webpack-livereload-plugin": "^0.8.2",
+    "json-loader": "^0.5.4",
+    "node-uuid": "^1.4.7",
+    "ws": "^1.1.1"
+  }
+}

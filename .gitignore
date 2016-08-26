@@ -85,4 +85,5 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-server/server.js
+dist/client/game.js
+dist/server/server.js

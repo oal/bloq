@@ -1,14 +1,14 @@
-import EntityManager from "../../shared/EntityManager";
 import {Server as WebSocketServer} from 'ws';
-import {PositionComponent, registerSharedComponents} from "../../shared/components";
+import {PositionComponent} from "../../shared/components";
 import uuid = require('node-uuid');
+import World from "../../shared/World";
 
 export default class Server {
-    entityManager: EntityManager;
     wss: WebSocketServer;
+    world: World;
 
     constructor() {
-        this.initEntityManager();
+        this.world = new World();
 
         this.wss = new WebSocketServer({
             port: 8081
@@ -17,19 +17,17 @@ export default class Server {
         this.wss.on('message', this.onMessage.bind(this));
     }
 
-    initEntityManager() {
-        let em = new EntityManager();
-        registerSharedComponents(em);
-
-        this.entityManager = em;
+    tick() {
+        console.log(123)
+        setImmediate(this.tick.bind(this));
     }
 
     onConnect(ws) {
         let pos = new PositionComponent();
         let entity = uuid.v4();
 
-        this.entityManager.addComponent(entity, pos);
-        ws.send(this.entityManager.serializeEntity(entity));
+        this.world.entityManager.addComponent(entity, pos);
+        ws.send(this.world.entityManager.serializeEntity(entity));
     }
 
     onMessage(ws) {

@@ -1,6 +1,6 @@
 var LiveReloadPlugin = require('webpack-livereload-plugin');
 var webpack = require('webpack');
-
+console.log(__dirname)
 module.exports = {
     resolve: {
         extensions: ['', '.ts', '.js']
@@ -11,10 +11,10 @@ module.exports = {
         new webpack.HotModuleReplacementPlugin()
     ],
 
-    entry: './src/main.ts',
+    entry: './client/src/main.ts',
     output: {
-        path: __dirname + "/dist",
-        publicPath: 'dist/',
+        path: __dirname + "/dist/client/",
+        publicPath: "/dist/client/",
         filename: "game.js"
     },
 
@@ -25,7 +25,7 @@ module.exports = {
             {
                 test: /\.ts$/,
                 exclude: /node_modules/,
-                loader: 'ts-loader'
+                loader: 'ts-loader?configFileName=tsconfig.client.json'
             }
         ]
     },

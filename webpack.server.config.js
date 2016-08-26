@@ -6,8 +6,9 @@ module.exports = {
     },
 
     target: 'node',
-    entry: './src/main.ts',
+    entry: './server/src/main.ts',
     output: {
+        path: __dirname + "/dist/server/",
         filename: "server.js"
     },
 
@@ -20,7 +21,7 @@ module.exports = {
             {
                 test: /\.ts$/,
                 exclude: /node_modules/,
-                loader: 'ts-loader'
+                loader: 'ts-loader?configFileName=tsconfig.server.json'
             },
         ]
     },
