@@ -4,6 +4,9 @@ import {buildChunkGeometry} from "./terrain";
 import {TERRAIN_CHUNK_SIZE} from "./constants";
 import AssetManager from "./AssetManager";
 import Server from "./Server";
+import EntityManager from "../../shared/EntityManager";
+import {registerSharedComponents} from "../../shared/components";
+import {registerClientComponents} from "./components";
 
 let size = TERRAIN_CHUNK_SIZE;
 let data = new Uint8Array(size * size * size).map((_, idx) => Math.sin(idx / 20) + Math.cos(idx / 40) > 0 ? (Math.random() * 3 + 1) | 0 : 0);
@@ -15,20 +18,40 @@ export default class Game {
     camera: PerspectiveCamera;
     mesh: Mesh;
 
-    assets: AssetManager = new AssetManager();
+    assetManager: AssetManager;
+    entityManager: EntityManager;
+
     server: Server;
 
     constructor() {
-        this.assets.add('texture', 'terrain', '../assets/textures.png');
-        this.assets.load(progress => {
+        this.initEntityManager()
+        this.loadAssets(() => {
+            this.init();
+            this.animate();
+        });
+        this.server = new Server();
+    }
+
+    initEntityManager() {
+        let entities = new EntityManager();
+        registerSharedComponents(entities);
+        registerClientComponents(entities);
+
+        this.entityManager = entities;
+    }
+
+    loadAssets(callback) {
+        let assets = new AssetManager();
+        assets.add('texture', 'terrain', '../assets/textures.png');
+        assets.load(progress => {
+            // TODO: Show loading progress in GUI.
             console.log(progress);
-            if(progress === 1) {
-                this.init();
-                this.animate();
-            }
+
+            // Continue setup when everything is loaded.
+            if (progress === 1) callback();
         });
 
-        this.server = new Server();
+        this.assetManager = assets;
     }
 
     init() {
@@ -44,7 +67,7 @@ export default class Game {
         var material = new ShaderMaterial({
             uniforms: {
                 texture: {
-                    value: this.assets.findTexture('terrain')
+                    value: this.assetManager.findTexture('terrain')
                 }
             },
             vertexShader: document.getElementById('vertexShader').textContent,
@@ -70,7 +93,7 @@ export default class Game {
 }
 
 /*
-* new TextureLoader().load('assets/textures.png', tex => {
+ * new TextureLoader().load('assetManager/textures.png', tex => {
  tex.minFilter = NearestFilter;
  tex.magFilter = NearestFilter;
  })*/

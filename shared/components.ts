@@ -1,3 +1,4 @@
+import EntityManager from "./EntityManager";
 export class Component {
     typeName(): string {
         let fullName = this.constructor.name.toString().toLowerCase();
@@ -6,6 +7,15 @@ export class Component {
 
     serialize() {
         return JSON.stringify(this);
+    }
+
+    // Pretty much full / partial deserialization, but JSON is already deserialized in entity deserializer.
+    update(data: Object) {
+        for(let key in data) {
+            if(!data.hasOwnProperty(key)) continue;
+
+            this[key] = data[key];
+        }
     }
 
     dispose(): void {}
@@ -18,3 +28,8 @@ export class PositionComponent extends Component {
 }
 
 export class PhysicsComponent extends Component {}
+
+export function registerSharedComponents(manager: EntityManager) {
+    manager.registerComponentType(new PositionComponent());
+    manager.registerComponentType(new PhysicsComponent());
+}
