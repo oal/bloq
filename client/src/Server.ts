@@ -19,7 +19,7 @@ export default class Server {
     }
 
     onMessage(evt) {
-        console.log('message');
+        console.log('message', evt);
     }
 
     onError(evt) {

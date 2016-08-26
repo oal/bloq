@@ -1,13 +1,20 @@
 export class Component {
     typeName(): string {
-        return this.constructor.toString();
+        let fullName = this.constructor.name.toString().toLowerCase();
+        return fullName.substring(0, fullName.length-9); // Everything except "Component".
     }
+
+    serialize() {
+        return JSON.stringify(this);
+    }
+
+    dispose(): void {}
 }
 
-class Position extends Component {
-    x: number;
-    y: number;
-    z: number;
+export class PositionComponent extends Component {
+    x: number = 0;
+    y: number = 0;
+    z: number = 0;
 }
 
-class Physics extends Component {}
+export class PhysicsComponent extends Component {}
