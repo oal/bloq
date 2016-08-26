@@ -14,7 +14,7 @@ module.exports = {
     entry: './client/src/main.ts',
     output: {
         path: __dirname + "/dist/client/",
-        publicPath: "/dist/client/",
+        publicPath: "dist/client/",
         filename: "game.js"
     },
 
