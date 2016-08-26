@@ -1,7 +1,7 @@
 import EntityManager from "./EntityManager";
 export class Component {
     typeName(): string {
-        let fullName = this.constructor.name.toString().toLowerCase();
+        let fullName = (this.constructor as any).name.toLowerCase();
         return fullName.substring(0, fullName.length-9); // Everything except "Component".
     }
 

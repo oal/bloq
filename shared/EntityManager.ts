@@ -10,12 +10,12 @@ export default class EntityManager {
     }
 
     registerComponentType(instance: Component) {
+
         let type = instance.typeName();
         if(this.componentConstructors.has(type)) {
             console.warn(`Component type "${type} already registered.`);
             return;
         }
-
         this.componentConstructors.set(type, instance.constructor);
         this.components.set(type, new Map<string, Component>());
     }
@@ -42,7 +42,7 @@ export default class EntityManager {
 
         components.forEach((data, type) => {
             let constructor = this.componentConstructors.get(type);
-            let instance = new constructor();
+            let instance = new (constructor as any)();
             instance.update(data);
         })
     }
