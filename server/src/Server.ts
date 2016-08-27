@@ -1,7 +1,7 @@
 import {Server as WebSocketServer} from 'ws';
 import {PositionComponent} from "../../shared/components";
 import uuid = require('node-uuid');
-import World from "../../shared/World";
+import World from "./World";
 import {initPlayerEntity} from "./entities";
 
 let hrtimeToSeconds = (hrtime: [number, number]) => hrtime[0] + hrtime[1] / 1000000000;

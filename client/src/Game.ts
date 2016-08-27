@@ -27,7 +27,7 @@ export default class Game {
         this.initEntityManager();
         this.loadAssets(() => {
             this.init();
-            this.animate();
+            this.tick();
         });
         this.server = new Server();
     }
@@ -52,6 +52,13 @@ export default class Game {
         });
 
         this.assetManager = assets;
+    }
+
+    tick() {
+        requestAnimationFrame(this.tick.bind(this));
+        this.server.tick();
+        this.mesh.rotation.y += 0.005;
+        this.renderer.render(this.scene, this.camera);
     }
 
     init() {
@@ -82,13 +89,6 @@ export default class Game {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
 
         document.body.appendChild(this.renderer.domElement);
-    }
-
-    animate() {
-        requestAnimationFrame(this.animate.bind(this));
-
-        this.mesh.rotation.y += 0.005;
-        this.renderer.render(this.scene, this.camera);
     }
 }
 

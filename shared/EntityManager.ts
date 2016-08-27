@@ -65,6 +65,10 @@ export default class EntityManager {
         return this.components.get(componentType);
     }
 
+    getComponent(entity: string, componentType: string) {
+        return this.components.get(componentType).get(entity);
+    }
+
     addComponent(entity: string, component: Component) {
         let typeName = component.typeName();
         this.components.get(typeName).set(entity, component);
