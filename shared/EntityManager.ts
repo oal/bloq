@@ -10,7 +10,6 @@ export default class EntityManager {
     }
 
     registerComponentType(instance: Component) {
-
         let type = instance.typeName();
         if(this.componentConstructors.has(type)) {
             console.warn(`Component type "${type} already registered.`);
@@ -20,18 +19,22 @@ export default class EntityManager {
         this.components.set(type, new Map<string, Component>());
     }
 
-    serializeEntity(entity: string) {
-        let obj = {
-            entity: entity,
-            components: {}
-        };
+    getRegisteredComponentTypes(): Iterator<string> {
+        return this.componentConstructors.keys();
+    }
 
+    serializeEntity(entity: string) {
+        // Each component needs to be serialized individually, then a JSON string is manually created.
+        // Just using JSON.stringify would cause each component's serialized string to be escaped.
+
+        let components = [];
         this.components.forEach((entities, type) => {
             let component = entities.get(entity);
-            if(component) obj['components'][type] = component;
+            if(component) {
+                components.push(`"${type}":${component.serialize()}`);
+            }
         });
-
-        return JSON.stringify(obj);
+        return `{"entity":"${entity}","components":{${components.join(',')}}}`;
     }
 
     deserializeAndSetEntity(json: string) {

@@ -1,13 +1,29 @@
 import EntityManager from "./EntityManager";
-export class Component {
-    private dirty: boolean;
 
-    setDirty() {
-        this.dirty = true;
+// Used when serializing component to avoid "dirty" flag being serialized. It is only needed locally at runtime.
+let componentReplacer = (key, value) => {
+    if(key === 'dirty') return undefined;
+    return value;
+};
+
+export class Component {
+    private dirty: boolean = false;
+    private sync: boolean = false;
+
+    constructor(sync: boolean = false) {
+        this.sync = sync;
+    }
+
+    setDirty(state: boolean) {
+        this.dirty = state;
     }
 
     isDirty(): boolean {
         return this.dirty;
+    }
+
+    isSync(): boolean {
+        return this.sync;
     }
 
     typeName(): string {
@@ -16,7 +32,7 @@ export class Component {
     }
 
     serialize() {
-        return JSON.stringify(this);
+        return JSON.stringify(this, componentReplacer);
     }
 
     // Pretty much full / partial deserialization, but JSON is already deserialized in entity deserializer.

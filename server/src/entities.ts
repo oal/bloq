@@ -3,7 +3,7 @@ import {InputComponent, PositionComponent, PlayerComponent} from "../../shared/c
 
 
 export function initPlayerEntity(em: EntityManager, entity: string) {
-    em.addComponent(entity, new InputComponent());
+    em.addComponent(entity, new InputComponent(true));
     em.addComponent(entity, new PositionComponent());
     em.addComponent(entity, new PlayerComponent());
 }

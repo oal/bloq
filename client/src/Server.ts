@@ -1,21 +1,18 @@
 import World from "./World";
+import Game from "./Game";
 export default class Server {
     url: string = 'ws://localhost:8081';
     ws: WebSocket;
-    world: World;
+    game: Game;
 
-    constructor() {
-        this.world = new World();
+    constructor(game: Game) {
+        this.game = game;
 
         this.ws = new WebSocket(this.url);
         this.ws.onopen = this.onOpen.bind(this);
         this.ws.onclose = this.onClose.bind(this);
         this.ws.onmessage = this.onMessage.bind(this);
         this.ws.onerror = this.onError.bind(this);
-    }
-
-    tick() {
-        this.world.tick(0.1);
     }
 
     onOpen(evt) {
@@ -27,12 +24,16 @@ export default class Server {
     }
 
     onMessage(evt) {
-        this.world.handlePacket(evt.data);
-        console.log(this.world.entityManager.getEntities('player'))
+        this.game.world.handlePacket(evt.data);
+        console.log(this.game.world.entityManager.getEntities('player'))
         console.log('message', evt);
     }
 
     onError(evt) {
         console.log('error');
+    }
+
+    send(data) {
+        this.ws.send(JSON.stringify(data));
     }
 }
