@@ -34,17 +34,25 @@ export default class EntityManager {
         return JSON.stringify(obj);
     }
 
-    // TODO: WIP, might not work properly.
     deserializeAndSetEntity(json: string) {
         let obj = JSON.parse(json);
+
+        // Extract entity UUID and component data.
         let entity = obj['entity'];
         let components = obj['components'];
 
-        components.forEach((data, type) => {
+        // Loop over and construct new instances of components.
+        for(let type in components) {
+            if(!components.hasOwnProperty(type)) continue;
+
+            let data = components[type];
             let constructor = this.componentConstructors.get(type);
             let instance = new (constructor as any)();
             instance.update(data);
-        })
+
+            // Finally, add / set component in entity manager.
+            this.addComponent(entity, instance);
+        }
     }
 
     removeEntity(entity: string) {

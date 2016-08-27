@@ -1,8 +1,12 @@
+import World from "../../shared/World";
 export default class Server {
     url: string = 'ws://localhost:8081';
     ws: WebSocket;
+    world: World;
 
     constructor() {
+        this.world = new World();
+
         this.ws = new WebSocket(this.url);
         this.ws.onopen = this.onOpen.bind(this);
         this.ws.onclose = this.onClose.bind(this);
@@ -19,6 +23,8 @@ export default class Server {
     }
 
     onMessage(evt) {
+        this.world.handlePacket(evt.data);
+        console.log(this.world.entityManager.getEntities('player'))
         console.log('message', evt);
     }
 

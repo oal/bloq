@@ -24,7 +24,7 @@ export default class Game {
     server: Server;
 
     constructor() {
-        this.initEntityManager()
+        this.initEntityManager();
         this.loadAssets(() => {
             this.init();
             this.animate();

@@ -2,10 +2,14 @@ import {Server as WebSocketServer} from 'ws';
 import {PositionComponent} from "../../shared/components";
 import uuid = require('node-uuid');
 import World from "../../shared/World";
+import {initPlayerEntity} from "./entities";
+
+let hrtimeToSeconds = (hrtime: [number, number]) => hrtime[0] + hrtime[1] / 1000000000;
 
 export default class Server {
     wss: WebSocketServer;
     world: World;
+
 
     constructor() {
         this.world = new World();
@@ -15,18 +19,40 @@ export default class Server {
         });
         this.wss.on('connection', this.onConnect.bind(this));
         this.wss.on('message', this.onMessage.bind(this));
+
+        this.startGameLoop();
     }
 
-    tick() {
-        console.log(123)
-        setImmediate(this.tick.bind(this));
+    startGameLoop() {
+        //let t = 0.0;
+        const dt = 1.0/30.0;
+
+        let currentTime = hrtimeToSeconds(process.hrtime());
+        let accumulator = 0.0;
+
+        setInterval(() => {
+            let newTime = hrtimeToSeconds(process.hrtime());
+            let frameTime = newTime - currentTime;
+            currentTime = newTime;
+
+            accumulator += frameTime;
+
+            while(accumulator >= dt) {
+                //console.log('tick!', accumulator);
+                this.tick(dt);
+                accumulator -= dt;
+                //t += dt;
+            }
+        }, 1);
+    }
+
+    tick(dt) {
+        this.world.tick(dt);
     }
 
     onConnect(ws) {
-        let pos = new PositionComponent();
         let entity = uuid.v4();
-
-        this.world.entityManager.addComponent(entity, pos);
+        initPlayerEntity(this.world.entityManager, entity);
         ws.send(this.world.entityManager.serializeEntity(entity));
     }
 
