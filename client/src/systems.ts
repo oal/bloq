@@ -36,6 +36,7 @@ export function syncPlayer(em: EntityManager, server: Server) {
     em.getEntities('player').forEach((component, entity) => {
         let position = em.getComponent(entity, 'position');
         let input = em.getComponent(entity, 'input');
+        
         if (input.isDirty()) {
             server.send({
                 entity: entity,

@@ -10,7 +10,6 @@ export default class Server {
     wss: WebSocketServer;
     world: World;
 
-
     constructor() {
         this.world = new World();
 
@@ -23,8 +22,7 @@ export default class Server {
     }
 
     startGameLoop() {
-        //let t = 0.0;
-        const dt = 1.0/30.0;
+        const dt = 1.0 / 30.0;
 
         let currentTime = hrtimeToSeconds(process.hrtime());
         let accumulator = 0.0;
@@ -36,11 +34,9 @@ export default class Server {
 
             accumulator += frameTime;
 
-            while(accumulator >= dt) {
-                //console.log('tick!', accumulator);
+            while (accumulator >= dt) {
                 this.tick(dt);
                 accumulator -= dt;
-                //t += dt;
             }
         }, 1);
     }
@@ -53,8 +49,8 @@ export default class Server {
         let playerEntity = uuid.v4();
         ws.on('message', (data, flags) => {
             let obj = JSON.parse(data);
-            if(obj.entity == playerEntity) {
-                if('input' in obj.components && 'position' in obj.components) {
+            if (obj.entity == playerEntity) {
+                if ('input' in obj.components && 'position' in obj.components) {
                     let input = obj.components['input'];
                     let position = obj.components['position'];
 
@@ -62,10 +58,10 @@ export default class Server {
                     existingInput.update(input);
 
                     let existingPosition = this.world.entityManager.getComponent(playerEntity, 'position') as PositionComponent;
-                    let dist = Math.sqrt(Math.pow(position.x-existingPosition.x, 2) + Math.pow(position.y-existingPosition.y, 2) +Math.pow(position.z-existingPosition.z, 2));
+                    let dist = Math.sqrt(Math.pow(position.x - existingPosition.x, 2) + Math.pow(position.y - existingPosition.y, 2) + Math.pow(position.z - existingPosition.z, 2));
 
                     existingPosition.update(position);
-                    if(dist > 0.5) {
+                    if (dist > 0.5) {
                         // TODO: Send correction to client.
                         console.log('Too big difference between client and server!', dist);
                     }

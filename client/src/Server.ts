@@ -1,5 +1,6 @@
-import World from "./World";
 import Game from "./Game";
+
+
 export default class Server {
     url: string = 'ws://localhost:8081';
     ws: WebSocket;
@@ -15,21 +16,21 @@ export default class Server {
         this.ws.onerror = this.onError.bind(this);
     }
 
-    onOpen(evt) {
+    onOpen(evt: MessageEvent) {
         console.log('open');
     }
 
-    onClose(evt) {
+    onClose(evt: MessageEvent) {
         console.log('close');
     }
 
-    onMessage(evt) {
+    onMessage(evt: MessageEvent) {
         this.game.world.handlePacket(evt.data);
         console.log(this.game.world.entityManager.getEntities('player'))
         console.log('message', evt);
     }
 
-    onError(evt) {
+    onError(evt: MessageEvent) {
         console.log('error');
     }
 

@@ -1,8 +1,8 @@
-import {TextureLoader, NearestFilter} from 'three';
+import {TextureLoader, NearestFilter, Texture} from 'three';
 
 export default class AssetManager {
     isLoaded: boolean;
-    textureLoader = new TextureLoader();
+    textureLoader: TextureLoader = new TextureLoader();
 
     queue: Array<[string, string, string]> = [];
     assets = {
@@ -13,11 +13,11 @@ export default class AssetManager {
 
     }
 
-    add(type, name, url) {
+    add(type: string, name: string, url: string) {
         this.queue.push([type, name, url]);
     }
 
-    load(callback) {
+    load(callback: Function) {
         if(this.isLoaded) return;
 
         let totalFiles = this.queue.length;
@@ -39,7 +39,7 @@ export default class AssetManager {
     }
 
 
-    findTexture(name) {
+    findTexture(name): Texture {
         return this.assets.textures[name];
     }
 }

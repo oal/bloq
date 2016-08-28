@@ -2,7 +2,7 @@ import EntityManager from "./EntityManager";
 
 // Used when serializing component to avoid "dirty" flag being serialized. It is only needed locally at runtime.
 let componentReplacer = (key, value) => {
-    if(key === 'dirty') return undefined;
+    if (key === 'dirty') return undefined;
     return value;
 };
 
@@ -56,7 +56,8 @@ export class InputComponent extends Component {
     jump: boolean = false;
 }
 
-export class PlayerComponent extends Component {}
+export class PlayerComponent extends Component {
+}
 
 export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new PositionComponent());

@@ -13,11 +13,12 @@ export default class Game {
         this.loadAssets(() => {
             this.world = new World(this);
             this.server = new Server(this);
-            this.tick();
+            this.startGameLoop();
         });
     }
 
-    loadAssets(callback) {
+
+    loadAssets(callback: Function) {
         let assets = new AssetManager();
         assets.add('texture', 'terrain', './assets/textures.png');
         assets.load(progress => {
@@ -31,9 +32,23 @@ export default class Game {
         this.assetManager = assets;
     }
 
-    tick() {
-        this.world.tick(1/60);
-        requestAnimationFrame(this.tick.bind(this));
+    startGameLoop() {
+        // Use closure to avoid adding time related stuff to the game object.
+        let currentTime = performance.now();
+        let update = () => {
+            let newTime = performance.now();
+            let dt = (newTime - currentTime) / 1000;
+
+            this.tick(dt);
+
+            currentTime = newTime;
+            requestAnimationFrame(update);
+        };
+        update();
+    }
+
+    tick(dt: number) {
+        this.world.tick(dt);
     }
 
 }

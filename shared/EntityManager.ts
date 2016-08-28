@@ -11,7 +11,7 @@ export default class EntityManager {
 
     registerComponentType(instance: Component) {
         let type = instance.typeName();
-        if(this.componentConstructors.has(type)) {
+        if (this.componentConstructors.has(type)) {
             console.warn(`Component type "${type} already registered.`);
             return;
         }
@@ -30,7 +30,7 @@ export default class EntityManager {
         let components = [];
         this.components.forEach((entities, type) => {
             let component = entities.get(entity);
-            if(component) {
+            if (component) {
                 components.push(`"${type}":${component.serialize()}`);
             }
         });
@@ -45,8 +45,8 @@ export default class EntityManager {
         let components = obj['components'];
 
         // Loop over and construct new instances of components.
-        for(let type in components) {
-            if(!components.hasOwnProperty(type)) continue;
+        for (let type in components) {
+            if (!components.hasOwnProperty(type)) continue;
 
             let data = components[type];
             let constructor = this.componentConstructors.get(type);
@@ -60,7 +60,7 @@ export default class EntityManager {
 
     removeEntity(entity: string) {
         this.components.forEach((entities, type) => {
-            if(entities.has(entity)) this.removeComponentType(entity, type);
+            if (entities.has(entity)) this.removeComponentType(entity, type);
         });
     }
 
@@ -80,7 +80,7 @@ export default class EntityManager {
     removeComponentType(entity: string, type: string) {
         let componentEntities = this.components.get(type);
         let component = componentEntities.get(entity);
-        if(component) {
+        if (component) {
             component.dispose(); // Hook into component in case it needs to do some cleanup.
             componentEntities.delete(entity);
         }
