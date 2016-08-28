@@ -24,8 +24,8 @@ export function updateMovement(em: EntityManager, dt) {
             pos.z += dt * 4;
             pos.setDirty(true);
         }
-        if(pos.isDirty()) {
+        /*if(pos.isDirty()) {
             console.log(`Pos updated: ${pos.x} : ${pos.y} : ${pos.z}`)
-        }
+        }*/
     })
 }

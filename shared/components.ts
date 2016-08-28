@@ -8,11 +8,6 @@ let componentReplacer = (key, value) => {
 
 export class Component {
     private dirty: boolean = false;
-    private sync: boolean = false;
-
-    constructor(sync: boolean = false) {
-        this.sync = sync;
-    }
 
     setDirty(state: boolean) {
         this.dirty = state;
@@ -20,10 +15,6 @@ export class Component {
 
     isDirty(): boolean {
         return this.dirty;
-    }
-
-    isSync(): boolean {
-        return this.sync;
     }
 
     typeName(): string {

@@ -1,7 +1,7 @@
 import {Scene, Mesh, WebGLRenderer, PerspectiveCamera, ShaderMaterial} from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
-import {updateKeyboard, updateDirtySyncComponents} from "./systems";
+import {updateKeyboard, syncPlayer} from "./systems";
 import {TERRAIN_CHUNK_SIZE} from "./constants";
 import {buildChunkGeometry} from "./terrain";
 import Game from "./Game";
@@ -64,7 +64,7 @@ export default class World extends BaseWorld {
             this.mesh.position.z = pos.z;
         });
 
-        updateDirtySyncComponents(this.entityManager, this.game.server);
+        syncPlayer(this.entityManager, this.game.server);
         this.renderer.render(this.scene, this.camera);
     }
 }
