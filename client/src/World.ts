@@ -1,7 +1,7 @@
 import {Scene, Mesh, WebGLRenderer, PerspectiveCamera, ShaderMaterial} from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
-import {updateKeyboard, syncPlayer, updateMeshes} from "./systems";
+import {updatePlayerInputs, syncPlayer, updateMeshes} from "./systems";
 import {TERRAIN_CHUNK_SIZE} from "./constants";
 import {buildChunkGeometry} from "./terrain";
 import Game from "./Game";
@@ -54,7 +54,7 @@ export default class World extends BaseWorld {
     }
 
     tick(dt) {
-        updateKeyboard(this.entityManager);
+        updatePlayerInputs(this.entityManager, dt);
         super.tick(dt);
 
         /*this.entityManager.getEntities('position').forEach((component, type) => {
