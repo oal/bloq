@@ -1,8 +1,5 @@
 import AssetManager from "./AssetManager";
 import Server from "./Server";
-import EntityManager from "../../shared/EntityManager";
-import {registerSharedComponents} from "../../shared/components";
-import {registerClientComponents} from "./components";
 import World from "./World";
 
 
@@ -35,7 +32,7 @@ export default class Game {
     }
 
     tick() {
-        this.world.tick(0.1);
+        this.world.tick(1/60);
         requestAnimationFrame(this.tick.bind(this));
     }
 

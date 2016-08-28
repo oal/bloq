@@ -14,19 +14,19 @@ export function updateKeyboard(em: EntityManager) {
         let moveBackward = Keymaster.isPressed('S'.charCodeAt(0));
 
         if(moveForward !== input.moveForward) {
-            input.moveForward = moveForward
+            input.moveForward = moveForward;
             input.setDirty(true);
         }
         if(moveLeft !== input.moveLeft) {
-            input.moveLeft = moveLeft
+            input.moveLeft = moveLeft;
             input.setDirty(true);
         }
         if(moveRight !== input.moveRight) {
-            input.moveRight = moveRight
+            input.moveRight = moveRight;
             input.setDirty(true);
         }
         if(moveBackward !== input.moveBackward) {
-            input.moveBackward = moveBackward
+            input.moveBackward = moveBackward;
             input.setDirty(true);
         }
     })

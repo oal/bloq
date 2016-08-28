@@ -49,12 +49,29 @@ export default class Server {
     }
 
     onConnect(ws) {
+        let playerEntity = uuid.v4();
         ws.on('message', (data, flags) => {
+            let obj = JSON.parse(data);
+            if(obj.entity == playerEntity) {
+                for(let componentType in obj.components) {
+                    if(!obj.components.hasOwnProperty(componentType)) continue;
+
+                    let existingComponent = this.world.entityManager.getComponent(playerEntity, componentType);
+                    if(existingComponent.isSync()) {
+                        let componentData = obj.components[componentType];
+                        // Never allow client to set sync to false and expect it to be accepted.
+                        componentData['sync'] = true;
+
+                        existingComponent.update(componentData);
+                        existingComponent.setDirty(true);
+                    }
+                    console.log(componentType)
+                }
+            }
             console.log('received: ' + data);
         });
 
-        let entity = uuid.v4();
-        initPlayerEntity(this.world.entityManager, entity);
-        ws.send(this.world.entityManager.serializeEntity(entity));
+        initPlayerEntity(this.world.entityManager, playerEntity);
+        ws.send(this.world.entityManager.serializeEntity(playerEntity));
     }
 }

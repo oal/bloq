@@ -61,6 +61,7 @@ export default class World extends BaseWorld {
         this.entityManager.getEntities('position').forEach((component, type) => {
             let pos = (component as PositionComponent);
             this.mesh.position.x = pos.x;
+            this.mesh.position.z = pos.z;
         });
 
         updateDirtySyncComponents(this.entityManager, this.game.server);
