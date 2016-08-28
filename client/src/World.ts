@@ -1,7 +1,7 @@
 import {Scene, Mesh, WebGLRenderer, PerspectiveCamera, ShaderMaterial} from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
-import {updateKeyboard, syncPlayer} from "./systems";
+import {updateKeyboard, syncPlayer, updateMeshes} from "./systems";
 import {TERRAIN_CHUNK_SIZE} from "./constants";
 import {buildChunkGeometry} from "./terrain";
 import Game from "./Game";
@@ -30,7 +30,7 @@ export default class World extends BaseWorld {
         this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
         this.camera.position.z = 20;
 
-        console.time('verts');
+        /*console.time('verts');
         let geometry = buildChunkGeometry(data);
         console.timeEnd('verts');
 
@@ -42,11 +42,10 @@ export default class World extends BaseWorld {
             },
             vertexShader: document.getElementById('vertexShader').textContent,
             fragmentShader: document.getElementById('fragmentShader').textContent
-
         });
 
         this.mesh = new Mesh(geometry, material);
-        this.scene.add(this.mesh);
+        this.scene.add(this.mesh);*/
 
         this.renderer = new WebGLRenderer();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -58,13 +57,14 @@ export default class World extends BaseWorld {
         updateKeyboard(this.entityManager);
         super.tick(dt);
 
-        this.entityManager.getEntities('position').forEach((component, type) => {
+        /*this.entityManager.getEntities('position').forEach((component, type) => {
             let pos = (component as PositionComponent);
             this.mesh.position.x = pos.x;
             this.mesh.position.z = pos.z;
-        });
+        });*/
 
         syncPlayer(this.entityManager, this.game.server);
+        updateMeshes(this.entityManager, this.scene);
         this.renderer.render(this.scene, this.camera);
     }
 }

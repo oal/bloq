@@ -1,4 +1,6 @@
 import Game from "./Game";
+import {objectHasKeys} from "../../shared/helpers";
+import {initPlayerEntity} from "./entities";
 
 
 export default class Server {
@@ -25,8 +27,13 @@ export default class Server {
     }
 
     onMessage(evt: MessageEvent) {
-        this.game.world.handlePacket(evt.data);
-        console.log(this.game.world.entityManager.getEntities('player'))
+        let obj = JSON.parse(evt.data);
+        if(objectHasKeys(obj.components, ['player'])) {
+            console.log('create player')
+            initPlayerEntity(this.game.world.entityManager, obj.entity, obj.components)
+        } else {
+            console.warn('Unknown packet')
+        }
         console.log('message', evt);
     }
 

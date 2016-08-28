@@ -1,7 +1,10 @@
 import * as Keymaster from 'keymaster';
+import {Scene} from 'three';
+
 import EntityManager from "../../shared/EntityManager";
-import {InputComponent} from "../../shared/components";
+import {InputComponent, PositionComponent} from "../../shared/components";
 import Server from "./Server";
+import {MeshComponent} from "./components";
 
 
 export function updateKeyboard(em: EntityManager) {
@@ -36,7 +39,7 @@ export function syncPlayer(em: EntityManager, server: Server) {
     em.getEntities('player').forEach((component, entity) => {
         let position = em.getComponent(entity, 'position');
         let input = em.getComponent(entity, 'input');
-        
+
         if (input.isDirty()) {
             server.send({
                 entity: entity,
@@ -47,5 +50,19 @@ export function syncPlayer(em: EntityManager, server: Server) {
             });
             input.setDirty(false);
         }
+    })
+}
+
+export function updateMeshes(em: EntityManager, scene: Scene) {
+    em.getEntities('mesh').forEach((component, entity) => {
+        let component = component as MeshComponent;
+        let position = em.getComponent(entity, 'position') as PositionComponent;
+
+        if(!component.mesh.parent) {
+            scene.add(component.mesh);
+        }
+        component.mesh.position.x = position.x;
+        component.mesh.position.y = position.y;
+        component.mesh.position.z = position.z;
     })
 }

@@ -12,10 +12,6 @@ export default class BaseWorld {
         this.entityManager = em;
     }
 
-    handlePacket(data: string) {
-        this.entityManager.deserializeAndSetEntity(data);
-    }
-
     tick(dt) {
         updateMovement(this.entityManager, dt);
     }

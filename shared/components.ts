@@ -45,6 +45,10 @@ export class PositionComponent extends Component {
     z: number = 0;
 }
 
+export class YawComponent extends Component {
+    rot: number = 0.0;
+}
+
 export class PhysicsComponent extends Component {
 }
 
@@ -61,6 +65,7 @@ export class PlayerComponent extends Component {
 
 export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new PositionComponent());
+    manager.registerComponentType(new YawComponent());
     manager.registerComponentType(new PhysicsComponent());
     manager.registerComponentType(new InputComponent());
     manager.registerComponentType(new PlayerComponent());
