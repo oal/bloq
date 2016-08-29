@@ -1,5 +1,6 @@
 import {PositionComponent, YawComponent} from "../../shared/components"
 import EntityManager from "../../shared/EntityManager";
+import {NetworkComponent} from "./components";
 
 
 export function updatePlayerInput(em: EntityManager, playerEntity, obj) {
@@ -22,4 +23,24 @@ export function updatePlayerYaw(em: EntityManager, playerEntity, obj) {
     let yaw = obj.components['yaw'];
     let existingYaw = em.getComponent(playerEntity, 'yaw') as YawComponent;
     existingYaw.update(yaw);
+}
+
+export function informNewPlayers(em: EntityManager) {
+    // Will ~99.999% only ever be one new player per tick.
+    em.getEntities('newplayer').forEach((component, newEntity) => {
+        let newPlayerData = em.serializeEntity(newEntity);
+
+        let ws = em.getComponent(newEntity, 'network') as NetworkComponent;
+        ws.websocket.send(newPlayerData);
+
+        // Send info about all new players to existing players.
+        em.getEntities('player').forEach((component, existingEntity) => {
+            if(existingEntity == newEntity) return; // Never send info about the new player to themselves.
+            let ws = em.getComponent(existingEntity, 'network') as NetworkComponent;
+            ws.websocket.send(newPlayerData);
+        });
+
+        console.log('New player informed.');
+        em.removeComponent(newEntity, component);
+    });
 }

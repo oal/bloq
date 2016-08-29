@@ -1,4 +1,4 @@
-import {Component} from "./components";
+import {Component, SerializableComponent} from "./components";
 
 export default class EntityManager {
     private components: Map<string, Map<string, Component>>;
@@ -30,7 +30,7 @@ export default class EntityManager {
         let components = [];
         this.components.forEach((entities, type) => {
             let component = entities.get(entity);
-            if (component) {
+            if (component instanceof SerializableComponent) {
                 components.push(`"${type}":${component.serialize()}`);
             }
         });

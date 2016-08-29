@@ -49,9 +49,9 @@ export default class Server {
 
     onConnect(ws) {
         let playerEntity = uuid.v4();
-        initPlayerEntity(this.world.entityManager, playerEntity);
-        broadcastPlayerEntity(this.world.entityManager, playerEntity, this.wss.clients);
-        sendExistingPlayerEntities(this.world.entityManager, playerEntity, ws);
+        initPlayerEntity(this.world.entityManager, playerEntity, ws);
+        //broadcastPlayerEntity(this.world.entityManager, playerEntity, this.wss.clients);
+        //sendExistingPlayerEntities(this.world.entityManager, playerEntity, ws);
 
         ws.on('message', (data, flags) => {
             let obj = JSON.parse(data);
@@ -64,6 +64,11 @@ export default class Server {
                 }
             }
         });
+
+        ws.on('close', () => {
+            console.log('Removing player');
+            this.world.entityManager.removeEntity(playerEntity);
+        })
 
     }
 }

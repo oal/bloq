@@ -22,9 +22,6 @@ export class Component {
         return fullName.substring(0, fullName.length - 9); // Everything except "Component".
     }
 
-    serialize() {
-        return JSON.stringify(this, componentReplacer);
-    }
 
     // Pretty much full / partial deserialization, but JSON is already deserialized in entity deserializer.
     update(data: Object) {
@@ -39,20 +36,26 @@ export class Component {
     }
 }
 
-export class PositionComponent extends Component {
+export class SerializableComponent extends Component {
+    serialize() {
+        return JSON.stringify(this, componentReplacer);
+    }
+}
+
+export class PositionComponent extends SerializableComponent {
     x: number = 0;
     y: number = 0;
     z: number = 0;
 }
 
-export class YawComponent extends Component {
+export class YawComponent extends SerializableComponent {
     rot: number = 0.0;
 }
 
-export class PhysicsComponent extends Component {
+export class PhysicsComponent extends SerializableComponent {
 }
 
-export class InputComponent extends Component {
+export class InputComponent extends SerializableComponent {
     moveForward: boolean = false;
     moveLeft: boolean = false;
     moveRight: boolean = false;
@@ -60,7 +63,7 @@ export class InputComponent extends Component {
     jump: boolean = false;
 }
 
-export class PlayerComponent extends Component {
+export class PlayerComponent extends SerializableComponent {
 }
 
 export function registerSharedComponents(manager: EntityManager) {
