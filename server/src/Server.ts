@@ -4,6 +4,7 @@ import World from "./World";
 import {initPlayerEntity} from "./entities";
 import {objectHasKeys} from "../../shared/helpers";
 import {updatePlayerInput, updatePlayerYaw} from "./systems";
+import {broadcastPlayerEntity, sendExistingPlayerEntities} from "./network";
 
 let hrtimeToSeconds = (hrtime: number[]) => hrtime[0] + hrtime[1] / 1000000000;
 
@@ -48,6 +49,10 @@ export default class Server {
 
     onConnect(ws) {
         let playerEntity = uuid.v4();
+        initPlayerEntity(this.world.entityManager, playerEntity);
+        broadcastPlayerEntity(this.world.entityManager, playerEntity, this.wss.clients);
+        sendExistingPlayerEntities(this.world.entityManager, playerEntity, ws);
+
         ws.on('message', (data, flags) => {
             let obj = JSON.parse(data);
             if (obj.entity == playerEntity) {
@@ -60,7 +65,5 @@ export default class Server {
             }
         });
 
-        initPlayerEntity(this.world.entityManager, playerEntity);
-        ws.send(this.world.entityManager.serializeEntity(playerEntity));
     }
 }

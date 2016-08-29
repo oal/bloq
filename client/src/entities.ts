@@ -7,8 +7,10 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
     // TODO: This should be cleaner.
     em.deserializeAndSetEntity(JSON.stringify({entity: entity, components: initialData}));
 
+    let color = parseInt(entity.substr(0, 6), 16);
+
     let geom = new BoxGeometry(1.5, 2.8, 1.25);
-    let mat = new MeshBasicMaterial({color: 0xffffaa});
+    let mat = new MeshBasicMaterial({color: color});
     let mesh = new Mesh(geom, mat);
 
     let meshComponent = new MeshComponent();

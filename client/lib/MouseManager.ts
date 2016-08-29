@@ -23,7 +23,8 @@ class MouseManager {
     delta(): [number, number] {
         if(!this.setupDone) return [0, 0];
 
-        let deltas = [this.x - this.lastX, this.y - this.lastY];
+        let deltas: [number, number];
+        deltas = [this.x - this.lastX, this.y - this.lastY];
 
         this.lastX = this.x;
         this.lastY = this.y;

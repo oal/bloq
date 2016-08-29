@@ -76,18 +76,18 @@ export function syncPlayer(em: EntityManager, server: Server) {
 
 export function updateMeshes(em: EntityManager, scene: Scene) {
     em.getEntities('mesh').forEach((component, entity) => {
-        let component = component as MeshComponent;
+        let meshComponent = component as MeshComponent;
 
-        if(!component.mesh.parent) {
-            scene.add(component.mesh);
+        if(!meshComponent.mesh.parent) {
+            scene.add(meshComponent.mesh);
         }
 
         let position = em.getComponent(entity, 'position') as PositionComponent;
-        component.mesh.position.x = position.x;
-        component.mesh.position.y = position.y;
-        component.mesh.position.z = position.z;
+        meshComponent.mesh.position.x = position.x;
+        meshComponent.mesh.position.y = position.y;
+        meshComponent.mesh.position.z = position.z;
 
         let yaw = em.getComponent(entity, 'yaw') as YawComponent;
-        component.mesh.rotation.y = yaw.rot;
+        meshComponent.mesh.rotation.y = yaw.rot;
     })
 }
