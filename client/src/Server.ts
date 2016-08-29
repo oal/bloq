@@ -28,13 +28,16 @@ export default class Server {
 
     onMessage(evt: MessageEvent) {
         let obj = JSON.parse(evt.data);
-        if(objectHasKeys(obj.components, ['player'])) {
+        if (objectHasKeys(obj.components, ['player'])) {
             console.log('create player')
             initPlayerEntity(this.game.world.entityManager, obj.entity, obj.components)
+        } else if (objectHasKeys(obj.components, ['input'])) {
+            this.game.world.entityManager.deserializeAndSetEntity(evt.data);
+        } else if (objectHasKeys(obj.components, ['yaw'])) {
+            this.game.world.entityManager.deserializeAndSetEntity(evt.data);
         } else {
             console.warn('Unknown packet')
         }
-        console.log('message', evt);
     }
 
     onError(evt: MessageEvent) {

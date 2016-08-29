@@ -1,10 +1,10 @@
 import {Server as WebSocketServer} from 'ws';
 import uuid = require('node-uuid');
 import World from "./World";
-import {initPlayerEntity} from "./entities";
+import {initPlayerEntity, updatePlayerInput, updatePlayerYaw} from "./entities";
 import {objectHasKeys} from "../../shared/helpers";
-import {updatePlayerInput, updatePlayerYaw} from "./systems";
 import {broadcastPlayerEntity, sendExistingPlayerEntities} from "./network";
+import {NetworkComponent} from "./components";
 
 let hrtimeToSeconds = (hrtime: number[]) => hrtime[0] + hrtime[1] / 1000000000;
 
@@ -50,6 +50,9 @@ export default class Server {
     onConnect(ws) {
         let playerEntity = uuid.v4();
         initPlayerEntity(this.world.entityManager, playerEntity, ws);
+
+        let netComponent = this.world.entityManager.getComponent(playerEntity, 'network') as NetworkComponent;
+        netComponent.websocket.send(this.world.entityManager.serializeEntity(playerEntity));
         //broadcastPlayerEntity(this.world.entityManager, playerEntity, this.wss.clients);
         //sendExistingPlayerEntities(this.world.entityManager, playerEntity, ws);
 

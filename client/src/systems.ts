@@ -9,7 +9,7 @@ import {MeshComponent} from "./components";
 
 
 export function updatePlayerInputs(em: EntityManager, dt) {
-    em.getEntities('player').forEach((component, entity) => {
+    em.getEntities('currentplayer').forEach((component, entity) => {
         // Keyboard
         let input = em.getComponent(entity, 'input') as InputComponent;
 
@@ -46,7 +46,7 @@ export function updatePlayerInputs(em: EntityManager, dt) {
 }
 
 export function syncPlayer(em: EntityManager, server: Server) {
-    em.getEntities('player').forEach((component, entity) => {
+    em.getEntities('currentplayer').forEach((component, entity) => {
         let position = em.getComponent(entity, 'position');
         let input = em.getComponent(entity, 'input');
 

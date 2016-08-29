@@ -23,17 +23,20 @@ export default class EntityManager {
         return this.componentConstructors.keys();
     }
 
-    serializeEntity(entity: string) {
+    serializeEntity(entity: string, withComponents: Array<string> = null) {
         // Each component needs to be serialized individually, then a JSON string is manually created.
         // Just using JSON.stringify would cause each component's serialized string to be escaped.
 
+        if(!withComponents) withComponents = Array.from(this.componentConstructors.keys());
+
         let components = [];
-        this.components.forEach((entities, type) => {
-            let component = entities.get(entity);
+        withComponents.forEach(typeName => {
+            let component = this.components.get(typeName).get(entity);
             if (component instanceof SerializableComponent) {
-                components.push(`"${type}":${component.serialize()}`);
+                components.push(`"${typeName}":${component.serialize()}`);
             }
         });
+
         return `{"entity":"${entity}","components":{${components.join(',')}}}`;
     }
 
