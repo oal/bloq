@@ -1,6 +1,6 @@
 import BaseWorld from "../../shared/BaseWorld";
 import {registerServerComponents} from "./components";
-import {informNewPlayers, broadcastPlayerInput} from "./systems";
+import {informNewPlayers, broadcastPlayerInput, removeEntities} from "./systems";
 
 export default class World extends BaseWorld {
     constructor() {
@@ -12,6 +12,7 @@ export default class World extends BaseWorld {
     tick(dt) {
         super.tick(dt);
 
+        removeEntities(this.entityManager)
         informNewPlayers(this.entityManager);
         broadcastPlayerInput(this.entityManager);
     }

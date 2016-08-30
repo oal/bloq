@@ -27,13 +27,17 @@ export default class EntityManager {
         // Each component needs to be serialized individually, then a JSON string is manually created.
         // Just using JSON.stringify would cause each component's serialized string to be escaped.
 
-        if(!withComponents) withComponents = Array.from(this.componentConstructors.keys());
+        if (!withComponents) withComponents = Array.from(this.componentConstructors.keys());
 
         let components = [];
         withComponents.forEach(typeName => {
             let component = this.components.get(typeName).get(entity);
             if (component instanceof SerializableComponent) {
                 components.push(`"${typeName}":${component.serialize()}`);
+            } else if (!component) {
+                console.error(`Tried to serialize ${component}`)
+            } else {
+                console.warn(`Tried to serialize non-serializeable component: "${component.typeName()}"`)
             }
         });
 

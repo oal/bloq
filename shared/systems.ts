@@ -1,5 +1,6 @@
 import EntityManager from "./EntityManager";
 import {PositionComponent, InputComponent, YawComponent} from "./components";
+import {NetworkComponent} from "../server/src/components";
 
 export function updateMovement(em: EntityManager, dt) {
     em.getEntities('position').forEach((component, entity) => {
@@ -36,3 +37,4 @@ export function updateMovement(em: EntityManager, dt) {
         }*/
     })
 }
+

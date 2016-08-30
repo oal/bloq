@@ -69,6 +69,10 @@ export class PlayerComponent extends SerializableComponent {
 export class CurrentPlayerComponent extends SerializableComponent {
 }
 
+
+export class RemovedEntityComponent extends SerializableComponent {
+}
+
 export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new PositionComponent());
     manager.registerComponentType(new YawComponent());
@@ -76,4 +80,5 @@ export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new InputComponent());
     manager.registerComponentType(new PlayerComponent());
     manager.registerComponentType(new CurrentPlayerComponent());
+    manager.registerComponentType(new RemovedEntityComponent());
 }

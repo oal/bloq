@@ -91,3 +91,9 @@ export function updateMeshes(em: EntityManager, scene: Scene) {
         meshComponent.mesh.rotation.y = yaw.rot;
     })
 }
+
+export function removeEntities(em: EntityManager) {
+    em.getEntities('removedentity').forEach((component, entity) => {
+        em.removeEntity(entity);
+    })
+}

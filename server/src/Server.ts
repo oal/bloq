@@ -3,8 +3,8 @@ import uuid = require('node-uuid');
 import World from "./World";
 import {initPlayerEntity, updatePlayerInput, updatePlayerYaw} from "./entities";
 import {objectHasKeys} from "../../shared/helpers";
-import {broadcastPlayerEntity, sendExistingPlayerEntities} from "./network";
 import {NetworkComponent} from "./components";
+import {RemovedEntityComponent} from "../../shared/components";
 
 let hrtimeToSeconds = (hrtime: number[]) => hrtime[0] + hrtime[1] / 1000000000;
 
@@ -70,7 +70,7 @@ export default class Server {
 
         ws.on('close', () => {
             console.log('Removing player');
-            this.world.entityManager.removeEntity(playerEntity);
+            this.world.entityManager.addComponent(playerEntity, new RemovedEntityComponent());
         })
 
     }

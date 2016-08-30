@@ -1,12 +1,11 @@
-import {Scene, Mesh, WebGLRenderer, PerspectiveCamera, ShaderMaterial} from 'three';
+import {Scene, Mesh, WebGLRenderer, PerspectiveCamera} from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
 import {updatePlayerInputs, syncPlayer, updateMeshes} from "./systems";
 import {TERRAIN_CHUNK_SIZE} from "./constants";
-import {buildChunkGeometry} from "./terrain";
 import Game from "./Game";
-import {PositionComponent} from "../../shared/components";
 import {registerClientComponents} from "./components";
+import {removeEntities} from "./systems";
 
 let size = TERRAIN_CHUNK_SIZE;
 let data = new Uint8Array(size * size * size).map((_, idx) => Math.sin(idx / 20) + Math.cos(idx / 40) > 0 ? (Math.random() * 3 + 1) | 0 : 0);
@@ -54,6 +53,7 @@ export default class World extends BaseWorld {
     }
 
     tick(dt) {
+        removeEntities(this.entityManager);
         updatePlayerInputs(this.entityManager, dt);
         super.tick(dt);
 

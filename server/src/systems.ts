@@ -5,15 +5,24 @@ import {InputComponent, YawComponent} from "../../shared/components";
 
 export function informNewPlayers(em: EntityManager) {
     // Will ~99.999% only ever be one new player per tick.
-    em.getEntities('newplayer').forEach((component, newEntity) => {
-        let newPlayerData = em.serializeEntity(newEntity, ['position', 'input', 'yaw', 'player']);
+    let syncComponents = ['position', 'input', 'yaw', 'player'];
 
-        // Send info about all new players to existing players.
+    em.getEntities('newplayer').forEach((component, newEntity) => {
+        let newPlayerData = em.serializeEntity(newEntity, syncComponents);
+        let existingPlayerDatas = [];
+
+        // Send info about new player to existing players.
         em.getEntities('player').forEach((component, existingEntity) => {
             if (existingEntity == newEntity) return; // Never send info about the new player to themselves.
             let ws = em.getComponent(existingEntity, 'network') as NetworkComponent;
             ws.websocket.send(newPlayerData);
+
+            existingPlayerDatas.push(em.serializeEntity(existingEntity, syncComponents));
         });
+
+        // Inform new player about existing players.
+        let ws = em.getComponent(newEntity, 'network') as NetworkComponent;
+        existingPlayerDatas.forEach(data => ws.websocket.send(data));
 
         console.log('New player informed.');
         em.removeComponent(newEntity, component);
@@ -52,4 +61,16 @@ export function broadcastPlayerInput(em: EntityManager) {
             })
         })
     }
+}
+
+export function removeEntities(em: EntityManager) {
+    em.getEntities('removedentity').forEach((component, entity) => {
+        let data = em.serializeEntity(entity, ['removedentity']);
+        console.log(data)
+        em.removeEntity(entity);
+        em.getEntities('player').forEach((component, entity) => {
+            let netComponent = em.getComponent(entity, 'network') as NetworkComponent;
+            netComponent.websocket.send(data);
+        });
+    })
 }
