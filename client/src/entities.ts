@@ -13,7 +13,7 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
     let head = new Mesh(new SphereGeometry(0.5, 5, 5), mat);
     head.position.y = 2.5;
 
-    let body = new Mesh(new BoxGeometry(2, 2, 1.1), mat);
+    let body = new Mesh(new BoxGeometry(1.1, 2, 1.1), mat);
     body.position.y = 1;
 
     let mesh = new Object3D();

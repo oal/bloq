@@ -11,6 +11,7 @@ import Server from "./Server";
 import {MeshComponent, TerrainChunkComponent} from "./components";
 import {buildChunkGeometry} from "./terrain";
 import {globalToChunk, chunkKey, mod} from "../../shared/helpers";
+import {TERRAIN_CHUNK_SIZE} from "../../shared/constants";
 
 
 export function updatePlayerInputs(em: EntityManager, dt) {
@@ -132,29 +133,61 @@ export function updateTerrainCollision(em: EntityManager) {
 
         // Never go below the ground level.
         let groundComponent = em.getComponent(entity, 'onground') as OnGroundComponent;
-        if(groundComponent && posComponent.y < groundComponent.groundY) {
+        if (groundComponent && posComponent.y < groundComponent.groundY) {
             posComponent.y = groundComponent.groundY;
         }
 
         // Build a list of all neighbor chunks. These are the only ones we can possibly collide with.
-        let chunkMeshes = [];
-        for(let nz = -1; nz <= 1; nz++) {
-            for(let ny = -1; ny <= 1; ny++) {
-                for(let nx = -1; nx <= 1; nx++) {
+        let chunks = {};
+        for (let nz = -1; nz <= 1; nz++) {
+            for (let ny = -1; ny <= 1; ny++) {
+                for (let nx = -1; nx <= 1; nx++) {
                     let key = chunkKey(cx, cy, cz);
                     let chunkComponent = em.getComponent(key, 'terrainchunk') as TerrainChunkComponent;
-                    if(chunkComponent) chunkMeshes.push(chunkComponent.mesh);
+                    if (chunkComponent) chunks[key] = chunkComponent;
                 }
             }
         }
 
-        // Cast rays for collision checks.
-        if (chunkMeshes.length) {
+        // TODO: This is fine for now, but can probably be optimized and made more smooth.
+        // Check all blocks around player for collisions.
+        for (let nz = -1; nz <= 1; nz++) {
+            for (let ny = 0; ny <= 3; ny++) {
+                for (let nx = -1; nx <= 1; nx++) {
+                    if (nz === 0 && ny >= 0 && ny < 3 && nx === 0) continue;
+
+                    let [gx, gy, gz] = [posComponent.x + nx, posComponent.y + ny + 1, posComponent.z + nz];
+                    let [lx, ly, lz] = [
+                        mod(gx, TERRAIN_CHUNK_SIZE) | 0,
+                        mod(gy, TERRAIN_CHUNK_SIZE) | 0,
+                        mod(gz, TERRAIN_CHUNK_SIZE) | 0
+                    ];
+
+                    let cx = globalToChunk(gx);
+                    let cy = globalToChunk(gy);
+                    let cz = globalToChunk(gz);
+
+                    let key = chunkKey(cx, cy, cz);
+                    let chunk = chunks[key];
+                    if (!chunk) return;
+
+                    if (chunk.getValue(lx, ly, lz)) {
+                        physComponent.velX -= nx / 25;
+                        physComponent.velZ -= nz / 25;
+                    }
+                }
+            }
+        }
+
+        // TODO: Same here.
+        // Cast rays for collision check downward.
+        let key = chunkKey(cx, cy, cz);
+        if (chunks[key]) {
             // Rays
             let [x, y, z] = [posComponent.x, posComponent.y, posComponent.z];
             let ray = new Raycaster(new Vector3(x, y, z), new Vector3(0, -1, 0), 0.0, 1.0);
 
-            let intersectDown = ray.intersectObjects(chunkMeshes);
+            let intersectDown = ray.intersectObject(chunks[key].mesh);
             if (intersectDown.length) {
                 let groundLevel = intersectDown[0].point.y;
                 em.addComponent(entity, new OnGroundComponent(groundLevel));

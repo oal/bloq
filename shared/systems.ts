@@ -36,7 +36,7 @@ export function updateMovement(em: EntityManager, dt) {
             physComponent.setDirty(true);
         }
         if (input.jump && em.getComponent(entity, 'onground')) {
-            physComponent.velY = 2.0;
+            physComponent.velY = 1.0;
             em.removeComponentType(entity, 'onground');
             physComponent.setDirty(true);
         }
