@@ -1,5 +1,5 @@
 import * as Keymaster from 'keymaster';
-import {Scene, Mesh, ShaderMaterial} from 'three';
+import {Scene, Mesh, ShaderMaterial, Raycaster, Vector3} from 'three';
 import MouseManager from '../lib/MouseManager';
 
 import EntityManager from "../../shared/EntityManager";
@@ -10,7 +10,6 @@ import {
 import Server from "./Server";
 import {MeshComponent, TerrainChunkComponent} from "./components";
 import {buildChunkGeometry} from "./terrain";
-import {TERRAIN_CHUNK_SIZE} from "../../shared/constants";
 import {globalToChunk, chunkKey, mod} from "../../shared/helpers";
 
 
@@ -126,24 +125,47 @@ export function updateTerrainCollision(em: EntityManager) {
     em.getEntities('physics').forEach((component, entity) => {
         let physComponent = component as PhysicsComponent;
         let posComponent = em.getComponent(entity, 'position') as PositionComponent;
+
         let cx = globalToChunk(posComponent.x);
         let cy = globalToChunk(posComponent.y);
         let cz = globalToChunk(posComponent.z);
 
-        let [lx, ly, lz] = [
-            mod(posComponent.x, TERRAIN_CHUNK_SIZE) | 0,
-            mod(posComponent.y, TERRAIN_CHUNK_SIZE) | 0,
-            mod(posComponent.z, TERRAIN_CHUNK_SIZE) | 0
-        ];
+        // Never go below the ground level.
+        let groundComponent = em.getComponent(entity, 'onground') as OnGroundComponent;
+        if(groundComponent && posComponent.y < groundComponent.groundY) {
+            posComponent.y = groundComponent.groundY;
+        }
 
-        let key = chunkKey(cx, cy, cz);
-        let chunkComponent = em.getComponent(key, 'terrainchunk') as TerrainChunkComponent;
-        if (chunkComponent && chunkComponent.getValue(lx, ly, lz)) {
-            physComponent.velY = 0;
-            em.addComponent(entity, new OnGroundComponent());
+        // Build a list of all neighbor chunks. These are the only ones we can possibly collide with.
+        let chunkMeshes = [];
+        for(let nz = -1; nz <= 1; nz++) {
+            for(let ny = -1; ny <= 1; ny++) {
+                for(let nx = -1; nx <= 1; nx++) {
+                    let key = chunkKey(cx, cy, cz);
+                    let chunkComponent = em.getComponent(key, 'terrainchunk') as TerrainChunkComponent;
+                    if(chunkComponent) chunkMeshes.push(chunkComponent.mesh);
+                }
+            }
+        }
 
-            physComponent.setDirty(true);
-            posComponent.setDirty(true);
+        // Cast rays for collision checks.
+        if (chunkMeshes.length) {
+            // Rays
+            let [x, y, z] = [posComponent.x, posComponent.y, posComponent.z];
+            let ray = new Raycaster(new Vector3(x, y, z), new Vector3(0, -1, 0), 0.0, 1.0);
+
+            let intersectDown = ray.intersectObjects(chunkMeshes);
+            if (intersectDown.length) {
+                let groundLevel = intersectDown[0].point.y;
+                em.addComponent(entity, new OnGroundComponent(groundLevel));
+
+                physComponent.velY = 0;
+                physComponent.setDirty(true);
+            } else {
+                em.removeComponentType(entity, 'onground');
+            }
+        } else {
+            em.removeComponentType(entity, 'onground');
         }
     })
 }

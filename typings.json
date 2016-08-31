@@ -4,6 +4,7 @@
     "keymaster": "registry:dt/keymaster#1.6.2+20160316155526",
     "node": "registry:dt/node#6.0.0+20160823142437",
     "node-uuid": "registry:dt/node-uuid#0.0.0+20160316155526",
+    "stats": "registry:dt/stats#0.16.0+20160505160752",
     "three": "registry:dt/three#0.0.0+20160802154944",
     "ws": "registry:dt/ws#0.0.0+20160724122153"
   }

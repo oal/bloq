@@ -49,10 +49,8 @@ export function updatePhysics(em: EntityManager, dt) {
         // Update physics.
         let physComponent = component as PhysicsComponent;
 
-        if (!em.getComponent(entity, 'onground')) {
-            physComponent.velY *= 0.9;
-            physComponent.velY -= dt * 5;
-        }
+        physComponent.velY *= 0.9;
+        physComponent.velY -= dt * 5;
 
         // TODO: Should use delta time here somewhere.
         physComponent.velX *= 0.5;

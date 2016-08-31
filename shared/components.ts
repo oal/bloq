@@ -22,7 +22,6 @@ export class Component {
         return fullName.substring(0, fullName.length - 9); // Everything except "Component".
     }
 
-
     // Pretty much full / partial deserialization, but JSON is already deserialized in entity deserializer.
     update(data: Object) {
         for (let key in data) {
@@ -59,6 +58,12 @@ export class PhysicsComponent extends SerializableComponent {
 }
 
 export class OnGroundComponent extends Component {
+    groundY: number;
+
+    constructor(groundY: number = 0) {
+        super();
+        this.groundY = groundY;
+    }
 }
 
 export class InputComponent extends SerializableComponent {

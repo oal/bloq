@@ -1,7 +1,12 @@
 import AssetManager from "./AssetManager";
 import Server from "./Server";
 import World from "./World";
+import Stats = require('stats.js');
 
+// Debug performance.
+var stats = new Stats();
+stats.showPanel(1); // 0: fps, 1: ms, 2: mb, 3+: custom
+document.body.appendChild(stats.dom);
 
 export default class Game {
     assetManager: AssetManager;
@@ -48,7 +53,9 @@ export default class Game {
     }
 
     tick(dt: number) {
+        stats.begin();
         this.world.tick(dt);
+        stats.end();
     }
 
 }
