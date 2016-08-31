@@ -106,15 +106,14 @@ export function updateTerrainChunks(em: EntityManager, scene: Scene, material: S
 
         if(!chunkComponent.mesh) {
             let data = new Uint8Array(TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE);
-            //console.log(chunkComponent.data)
-            //debugger;
+
             for(let idx in chunkComponent.data) {
                 //if(!chunkComponent.hasOwnProperty(idx)) continue;
-                data[+idx] = chunkComponent.data[idx]
-                //debugger;
+                data[+idx] = chunkComponent.data[idx];
             }
             let chunkGeom = buildChunkGeometry(data);
             let mesh = new Mesh(chunkGeom, material);
+            chunkComponent.mesh = mesh;
             scene.add(mesh);
         }
     })

@@ -1,40 +1,59 @@
 import EntityManager from "./EntityManager";
-import {PositionComponent, InputComponent, YawComponent} from "./components";
+import {PositionComponent, InputComponent, YawComponent, PhysicsComponent} from "./components";
 import {NetworkComponent} from "../server/src/components";
 
 export function updateMovement(em: EntityManager, dt) {
-    em.getEntities('position').forEach((component, entity) => {
+    em.getEntities('physics').forEach((component, entity) => {
         let input = em.getComponent(entity, 'input') as InputComponent;
 
         let yaw = em.getComponent(entity, 'yaw') as YawComponent;
         let rotation = yaw.rot;
 
-        let pos = (component as PositionComponent);
-        pos.setDirty(false);
+        let physComponent = component as PhysicsComponent;
+        physComponent.setDirty(false);
 
+        let speed = dt * 7.5;
+        let sinSpeed = Math.sin(rotation) * speed;
+        let cosSpeed = Math.cos(rotation) * speed;
         if (input.moveForward) {
-            pos.x -= Math.sin(rotation) * dt * 4;
-            pos.z -= Math.cos(rotation) * dt * 4;
-            pos.setDirty(true);
+            physComponent.velX -= sinSpeed;
+            physComponent.velZ -= cosSpeed;
+            physComponent.setDirty(true);
         }
         if (input.moveLeft) {
-            pos.x -= Math.cos(rotation) * dt * 4;
-            pos.z += Math.sin(rotation) * dt * 4;
-            pos.setDirty(true);
+            physComponent.velX -= cosSpeed;
+            physComponent.velZ += sinSpeed;
+            physComponent.setDirty(true);
         }
         if (input.moveRight) {
-            pos.x += Math.cos(rotation) * dt * 4;
-            pos.z -= Math.sin(rotation) * dt * 4;
-            pos.setDirty(true);
+            physComponent.velX += cosSpeed;
+            physComponent.velZ -= sinSpeed;
+            physComponent.setDirty(true);
         }
         if (input.moveBackward) {
-            pos.x += Math.sin(rotation) * dt * 4;
-            pos.z += Math.cos(rotation) * dt * 4;
-            pos.setDirty(true);
+            physComponent.velX += sinSpeed;
+            physComponent.velZ += cosSpeed;
+            physComponent.setDirty(true);
         }
-        /*if(pos.isDirty()) {
-            console.log(`Pos updated: ${pos.x} : ${pos.y} : ${pos.z}`)
-        }*/
     })
 }
 
+
+export function updatePhysics(em: EntityManager, dt) {
+    em.getEntities('physics').forEach((component, entity) => {
+        // Update physics.
+        let physComponent = component as PhysicsComponent;
+        //physComponent.velY -= 1.0;
+
+        // TODO: Should use delta time here somewhere.
+        physComponent.velX *= 0.5;
+        physComponent.velZ *= 0.5;
+
+        // Update positions.
+        let posComponent = em.getComponent(entity, 'position') as PositionComponent;
+        posComponent.x += physComponent.velX;
+        posComponent.y += physComponent.velY;
+        posComponent.z += physComponent.velZ;
+        posComponent.setDirty(true);
+    })
+}

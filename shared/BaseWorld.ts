@@ -1,6 +1,6 @@
 import EntityManager from "./EntityManager";
 import {registerSharedComponents} from "./components";
-import {updateMovement} from "./systems";
+import {updateMovement, updatePhysics} from "./systems";
 
 export default class BaseWorld {
     entityManager: EntityManager;
@@ -14,5 +14,6 @@ export default class BaseWorld {
 
     tick(dt) {
         updateMovement(this.entityManager, dt);
+        updatePhysics(this.entityManager, dt);
     }
 }

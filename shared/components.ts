@@ -53,6 +53,9 @@ export class YawComponent extends SerializableComponent {
 }
 
 export class PhysicsComponent extends SerializableComponent {
+    velX: number = 0;
+    velY: number = 0;
+    velZ: number = 0;
 }
 
 export class InputComponent extends SerializableComponent {
