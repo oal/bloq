@@ -13,7 +13,7 @@ let buildChunkArrays = (data) => {
 
     let getPoint = (x, y, z) => {
         if (x < 0 || y < 0 || z < 0 || x >= size || y >= size || z >= size) return 0;
-        return data[z * size * size + y * size + x];
+        return data[y * size * size + z * size + x];
     };
 
     for (let z = 0; z < size; z++) {

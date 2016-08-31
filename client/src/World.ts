@@ -1,7 +1,7 @@
-import {Scene, Mesh, WebGLRenderer, PerspectiveCamera} from 'three';
+import {Scene, Mesh, WebGLRenderer, PerspectiveCamera, ShaderMaterial} from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
-import {updatePlayerInputs, syncPlayer, updateMeshes} from "./systems";
+import {updatePlayerInputs, syncPlayer, updateMeshes, updateTerrainChunks} from "./systems";
 import {TERRAIN_CHUNK_SIZE} from "./constants";
 import Game from "./Game";
 import {registerClientComponents} from "./components";
@@ -14,7 +14,7 @@ export default class World extends BaseWorld {
     scene: Scene;
     renderer: WebGLRenderer;
     camera: PerspectiveCamera;
-    mesh: Mesh;
+    terrainMaterial: ShaderMaterial;
 
     game: Game;
 
@@ -31,9 +31,9 @@ export default class World extends BaseWorld {
 
         /*console.time('verts');
         let geometry = buildChunkGeometry(data);
-        console.timeEnd('verts');
+        console.timeEnd('verts');*/
 
-        var material = new ShaderMaterial({
+        this.terrainMaterial = new ShaderMaterial({
             uniforms: {
                 texture: {
                     value: this.game.assetManager.findTexture('terrain')
@@ -42,7 +42,7 @@ export default class World extends BaseWorld {
             vertexShader: document.getElementById('vertexShader').textContent,
             fragmentShader: document.getElementById('fragmentShader').textContent
         });
-
+        /*
         this.mesh = new Mesh(geometry, material);
         this.scene.add(this.mesh);*/
 
@@ -54,6 +54,7 @@ export default class World extends BaseWorld {
 
     tick(dt) {
         removeEntities(this.entityManager);
+        updateTerrainChunks(this.entityManager, this.scene, this.terrainMaterial);
         updatePlayerInputs(this.entityManager, dt);
         super.tick(dt);
 

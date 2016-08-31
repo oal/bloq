@@ -14,6 +14,19 @@ export class MeshComponent extends Component {
     }
 }
 
+export class TerrainChunkComponent extends Component {
+    mesh: Mesh;
+    data: Object;
+
+    dispose(): void {
+        super.dispose();
+        if(this.mesh && this.mesh.parent) {
+            this.mesh.parent.remove(this.mesh);
+        }
+    }
+}
+
 export function registerClientComponents(manager: EntityManager) {
     manager.registerComponentType(new MeshComponent());
+    manager.registerComponentType(new TerrainChunkComponent());
 }

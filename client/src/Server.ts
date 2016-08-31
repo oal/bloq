@@ -37,6 +37,8 @@ export default class Server {
             this.game.world.entityManager.deserializeAndSetEntity(evt.data);
         } else if (objectHasKeys(obj.components, ['removedentity'])) {
             this.game.world.entityManager.deserializeAndSetEntity(evt.data);
+        }  else if (objectHasKeys(obj.components, ['terrainchunk'])) {
+            this.game.world.entityManager.deserializeAndSetEntity(evt.data);
         } else {
             console.warn('Unknown packet: ', evt.data)
         }

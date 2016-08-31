@@ -1,11 +1,13 @@
 import * as Keymaster from 'keymaster';
-import {Scene} from 'three';
+import {Scene, Mesh, ShaderMaterial} from 'three';
 import MouseManager from '../lib/MouseManager';
 
 import EntityManager from "../../shared/EntityManager";
 import {InputComponent, PositionComponent, YawComponent} from "../../shared/components";
 import Server from "./Server";
-import {MeshComponent} from "./components";
+import {MeshComponent, TerrainChunkComponent} from "./components";
+import {TERRAIN_CHUNK_SIZE} from "./constants";
+import {buildChunkGeometry} from "./terrain";
 
 
 export function updatePlayerInputs(em: EntityManager, dt) {
@@ -95,5 +97,25 @@ export function updateMeshes(em: EntityManager, scene: Scene) {
 export function removeEntities(em: EntityManager) {
     em.getEntities('removedentity').forEach((component, entity) => {
         em.removeEntity(entity);
+    })
+}
+
+export function updateTerrainChunks(em: EntityManager, scene: Scene, material: ShaderMaterial) {
+    em.getEntities('terrainchunk').forEach((component, entity) => {
+        let chunkComponent = component as TerrainChunkComponent;
+
+        if(!chunkComponent.mesh) {
+            let data = new Uint8Array(TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE);
+            //console.log(chunkComponent.data)
+            //debugger;
+            for(let idx in chunkComponent.data) {
+                //if(!chunkComponent.hasOwnProperty(idx)) continue;
+                data[+idx] = chunkComponent.data[idx]
+                //debugger;
+            }
+            let chunkGeom = buildChunkGeometry(data);
+            let mesh = new Mesh(chunkGeom, material);
+            scene.add(mesh);
+        }
     })
 }
