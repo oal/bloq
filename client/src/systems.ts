@@ -185,7 +185,7 @@ export function updateTerrainCollision(em: EntityManager) {
         if (chunks[key]) {
             // Rays
             let [x, y, z] = [posComponent.x, posComponent.y, posComponent.z];
-            let ray = new Raycaster(new Vector3(x, y, z), new Vector3(0, -1, 0), 0.0, 1.0);
+            let ray = new Raycaster(new Vector3(x, y+1, z), new Vector3(0, -1, 0), 0.0, 1.5);
 
             let intersectDown = ray.intersectObject(chunks[key].mesh);
             if (intersectDown.length) {

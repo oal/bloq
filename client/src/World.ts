@@ -1,4 +1,4 @@
-import {Scene, WebGLRenderer, PerspectiveCamera, ShaderMaterial} from 'three';
+import {Scene, WebGLRenderer, PerspectiveCamera, ShaderMaterial, Vector3} from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
 import {updatePlayerInputs, syncPlayer, updateMeshes, updateTerrainChunks, updateTerrainCollision} from "./systems";
@@ -24,8 +24,10 @@ export default class World extends BaseWorld {
         this.scene = new Scene();
 
         this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+        this.camera.position.x = 20;
         this.camera.position.z = 20;
         this.camera.position.y = 10;
+        this.camera.lookAt(new Vector3(0,0,0));
 
         this.terrainMaterial = new ShaderMaterial({
             uniforms: {
