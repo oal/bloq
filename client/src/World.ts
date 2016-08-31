@@ -1,7 +1,7 @@
 import {Scene, WebGLRenderer, PerspectiveCamera, ShaderMaterial} from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
-import {updatePlayerInputs, syncPlayer, updateMeshes, updateTerrainChunks} from "./systems";
+import {updatePlayerInputs, syncPlayer, updateMeshes, updateTerrainChunks, updateTerrainCollision} from "./systems";
 import Game from "./Game";
 import {registerClientComponents} from "./components";
 import {removeEntities} from "./systems";
@@ -25,6 +25,7 @@ export default class World extends BaseWorld {
 
         this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
         this.camera.position.z = 20;
+        this.camera.position.y = 10;
 
         this.terrainMaterial = new ShaderMaterial({
             uniforms: {
@@ -46,6 +47,7 @@ export default class World extends BaseWorld {
         removeEntities(this.entityManager);
         updateTerrainChunks(this.entityManager, this.scene, this.terrainMaterial);
         updatePlayerInputs(this.entityManager, dt);
+        updateTerrainCollision(this.entityManager);
 
         // Handle BaseWorld systems.
         super.tick(dt);

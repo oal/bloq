@@ -3,11 +3,12 @@ import {Scene, Mesh, ShaderMaterial} from 'three';
 import MouseManager from '../lib/MouseManager';
 
 import EntityManager from "../../shared/EntityManager";
-import {InputComponent, PositionComponent, YawComponent} from "../../shared/components";
+import {InputComponent, PositionComponent, YawComponent, PhysicsComponent} from "../../shared/components";
 import Server from "./Server";
 import {MeshComponent, TerrainChunkComponent} from "./components";
-import {TERRAIN_CHUNK_SIZE} from "./constants";
 import {buildChunkGeometry} from "./terrain";
+import {TERRAIN_CHUNK_SIZE} from "../../shared/constants";
+import {globalToChunk, chunkKey, mod} from "../../shared/helpers";
 
 
 export function updatePlayerInputs(em: EntityManager, dt) {
@@ -40,8 +41,8 @@ export function updatePlayerInputs(em: EntityManager, dt) {
         // Mouse
         let yaw = em.getComponent(entity, 'yaw') as YawComponent;
         let [dx, dy] = MouseManager.delta();
-        if(dx !== 0) {
-            yaw.rot -= dx/5.0 * dt;
+        if (dx !== 0) {
+            yaw.rot -= dx / 5.0 * dt;
             yaw.setDirty(true);
         }
     })
@@ -80,7 +81,7 @@ export function updateMeshes(em: EntityManager, scene: Scene) {
     em.getEntities('mesh').forEach((component, entity) => {
         let meshComponent = component as MeshComponent;
 
-        if(!meshComponent.mesh.parent) {
+        if (!meshComponent.mesh.parent) {
             scene.add(meshComponent.mesh);
         }
 
@@ -104,17 +105,36 @@ export function updateTerrainChunks(em: EntityManager, scene: Scene, material: S
     em.getEntities('terrainchunk').forEach((component, entity) => {
         let chunkComponent = component as TerrainChunkComponent;
 
-        if(!chunkComponent.mesh) {
-            let data = new Uint8Array(TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE);
-
-            for(let idx in chunkComponent.data) {
-                //if(!chunkComponent.hasOwnProperty(idx)) continue;
-                data[+idx] = chunkComponent.data[idx];
-            }
-            let chunkGeom = buildChunkGeometry(data);
+        if (!chunkComponent.mesh) {
+            let chunkGeom = buildChunkGeometry(chunkComponent.data);
             let mesh = new Mesh(chunkGeom, material);
             chunkComponent.mesh = mesh;
             scene.add(mesh);
+        }
+    })
+}
+
+export function updateTerrainCollision(em: EntityManager) {
+    em.getEntities('physics').forEach((component, entity) => {
+        let physComponent = component as PhysicsComponent;
+        let posComponent = em.getComponent(entity, 'position') as PositionComponent;
+        let cx = globalToChunk(posComponent.x);
+        let cy = globalToChunk(posComponent.y);
+        let cz = globalToChunk(posComponent.z);
+
+        let [lx, ly, lz] = [
+            mod(posComponent.x, TERRAIN_CHUNK_SIZE) | 0,
+            mod(posComponent.y, TERRAIN_CHUNK_SIZE) | 0,
+            mod(posComponent.z, TERRAIN_CHUNK_SIZE) | 0
+        ];
+
+        let key = chunkKey(cx, cy, cz);
+        let chunkComponent = em.getComponent(key, 'terrainchunk') as TerrainChunkComponent;
+        if (chunkComponent && chunkComponent.getValue(lx, ly, lz)) {
+            physComponent.velY = 0;
+            posComponent.y += 0.5;
+            physComponent.setDirty(true);
+            posComponent.setDirty(true);
         }
     })
 }

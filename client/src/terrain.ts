@@ -1,5 +1,5 @@
-import {TERRAIN_CHUNK_SIZE} from './constants';
 import {BufferAttribute, BufferGeometry} from 'three';
+import {TERRAIN_CHUNK_SIZE} from "../../shared/constants";
 
 const size = TERRAIN_CHUNK_SIZE;
 
@@ -17,13 +17,13 @@ let buildChunkArrays = (data) => {
     };
 
     for (let z = 0; z < size; z++) {
-        let oz = z - size / 2;
+        let oz = z; // z - size / 2;
         for (let y = 0; y < size; y++) {
-            let oy = y - size / 2;
+            let oy = y; // y - size / 2;
             for (let x = 0; x < size; x++) {
                 let val = getPoint(x, y, z);
                 if (val) {
-                    let ox = x - size / 2;
+                    let ox = x; // = x - size / 2;
                     if (!getPoint(x, y, z + 1)) {
                         verts[i++] = ox - 0.5;
                         verts[i++] = oy - 0.5;

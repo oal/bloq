@@ -1,6 +1,6 @@
 import EntityManager from "./EntityManager";
 import {PositionComponent, InputComponent, YawComponent, PhysicsComponent} from "./components";
-import {NetworkComponent} from "../server/src/components";
+import {globalToChunk, chunkKey} from "./helpers";
 
 export function updateMovement(em: EntityManager, dt) {
     em.getEntities('physics').forEach((component, entity) => {
@@ -43,7 +43,9 @@ export function updatePhysics(em: EntityManager, dt) {
     em.getEntities('physics').forEach((component, entity) => {
         // Update physics.
         let physComponent = component as PhysicsComponent;
-        //physComponent.velY -= 1.0;
+        physComponent.velY *= 0.5;
+        physComponent.velY -= dt*5;
+        //physComponent.velY = Math.max(physComponent.velY, dt*4);
 
         // TODO: Should use delta time here somewhere.
         physComponent.velX *= 0.5;
@@ -57,3 +59,4 @@ export function updatePhysics(em: EntityManager, dt) {
         posComponent.setDirty(true);
     })
 }
+

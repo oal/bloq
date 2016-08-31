@@ -1,8 +1,5 @@
-import {TERRAIN_CHUNK_SIZE} from "../../client/src/constants";
-import {SerializableComponent} from "../../shared/components";
-
-
-let chunkKey = (x: number, y: number, z: number) => `${x}x${y}x${z}`;
+import {TERRAIN_CHUNK_SIZE} from "../../shared/constants";
+import {chunkKey} from "../../shared/helpers";
 
 
 export class Terrain {

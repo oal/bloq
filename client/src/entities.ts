@@ -1,7 +1,6 @@
-
 import EntityManager from "../../shared/EntityManager";
 import {MeshComponent} from "./components";
-import {Mesh, BoxGeometry, MeshBasicMaterial} from 'three';
+import {Mesh, BoxGeometry, Object3D, SphereGeometry, MeshBasicMaterial} from 'three';
 
 export function initPlayerEntity(em: EntityManager, entity: string, initialData: Object) {
     // TODO: This should be cleaner.
@@ -9,9 +8,17 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
 
     let color = parseInt(entity.substr(0, 6), 16);
 
-    let geom = new BoxGeometry(1.5, 2.8, 1.25);
     let mat = new MeshBasicMaterial({color: color});
-    let mesh = new Mesh(geom, mat);
+
+    let head = new Mesh(new SphereGeometry(0.5, 5, 5), mat);
+    head.position.y = 2.5;
+
+    let body = new Mesh(new BoxGeometry(2, 2, 1.1), mat);
+    body.position.y = 1;
+
+    let mesh = new Object3D();
+    mesh.add(head);
+    mesh.add(body);
 
     let meshComponent = new MeshComponent();
     meshComponent.mesh = mesh;
