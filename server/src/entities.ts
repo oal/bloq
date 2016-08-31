@@ -12,7 +12,7 @@ export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocke
     em.addComponent(entity, net); // Keyboard input
     em.addComponent(entity, new InputComponent()); // Keyboard input
     let pos = new PositionComponent();
-    pos.y = 5;
+    pos.y = 15;
     pos.x = 5;
     pos.z = 5;
     em.addComponent(entity, pos); // Position tracking

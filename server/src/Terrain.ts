@@ -29,13 +29,9 @@ class TerrainChunk {
     constructor(x: number, y: number, z: number) {
         for (let x = 0; x < TERRAIN_CHUNK_SIZE; x++) {
             for (let z = 0; z < TERRAIN_CHUNK_SIZE; z++) {
+                let maxy = (Math.sin(-x/5+z/6.5)+1)*5;
+                for(let y = 0; y < maxy; y++) this.setValue(x, y, z, 2);
                 this.setValue(x, 0, z, 1);
-                if(z < 6) this.setValue(x, z, 0, 2);
-                if(z < 6) this.setValue(x, z, 1, 2);
-                if(z < 4) this.setValue(x, z, 2, 3);
-                if(z < 4) this.setValue(x, z, 3, 3);
-                if(z < 2) this.setValue(x, z, 4, 2);
-                if(z < 2) this.setValue(x, z, 5, 2);
             }
         }
     }

@@ -172,8 +172,8 @@ export function updateTerrainCollision(em: EntityManager) {
                     if (!chunk) return;
 
                     if (chunk.getValue(lx, ly, lz)) {
-                        physComponent.velX -= nx / 25;
-                        physComponent.velZ -= nz / 25;
+                        physComponent.velX -= nx / 22.5;
+                        physComponent.velZ -= nz / 22.5;
                     }
                 }
             }

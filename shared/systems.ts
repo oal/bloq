@@ -36,7 +36,7 @@ export function updateMovement(em: EntityManager, dt) {
             physComponent.setDirty(true);
         }
         if (input.jump && em.getComponent(entity, 'onground')) {
-            physComponent.velY = 1.0;
+            physComponent.velY = 0.5;
             em.removeComponentType(entity, 'onground');
             physComponent.setDirty(true);
         }
@@ -49,12 +49,12 @@ export function updatePhysics(em: EntityManager, dt) {
         // Update physics.
         let physComponent = component as PhysicsComponent;
 
-        physComponent.velY *= 0.9;
-        physComponent.velY -= dt * 5;
+        physComponent.velY -= dt * 2.5;
+        if (physComponent.velY < -1) physComponent.velY = -1;
 
         // TODO: Should use delta time here somewhere.
-        physComponent.velX *= 0.5;
-        physComponent.velZ *= 0.5;
+        physComponent.velX *= 30 * dt;
+        physComponent.velZ *= 30 * dt;
 
         // Update positions.
         let posComponent = em.getComponent(entity, 'position') as PositionComponent;
