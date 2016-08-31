@@ -3,7 +3,10 @@ import {Scene, Mesh, ShaderMaterial} from 'three';
 import MouseManager from '../lib/MouseManager';
 
 import EntityManager from "../../shared/EntityManager";
-import {InputComponent, PositionComponent, YawComponent, PhysicsComponent} from "../../shared/components";
+import {
+    InputComponent, PositionComponent, YawComponent, PhysicsComponent,
+    OnGroundComponent
+} from "../../shared/components";
 import Server from "./Server";
 import {MeshComponent, TerrainChunkComponent} from "./components";
 import {buildChunkGeometry} from "./terrain";
@@ -20,6 +23,7 @@ export function updatePlayerInputs(em: EntityManager, dt) {
         let moveLeft = Keymaster.isPressed('A'.charCodeAt(0));
         let moveRight = Keymaster.isPressed('D'.charCodeAt(0));
         let moveBackward = Keymaster.isPressed('S'.charCodeAt(0));
+        let jump = Keymaster.isPressed(' '.charCodeAt(0));
 
         if (moveForward !== input.moveForward) {
             input.moveForward = moveForward;
@@ -35,6 +39,10 @@ export function updatePlayerInputs(em: EntityManager, dt) {
         }
         if (moveBackward !== input.moveBackward) {
             input.moveBackward = moveBackward;
+            input.setDirty(true);
+        }
+        if (jump !== input.jump) {
+            input.jump = jump;
             input.setDirty(true);
         }
 
@@ -132,7 +140,8 @@ export function updateTerrainCollision(em: EntityManager) {
         let chunkComponent = em.getComponent(key, 'terrainchunk') as TerrainChunkComponent;
         if (chunkComponent && chunkComponent.getValue(lx, ly, lz)) {
             physComponent.velY = 0;
-            posComponent.y += 0.5;
+            em.addComponent(entity, new OnGroundComponent());
+
             physComponent.setDirty(true);
             posComponent.setDirty(true);
         }

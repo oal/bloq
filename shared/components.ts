@@ -58,6 +58,9 @@ export class PhysicsComponent extends SerializableComponent {
     velZ: number = 0;
 }
 
+export class OnGroundComponent extends Component {
+}
+
 export class InputComponent extends SerializableComponent {
     moveForward: boolean = false;
     moveLeft: boolean = false;
@@ -80,6 +83,7 @@ export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new PositionComponent());
     manager.registerComponentType(new YawComponent());
     manager.registerComponentType(new PhysicsComponent());
+    manager.registerComponentType(new OnGroundComponent());
     manager.registerComponentType(new InputComponent());
     manager.registerComponentType(new PlayerComponent());
     manager.registerComponentType(new CurrentPlayerComponent());
