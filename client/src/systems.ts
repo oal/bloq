@@ -5,7 +5,7 @@ import MouseManager from '../lib/MouseManager';
 import EntityManager from "../../shared/EntityManager";
 import {
     InputComponent, PositionComponent, YawComponent, PhysicsComponent,
-    OnGroundComponent
+    OnGroundComponent, WallCollisionComponent
 } from "../../shared/components";
 import Server from "./Server";
 import {MeshComponent, TerrainChunkComponent} from "./components";
@@ -124,18 +124,12 @@ export function updateTerrainChunks(em: EntityManager, scene: Scene, material: S
 
 export function updateTerrainCollision(em: EntityManager) {
     em.getEntities('physics').forEach((component, entity) => {
-        let physComponent = component as PhysicsComponent;
         let posComponent = em.getComponent(entity, 'position') as PositionComponent;
 
+        // Find the chunk coordinates based on current global position (12 -> 0 etc.)
         let cx = globalToChunk(posComponent.x);
         let cy = globalToChunk(posComponent.y);
         let cz = globalToChunk(posComponent.z);
-
-        // Never go below the ground level.
-        let groundComponent = em.getComponent(entity, 'onground') as OnGroundComponent;
-        if (groundComponent && posComponent.y < groundComponent.groundY) {
-            posComponent.y = groundComponent.groundY;
-        }
 
         // Build a list of all neighbor chunks. These are the only ones we can possibly collide with.
         let chunks = {};
@@ -149,56 +143,40 @@ export function updateTerrainCollision(em: EntityManager) {
             }
         }
 
-        // TODO: This is fine for now, but can probably be optimized and made more smooth.
-        // Check all blocks around player for collisions.
-        for (let nz = -1; nz <= 1; nz++) {
-            for (let ny = 0; ny <= 3; ny++) {
-                for (let nx = -1; nx <= 1; nx++) {
-                    if (nz === 0 && ny >= 0 && ny < 3 && nx === 0) continue;
+        // Helper function for collision checks below.
+        let checkCollisionAt = (nx, ny, nz) => {
+            let [gx, gy, gz] = [posComponent.x + nx, posComponent.y + ny + 1, posComponent.z + nz];
+            let [lx, ly, lz] = [
+                mod(gx, TERRAIN_CHUNK_SIZE),
+                mod(gy, TERRAIN_CHUNK_SIZE),
+                mod(gz, TERRAIN_CHUNK_SIZE)
+            ];
 
-                    let [gx, gy, gz] = [posComponent.x + nx, posComponent.y + ny + 1, posComponent.z + nz];
-                    let [lx, ly, lz] = [
-                        mod(gx, TERRAIN_CHUNK_SIZE) | 0,
-                        mod(gy, TERRAIN_CHUNK_SIZE) | 0,
-                        mod(gz, TERRAIN_CHUNK_SIZE) | 0
-                    ];
+            let cx = globalToChunk(gx);
+            let cy = globalToChunk(gy);
+            let cz = globalToChunk(gz);
 
-                    let cx = globalToChunk(gx);
-                    let cy = globalToChunk(gy);
-                    let cz = globalToChunk(gz);
+            let key = chunkKey(cx, cy, cz);
+            let chunk = chunks[key];
+            if (!chunk) return false;
 
-                    let key = chunkKey(cx, cy, cz);
-                    let chunk = chunks[key];
-                    if (!chunk) return;
+            return chunk.getValue(lx|0, ly|0, lz|0)
+        };
 
-                    if (chunk.getValue(lx, ly, lz)) {
-                        physComponent.velX -= nx / 22.5;
-                        physComponent.velZ -= nz / 22.5;
-                    }
-                }
-            }
-        }
-
-        // TODO: Same here.
-        // Cast rays for collision check downward.
-        let key = chunkKey(cx, cy, cz);
-        if (chunks[key]) {
-            // Rays
-            let [x, y, z] = [posComponent.x, posComponent.y, posComponent.z];
-            let ray = new Raycaster(new Vector3(x, y+1, z), new Vector3(0, -1, 0), 0.0, 1.5);
-
-            let intersectDown = ray.intersectObject(chunks[key].mesh);
-            if (intersectDown.length) {
-                let groundLevel = intersectDown[0].point.y;
-                em.addComponent(entity, new OnGroundComponent(groundLevel));
-
-                physComponent.velY = 0;
-                physComponent.setDirty(true);
-            } else {
-                em.removeComponentType(entity, 'onground');
-            }
+        // Check and handle ground collisions.
+        if(checkCollisionAt(0, -1, 0) || checkCollisionAt(0, 2, 0)) {
+            let physComponent = component as PhysicsComponent;
+            physComponent.velY = 0.0;
+            em.addComponent(entity, new OnGroundComponent(posComponent.y));
         } else {
             em.removeComponentType(entity, 'onground');
         }
+
+        // Check and update block collision component (wall collisions).
+        let bcComponent = em.getComponent(entity, 'wallcollision') as WallCollisionComponent;
+        bcComponent.px = !!(checkCollisionAt(1, 0, 0) || checkCollisionAt(1, 1, 0));
+        bcComponent.nx = !!(checkCollisionAt(-1, 0, 0) || checkCollisionAt(-1, 1, 0));
+        bcComponent.pz = !!(checkCollisionAt(0, 0, 1) || checkCollisionAt(0, 1, 1));
+        bcComponent.nz = !!(checkCollisionAt(0, 0, -1) || checkCollisionAt(0, 1, -1));
     })
 }

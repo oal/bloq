@@ -1,5 +1,5 @@
 import EntityManager from "./EntityManager";
-import {PositionComponent, InputComponent, YawComponent, PhysicsComponent} from "./components";
+import {PositionComponent, InputComponent, YawComponent, PhysicsComponent, WallCollisionComponent} from "./components";
 
 
 export function updateMovement(em: EntityManager, dt) {
@@ -12,7 +12,7 @@ export function updateMovement(em: EntityManager, dt) {
         let physComponent = component as PhysicsComponent;
         physComponent.setDirty(false);
 
-        let speed = dt * 7.5;
+        let speed = dt * 4;
         let sinSpeed = Math.sin(rotation) * speed;
         let cosSpeed = Math.cos(rotation) * speed;
         if (input.moveForward) {
@@ -36,10 +36,17 @@ export function updateMovement(em: EntityManager, dt) {
             physComponent.setDirty(true);
         }
         if (input.jump && em.getComponent(entity, 'onground')) {
-            physComponent.velY = 0.5;
+            physComponent.velY = 0.25;
             em.removeComponentType(entity, 'onground');
             physComponent.setDirty(true);
         }
+
+        // Are we colliding with a block in the world? If so, allow no more movement in that direction.
+        let blockCollision = em.getComponent(entity, 'wallcollision') as WallCollisionComponent;
+        if (blockCollision.px && physComponent.velX > 0) physComponent.velX = 0;
+        if (blockCollision.nx && physComponent.velX < 0) physComponent.velX = 0;
+        if (blockCollision.pz && physComponent.velZ > 0) physComponent.velZ = 0;
+        if (blockCollision.nz && physComponent.velZ < 0) physComponent.velZ = 0;
     })
 }
 
@@ -49,12 +56,19 @@ export function updatePhysics(em: EntityManager, dt) {
         // Update physics.
         let physComponent = component as PhysicsComponent;
 
-        physComponent.velY -= dt * 2.5;
+        physComponent.velY -= dt * 2;
         if (physComponent.velY < -1) physComponent.velY = -1;
 
         // TODO: Should use delta time here somewhere.
         physComponent.velX *= 30 * dt;
         physComponent.velZ *= 30 * dt;
+    })
+}
+
+export function updatePositions(em: EntityManager, dt) {
+    em.getEntities('physics').forEach((component, entity) => {
+        // Get physics.
+        let physComponent = component as PhysicsComponent;
 
         // Update positions.
         let posComponent = em.getComponent(entity, 'position') as PositionComponent;
@@ -64,4 +78,3 @@ export function updatePhysics(em: EntityManager, dt) {
         posComponent.setDirty(true);
     })
 }
-

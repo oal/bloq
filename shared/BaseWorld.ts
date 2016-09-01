@@ -1,6 +1,5 @@
 import EntityManager from "./EntityManager";
 import {registerSharedComponents} from "./components";
-import {updateMovement, updatePhysics} from "./systems";
 
 export default class BaseWorld {
     entityManager: EntityManager;
@@ -12,8 +11,7 @@ export default class BaseWorld {
         this.entityManager = em;
     }
 
+    // This should never be used. Use proper systems ordering on server and client instead.
     tick(dt) {
-        updateMovement(this.entityManager, dt);
-        updatePhysics(this.entityManager, dt);
     }
 }

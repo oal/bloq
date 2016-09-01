@@ -5,6 +5,7 @@ import {updatePlayerInputs, syncPlayer, updateMeshes, updateTerrainChunks, updat
 import Game from "./Game";
 import {registerClientComponents} from "./components";
 import {removeEntities} from "./systems";
+import {updatePhysics, updateMovement, updatePositions} from "../../shared/systems";
 
 
 export default class World extends BaseWorld {
@@ -27,7 +28,7 @@ export default class World extends BaseWorld {
         this.camera.position.x = 25;
         this.camera.position.z = 15;
         this.camera.position.y = 10;
-        this.camera.lookAt(new Vector3(0,0,0));
+        this.camera.lookAt(new Vector3(0, 0, 0));
 
         this.terrainMaterial = new ShaderMaterial({
             uniforms: {
@@ -49,10 +50,11 @@ export default class World extends BaseWorld {
         removeEntities(this.entityManager);
         updateTerrainChunks(this.entityManager, this.scene, this.terrainMaterial);
         updatePlayerInputs(this.entityManager, dt);
-        updateTerrainCollision(this.entityManager);
 
-        // Handle BaseWorld systems.
-        super.tick(dt);
+        updatePhysics(this.entityManager, dt);
+        updateTerrainCollision(this.entityManager);
+        updateMovement(this.entityManager, dt);
+        updatePositions(this.entityManager, dt);
 
         syncPlayer(this.entityManager, this.game.server);
         updateMeshes(this.entityManager, this.scene);

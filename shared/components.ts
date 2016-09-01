@@ -66,6 +66,14 @@ export class OnGroundComponent extends Component {
     }
 }
 
+// TODO: Use setters or something for these values, and use on server as well.
+export class WallCollisionComponent extends Component {
+    public px: boolean = false;
+    public pz: boolean = false;
+    public nx: boolean = false;
+    public nz: boolean = false;
+}
+
 export class InputComponent extends SerializableComponent {
     moveForward: boolean = false;
     moveLeft: boolean = false;
@@ -93,4 +101,5 @@ export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new PlayerComponent());
     manager.registerComponentType(new CurrentPlayerComponent());
     manager.registerComponentType(new RemovedEntityComponent());
+    manager.registerComponentType(new WallCollisionComponent());
 }

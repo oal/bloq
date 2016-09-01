@@ -1,6 +1,7 @@
 import EntityManager from "../../shared/EntityManager";
 import {MeshComponent} from "./components";
 import {Mesh, BoxGeometry, Object3D, SphereGeometry, MeshBasicMaterial, Raycaster, Vector3} from 'three';
+import {WallCollisionComponent} from "../../shared/components";
 
 export function initPlayerEntity(em: EntityManager, entity: string, initialData: Object) {
     // TODO: This should be cleaner.
@@ -18,9 +19,12 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
 
     let mesh = new Object3D();
     mesh.add(head);
-    mesh.add(body)
+    mesh.add(body);
 
     let meshComponent = new MeshComponent();
     meshComponent.mesh = mesh;
     em.addComponent(entity, meshComponent);
+
+    // Add local component to track wall / block collisions.
+    em.addComponent(entity, new WallCollisionComponent());
 }
