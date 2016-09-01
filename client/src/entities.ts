@@ -1,9 +1,9 @@
 import EntityManager from "../../shared/EntityManager";
 import {MeshComponent} from "./components";
-import {Mesh, BoxGeometry, Object3D, SphereGeometry, MeshBasicMaterial, Raycaster, Vector3} from 'three';
+import {Mesh, BoxGeometry, Object3D, SphereGeometry, MeshBasicMaterial, PerspectiveCamera} from 'three';
 import {WallCollisionComponent} from "../../shared/components";
 
-export function initPlayerEntity(em: EntityManager, entity: string, initialData: Object) {
+export function initPlayerEntity(em: EntityManager, entity: string, initialData: Object, camera: PerspectiveCamera) {
     // TODO: This should be cleaner.
     em.deserializeAndSetEntity(JSON.stringify({entity: entity, components: initialData}));
 
@@ -13,13 +13,18 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
 
     let head = new Mesh(new SphereGeometry(0.5, 5, 5), mat);
     head.position.y = 2.5;
+    head.scale.x = 1.2;
+    head.add(camera);
 
-    let body = new Mesh(new BoxGeometry(1.1, 2, 1.1), mat);
+    let body = new Mesh(new BoxGeometry(1.5, 2, 1.1), mat);
     body.position.y = 1;
+
 
     let mesh = new Object3D();
     mesh.add(head);
     mesh.add(body);
+
+
 
     let meshComponent = new MeshComponent();
     meshComponent.mesh = mesh;

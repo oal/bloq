@@ -25,10 +25,10 @@ export default class World extends BaseWorld {
         this.scene = new Scene();
 
         this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
-        this.camera.position.x = 25;
-        this.camera.position.z = 15;
-        this.camera.position.y = 10;
-        this.camera.lookAt(new Vector3(0, 0, 0));
+        /*this.camera.position.x = 8;
+        this.camera.position.z = 8;
+        this.camera.position.y = 15;
+        this.camera.lookAt(new Vector3(8, 0, 8));*/
 
         this.terrainMaterial = new ShaderMaterial({
             uniforms: {

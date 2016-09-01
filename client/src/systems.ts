@@ -145,7 +145,7 @@ export function updateTerrainCollision(em: EntityManager) {
 
         // Helper function for collision checks below.
         let checkCollisionAt = (nx, ny, nz) => {
-            let [gx, gy, gz] = [posComponent.x + nx, posComponent.y + ny + 1, posComponent.z + nz];
+            let [gx, gy, gz] = [posComponent.x + nx, posComponent.y + ny, posComponent.z + nz];
             let [lx, ly, lz] = [
                 mod(gx, TERRAIN_CHUNK_SIZE),
                 mod(gy, TERRAIN_CHUNK_SIZE),
@@ -160,14 +160,15 @@ export function updateTerrainCollision(em: EntityManager) {
             let chunk = chunks[key];
             if (!chunk) return false;
 
-            return chunk.getValue(lx|0, ly|0, lz|0)
+            return chunk.getValue(Math.round(lx), Math.round(ly), Math.round(lz))
         };
 
+        // TODO: Actually hit ground instead of hover.
         // Check and handle ground collisions.
         if(checkCollisionAt(0, -1, 0) || checkCollisionAt(0, 2, 0)) {
             let physComponent = component as PhysicsComponent;
             physComponent.velY = 0.0;
-            em.addComponent(entity, new OnGroundComponent(posComponent.y));
+            em.addComponent(entity, new OnGroundComponent());
         } else {
             em.removeComponentType(entity, 'onground');
         }

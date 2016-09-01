@@ -58,12 +58,6 @@ export class PhysicsComponent extends SerializableComponent {
 }
 
 export class OnGroundComponent extends Component {
-    groundY: number;
-
-    constructor(groundY: number = 0) {
-        super();
-        this.groundY = groundY;
-    }
 }
 
 // TODO: Use setters or something for these values, and use on server as well.

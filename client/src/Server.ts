@@ -48,7 +48,7 @@ export default class Server {
             let obj = JSON.parse(evt.data);
             if (objectHasKeys(obj.components, ['player'])) {
                 console.log('create player')
-                initPlayerEntity(this.game.world.entityManager, obj.entity, obj.components)
+                initPlayerEntity(this.game.world.entityManager, obj.entity, obj.components, this.game.world.camera);
             } else if (objectHasKeys(obj.components, ['input'])) {
                 this.game.world.entityManager.deserializeAndSetEntity(evt.data);
             } else if (objectHasKeys(obj.components, ['yaw'])) {
