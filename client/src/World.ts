@@ -1,14 +1,13 @@
-import {Scene, WebGLRenderer, PerspectiveCamera, ShaderMaterial, Vector3} from 'three';
+import {Scene, WebGLRenderer, PerspectiveCamera, ShaderMaterial} from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
 import {
-    updatePlayerInputs, syncPlayer, updateMeshes, updateTerrainChunks, updateTerrainCollision,
+    updatePlayerInputs, syncPlayer, updateMeshes, updateTerrainChunks,
     updatePlayerMeshes
 } from "./systems";
 import Game from "./Game";
 import {registerClientComponents} from "./components";
 import {removeEntities} from "./systems";
-import {updatePhysics, updateMovement, updatePositions} from "../../shared/systems";
 
 
 export default class World extends BaseWorld {
@@ -53,15 +52,15 @@ export default class World extends BaseWorld {
     }
 
     tick(dt) {
+        // Client only
         removeEntities(this.entityManager);
         updateTerrainChunks(this.entityManager, this.scene, this.terrainMaterial);
         updatePlayerInputs(this.entityManager, dt);
 
-        updatePhysics(this.entityManager, dt);
-        updateTerrainCollision(this.entityManager);
-        updateMovement(this.entityManager, dt);
-        updatePositions(this.entityManager, dt);
+        // Shared systems
+        super.tick(dt);
 
+        // Only client
         syncPlayer(this.entityManager, this.game.server);
         updateMeshes(this.entityManager, this.scene);
         updatePlayerMeshes(this.entityManager, this.scene);

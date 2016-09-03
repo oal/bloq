@@ -1,22 +1,24 @@
 import BaseWorld from "../../shared/BaseWorld";
 import {registerServerComponents} from "./components";
 import {informNewPlayers, broadcastPlayerInput, removeEntities} from "./systems";
-import {Terrain} from "./Terrain";
+import {TerrainChunkComponent} from "../../shared/components";
 
 export default class World extends BaseWorld {
-    terrain: Terrain = new Terrain();
 
     constructor() {
         super();
+        this.entityManager.addComponent('0x0x0', new TerrainChunkComponent(0, 0, 0));
         registerServerComponents(this.entityManager);
     }
 
 
     tick(dt) {
-        super.tick(dt);
-
+        // Server only
         removeEntities(this.entityManager);
         informNewPlayers(this.entityManager);
         broadcastPlayerInput(this.entityManager);
+
+        // Shared systems
+        super.tick(dt);
     }
 }

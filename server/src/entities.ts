@@ -1,7 +1,7 @@
 import EntityManager from "../../shared/EntityManager";
 import {
     InputComponent, PositionComponent,
-    CurrentPlayerComponent, PhysicsComponent, RotationComponent
+    CurrentPlayerComponent, PhysicsComponent, RotationComponent, WallCollisionComponent
 } from "../../shared/components";
 import {NetworkComponent, NewPlayerComponent, PlayerComponent} from "./components";
 
@@ -22,6 +22,7 @@ export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocke
     em.addComponent(entity, new PlayerComponent()); // Treat as player / render as player? WIP
     em.addComponent(entity, new CurrentPlayerComponent()); // Treat as current player. A temporary way to signalize that this is the player to control.
     em.addComponent(entity, new NewPlayerComponent()); // Deleted as soon as all players have been informed of this new player
+    em.addComponent(entity, new WallCollisionComponent()) // For wall collisions.
 }
 
 export function updatePlayerInput(em: EntityManager, playerEntity, obj) {

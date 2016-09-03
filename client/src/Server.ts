@@ -1,7 +1,7 @@
 import Game from "./Game";
 import {objectHasKeys} from "../../shared/helpers";
 import {initPlayerEntity} from "./entities";
-import {TerrainChunkComponent} from "./components";
+import {TerrainChunkComponent} from "../../shared/components";
 
 let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponent] => {
     let view = new DataView(data);

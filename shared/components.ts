@@ -1,4 +1,5 @@
 import EntityManager from "./EntityManager";
+import {TERRAIN_CHUNK_SIZE} from "./constants";
 
 // Used when serializing component to avoid "dirty" flag being serialized. It is only needed locally at runtime.
 let componentReplacer = (key, value) => {
@@ -87,6 +88,57 @@ export class CurrentPlayerComponent extends SerializableComponent {
 export class RemovedEntityComponent extends SerializableComponent {
 }
 
+
+export class TerrainChunkComponent extends Component {
+    x: number;
+    y: number;
+    z: number;
+    data: Uint8Array = new Uint8Array(TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE);
+
+    constructor(x?: number, y?: number, z?: number) {
+        super();
+
+        this.x = x || 0;
+        this.y = y || 0;
+        this.z = z || 0;
+
+        // TODO: Sample for simplex noise or similar.
+        for (let x = 0; x < TERRAIN_CHUNK_SIZE; x++) {
+            for (let z = 0; z < TERRAIN_CHUNK_SIZE; z++) {
+                let maxy = (Math.sin(-x/5+z/6.5)+1)*5;
+                for(let y = 0; y < maxy; y++) this.setValue(x, y, z, 2);
+                this.setValue(x, 0, z, 1);
+            }
+        }
+    }
+
+    getValue(x: number, y: number, z: number) {
+        if (x < 0 || y < 0 || z < 0 || x >= TERRAIN_CHUNK_SIZE || y >= TERRAIN_CHUNK_SIZE || z >= TERRAIN_CHUNK_SIZE) return 0;
+        return this.data[(y|0) * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE + (z|0) * TERRAIN_CHUNK_SIZE + (x|0)];
+    }
+
+    setValue(x: number, y: number, z: number, mat: number): boolean {
+        if (x < 0 || y < 0 || z < 0 || x >= TERRAIN_CHUNK_SIZE || y >= TERRAIN_CHUNK_SIZE || z >= TERRAIN_CHUNK_SIZE) return false;
+        this.data[y * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE + z * TERRAIN_CHUNK_SIZE + x] = mat;
+    }
+
+    serialize(): Uint8Array {
+        // Copy chunk data at an offset of 3 Int32 (chunk coordinates).
+        let arr = new Uint8Array(Int32Array.BYTES_PER_ELEMENT * 3 + this.data.length);
+        arr.set(this.data, Int32Array.BYTES_PER_ELEMENT * 3);
+
+        // Set three Int32 for chunk coordinates at the beginning of the underlying buffer.
+        let coordView = new DataView(arr.buffer);
+        coordView.setInt32(0, this.x);
+        coordView.setInt32(Int32Array.BYTES_PER_ELEMENT, this.y);
+        coordView.setInt32(Int32Array.BYTES_PER_ELEMENT*2, this.z);
+
+        // Return as buffer for Node to transfer it correctly.
+        return arr;
+    }
+}
+
+
 export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new PositionComponent());
     manager.registerComponentType(new RotationComponent());
@@ -96,4 +148,5 @@ export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new CurrentPlayerComponent());
     manager.registerComponentType(new RemovedEntityComponent());
     manager.registerComponentType(new WallCollisionComponent());
+    manager.registerComponentType(new TerrainChunkComponent());
 }
