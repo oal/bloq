@@ -6,7 +6,7 @@ let objectHasKeys = (obj: Object, keys: Array<string>) => keys.filter(key => key
 let mod = (a, b) => ((a % b) + b) % b;
 
 let globalToChunk = (x: number) => {
-    if (x < 0) return Math.floor((x - TERRAIN_CHUNK_SIZE) / TERRAIN_CHUNK_SIZE);
+    if (x < 0) return Math.ceil((x - TERRAIN_CHUNK_SIZE) / TERRAIN_CHUNK_SIZE);
     else return Math.floor(x / TERRAIN_CHUNK_SIZE);
 };
 

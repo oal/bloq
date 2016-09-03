@@ -8,6 +8,10 @@ export default class World extends BaseWorld {
     constructor() {
         super();
         this.entityManager.addComponent('0x0x0', new TerrainChunkComponent(0, 0, 0));
+        this.entityManager.addComponent('1x0x0', new TerrainChunkComponent(1, 0, 0));
+        this.entityManager.addComponent('0x0x1', new TerrainChunkComponent(0, 0, 1));
+        this.entityManager.addComponent('1x0x1', new TerrainChunkComponent(1, 0, 1));
+        this.entityManager.addComponent('-1x0x0', new TerrainChunkComponent(-1, 0, 0));
         registerServerComponents(this.entityManager);
     }
 

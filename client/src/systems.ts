@@ -9,6 +9,7 @@ import {
 import Server from "./Server";
 import {MeshComponent, PlayerComponent} from "./components";
 import {buildChunkGeometry} from "./terrain";
+import {TERRAIN_CHUNK_SIZE} from "../../shared/constants";
 
 
 export function updatePlayerInputs(em: EntityManager, dt) {
@@ -146,9 +147,9 @@ export function updateTerrainChunks(em: EntityManager, scene: Scene, material: S
         if (!meshComponent.mesh) {
             let chunkGeom = buildChunkGeometry(chunkComponent.data);
             let mesh = new Mesh(chunkGeom, material);
-            mesh.position.x = chunkComponent.x;
-            mesh.position.y = chunkComponent.y;
-            mesh.position.z = chunkComponent.z;
+            mesh.position.x = chunkComponent.x * TERRAIN_CHUNK_SIZE;
+            mesh.position.y = chunkComponent.y * TERRAIN_CHUNK_SIZE;
+            mesh.position.z = chunkComponent.z * TERRAIN_CHUNK_SIZE;
             meshComponent.mesh = mesh;
             scene.add(mesh);
         }

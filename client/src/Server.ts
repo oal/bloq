@@ -10,7 +10,7 @@ let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponen
     let z = view.getInt32(Int32Array.BYTES_PER_ELEMENT * 2);
     let chunkData = new Uint8Array(data.slice(Int32Array.BYTES_PER_ELEMENT*3));
 
-    let chunkComponent = new TerrainChunkComponent();
+    let chunkComponent = new TerrainChunkComponent(x, y, z);
     chunkComponent.data = chunkData;
     return [`${x}x${y}x${z}`, chunkComponent]
 };

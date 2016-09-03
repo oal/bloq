@@ -119,7 +119,7 @@ export class TerrainChunkComponent extends Component {
 
     setValue(x: number, y: number, z: number, mat: number): boolean {
         if (x < 0 || y < 0 || z < 0 || x >= TERRAIN_CHUNK_SIZE || y >= TERRAIN_CHUNK_SIZE || z >= TERRAIN_CHUNK_SIZE) return false;
-        this.data[y * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE + z * TERRAIN_CHUNK_SIZE + x] = mat;
+        this.data[(y|0) * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE + (z|0) * TERRAIN_CHUNK_SIZE + (x|0)] = mat;
     }
 
     serialize(): Uint8Array {

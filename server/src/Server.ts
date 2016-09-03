@@ -54,6 +54,10 @@ export default class Server {
         let netComponent = this.world.entityManager.getComponent(playerEntity, 'network') as NetworkComponent;
         netComponent.websocket.send(this.world.entityManager.serializeEntity(playerEntity));
         netComponent.websocket.send((this.world.entityManager.getComponent(chunkKey(0, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize());
+        netComponent.websocket.send((this.world.entityManager.getComponent(chunkKey(1, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize());
+        netComponent.websocket.send((this.world.entityManager.getComponent(chunkKey(0, 0, 1), 'terrainchunk') as TerrainChunkComponent).serialize());
+        netComponent.websocket.send((this.world.entityManager.getComponent(chunkKey(1, 0, 1), 'terrainchunk') as TerrainChunkComponent).serialize());
+        netComponent.websocket.send((this.world.entityManager.getComponent(chunkKey(-1, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize());
 
         ws.on('message', (data, flags) => {
             let obj = JSON.parse(data);

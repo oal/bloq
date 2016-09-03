@@ -1,5 +1,5 @@
 import EntityManager from "../../shared/EntityManager";
-import {MeshComponent, PlayerComponent} from "./components";
+import {PlayerComponent} from "./components";
 import {Mesh, BoxGeometry, Object3D, SphereGeometry, MeshBasicMaterial, PerspectiveCamera} from 'three';
 import {WallCollisionComponent} from "../../shared/components";
 
