@@ -1,9 +1,9 @@
 import EntityManager from "../../shared/EntityManager";
 import {
-    InputComponent, PositionComponent, YawComponent, PlayerComponent,
-    CurrentPlayerComponent, PhysicsComponent
+    InputComponent, PositionComponent,
+    CurrentPlayerComponent, PhysicsComponent, RotationComponent
 } from "../../shared/components";
-import {NetworkComponent, NewPlayerComponent} from "./components";
+import {NetworkComponent, NewPlayerComponent, PlayerComponent} from "./components";
 
 
 export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocket) {
@@ -17,7 +17,7 @@ export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocke
     pos.z = 5;
     em.addComponent(entity, pos); // Position tracking
     em.addComponent(entity, new PhysicsComponent()); // Physics tracking
-    em.addComponent(entity, new YawComponent()); // Rotation
+    em.addComponent(entity, new RotationComponent()); // Rotation
 
     em.addComponent(entity, new PlayerComponent()); // Treat as player / render as player? WIP
     em.addComponent(entity, new CurrentPlayerComponent()); // Treat as current player. A temporary way to signalize that this is the player to control.
@@ -41,8 +41,8 @@ export function updatePlayerInput(em: EntityManager, playerEntity, obj) {
     }
 }
 
-export function updatePlayerYaw(em: EntityManager, playerEntity, obj) {
-    let yaw = obj.components['yaw'];
-    let existingYaw = em.getComponent(playerEntity, 'yaw') as YawComponent;
-    existingYaw.update(yaw);
+export function updatePlayerRotation(em: EntityManager, playerEntity, obj) {
+    let rot = obj.components['rotation'];
+    let existingRot = em.getComponent(playerEntity, 'rotation') as RotationComponent;
+    existingRot.update(rot);
 }

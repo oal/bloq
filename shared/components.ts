@@ -47,8 +47,10 @@ export class PositionComponent extends SerializableComponent {
     z: number = 0;
 }
 
-export class YawComponent extends SerializableComponent {
-    rot: number = 0.0;
+export class RotationComponent extends SerializableComponent {
+    x: number = 0.0;
+    y: number = 0.0;
+    z: number = 0.0;
 }
 
 export class PhysicsComponent extends SerializableComponent {
@@ -76,8 +78,7 @@ export class InputComponent extends SerializableComponent {
     jump: boolean = false;
 }
 
-export class PlayerComponent extends SerializableComponent {
-}
+
 
 export class CurrentPlayerComponent extends SerializableComponent {
 }
@@ -88,11 +89,10 @@ export class RemovedEntityComponent extends SerializableComponent {
 
 export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new PositionComponent());
-    manager.registerComponentType(new YawComponent());
+    manager.registerComponentType(new RotationComponent());
     manager.registerComponentType(new PhysicsComponent());
     manager.registerComponentType(new OnGroundComponent());
     manager.registerComponentType(new InputComponent());
-    manager.registerComponentType(new PlayerComponent());
     manager.registerComponentType(new CurrentPlayerComponent());
     manager.registerComponentType(new RemovedEntityComponent());
     manager.registerComponentType(new WallCollisionComponent());

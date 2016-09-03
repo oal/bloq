@@ -1,7 +1,7 @@
 import {Server as WebSocketServer} from 'ws';
 import uuid = require('node-uuid');
 import World from "./World";
-import {initPlayerEntity, updatePlayerInput, updatePlayerYaw} from "./entities";
+import {initPlayerEntity, updatePlayerInput, updatePlayerRotation} from "./entities";
 import {objectHasKeys} from "../../shared/helpers";
 import {NetworkComponent} from "./components";
 import {RemovedEntityComponent} from "../../shared/components";
@@ -61,8 +61,8 @@ export default class Server {
                 if(objectHasKeys(obj.components, ['input', 'position'])) {
                     updatePlayerInput(this.world.entityManager, playerEntity, obj);
                 }
-                if(objectHasKeys(obj.components, ['yaw'])) {
-                    updatePlayerYaw(this.world.entityManager, playerEntity, obj);
+                if(objectHasKeys(obj.components, ['rotation'])) {
+                    updatePlayerRotation(this.world.entityManager, playerEntity, obj);
                 }
             }
         });

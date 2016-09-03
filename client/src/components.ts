@@ -1,4 +1,4 @@
-import {Object3D, Mesh} from 'three';
+import {Object3D, Mesh, PerspectiveCamera} from 'three';
 
 import {Component} from '../../shared/components';
 import EntityManager from "../../shared/EntityManager";
@@ -33,7 +33,13 @@ export class TerrainChunkComponent extends Component {
     }
 }
 
+
+// Similar, but simpler component is found on server. Server version doesn't need to be concerned with meshes etc.
+export class PlayerComponent extends MeshComponent {
+}
+
 export function registerClientComponents(manager: EntityManager) {
     manager.registerComponentType(new MeshComponent());
     manager.registerComponentType(new TerrainChunkComponent());
+    manager.registerComponentType(new PlayerComponent());
 }

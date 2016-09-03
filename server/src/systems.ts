@@ -1,11 +1,11 @@
 import EntityManager from "../../shared/EntityManager";
 import {NetworkComponent} from "./components";
-import {InputComponent, YawComponent} from "../../shared/components";
+import {InputComponent, RotationComponent} from "../../shared/components";
 
 
 export function informNewPlayers(em: EntityManager) {
     // Will ~99.999% only ever be one new player per tick.
-    let syncComponents = ['position', 'physics', 'input', 'yaw', 'player'];
+    let syncComponents = ['position', 'rotation', 'physics', 'input', 'player'];
 
     em.getEntities('newplayer').forEach((component, newEntity) => {
         let newPlayerData = em.serializeEntity(newEntity, syncComponents);
@@ -39,12 +39,12 @@ export function broadcastPlayerInput(em: EntityManager) {
         }
     });
 
-    let changedYaws = new Map();
-    em.getEntities('yaw').forEach((component, entity) => {
-        let yawComponent = component as YawComponent;
-        if (yawComponent.isDirty()) {
-            changedYaws.set(entity, yawComponent.serialize());
-            yawComponent.setDirty(false);
+    let changedRots = new Map();
+    em.getEntities('rotation').forEach((component, entity) => {
+        let rot = component as RotationComponent;
+        if (rot.isDirty()) {
+            changedRots.set(entity, rot.serialize());
+            rot.setDirty(false);
         }
     });
 
@@ -58,10 +58,10 @@ export function broadcastPlayerInput(em: EntityManager) {
         })
     }
 
-    if (changedYaws.size > 0) {
+    if (changedRots.size > 0) {
         em.getEntities('network').forEach((component, entity) => {
             let netComponent = component as NetworkComponent;
-            changedYaws.forEach((serializedYaw, changedEntity) => {
+            changedRots.forEach((serializedYaw, changedEntity) => {
                 if (changedEntity === entity) return;
                 netComponent.websocket.send(`{"entity":"${changedEntity}","components":{"yaw":${serializedYaw}}}`)
             })

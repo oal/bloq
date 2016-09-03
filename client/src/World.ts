@@ -1,7 +1,10 @@
 import {Scene, WebGLRenderer, PerspectiveCamera, ShaderMaterial, Vector3} from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
-import {updatePlayerInputs, syncPlayer, updateMeshes, updateTerrainChunks, updateTerrainCollision} from "./systems";
+import {
+    updatePlayerInputs, syncPlayer, updateMeshes, updateTerrainChunks, updateTerrainCollision,
+    updatePlayerMeshes
+} from "./systems";
 import Game from "./Game";
 import {registerClientComponents} from "./components";
 import {removeEntities} from "./systems";
@@ -25,10 +28,7 @@ export default class World extends BaseWorld {
         this.scene = new Scene();
 
         this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
-        /*this.camera.position.x = 8;
-        this.camera.position.z = 8;
-        this.camera.position.y = 15;
-        this.camera.lookAt(new Vector3(8, 0, 8));*/
+        this.camera.name = 'camera'; // Used to look up camera from e.g. player's Object3D.
 
         this.terrainMaterial = new ShaderMaterial({
             uniforms: {
@@ -44,6 +44,12 @@ export default class World extends BaseWorld {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
 
         document.body.appendChild(this.renderer.domElement);
+
+        // TODO: Add a more robust version of this to capture lock if player presses escape and tries to re-lock.
+        this.renderer.domElement.onclick = () => {
+            this.renderer.domElement.requestPointerLock();
+            this.renderer.domElement.onclick = null;
+        }
     }
 
     tick(dt) {
@@ -58,6 +64,7 @@ export default class World extends BaseWorld {
 
         syncPlayer(this.entityManager, this.game.server);
         updateMeshes(this.entityManager, this.scene);
+        updatePlayerMeshes(this.entityManager, this.scene);
 
         this.renderer.render(this.scene, this.camera);
     }

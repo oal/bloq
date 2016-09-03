@@ -1,35 +1,20 @@
 class MouseManager {
-    x: number;
-    y: number;
-
-    private lastX: number;
-    private lastY: number;
-    private setupDone: boolean = false;
+    x: number = 0;
+    y: number = 0;
 
     constructor() {
         document.addEventListener('mousemove', evt => {
-            this.x = evt.clientX;
-            this.y = evt.clientY;
-
-            if (!this.setupDone) {
-                this.lastX = this.x;
-                this.lastY = this.y;
-                this.setupDone = true;
-            }
+            this.x += evt.movementX;
+            this.y += evt.movementY;
         }, false);
     }
 
     // Return difference from last call
     delta(): [number, number] {
-        if(!this.setupDone) return [0, 0];
-
-        let deltas: [number, number];
-        deltas = [this.x - this.lastX, this.y - this.lastY];
-
-        this.lastX = this.x;
-        this.lastY = this.y;
-
-        return deltas;
+        let [dx, dy] = [this.x, this.y];
+        this.x = 0;
+        this.y = 0;
+        return [dx, dy];
     }
 }
 

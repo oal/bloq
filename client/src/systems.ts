@@ -4,11 +4,11 @@ import MouseManager from '../lib/MouseManager';
 
 import EntityManager from "../../shared/EntityManager";
 import {
-    InputComponent, PositionComponent, YawComponent, PhysicsComponent,
-    OnGroundComponent, WallCollisionComponent
+    InputComponent, PositionComponent, PhysicsComponent,
+    OnGroundComponent, WallCollisionComponent, RotationComponent
 } from "../../shared/components";
 import Server from "./Server";
-import {MeshComponent, TerrainChunkComponent} from "./components";
+import {MeshComponent, TerrainChunkComponent, PlayerComponent} from "./components";
 import {buildChunkGeometry} from "./terrain";
 import {globalToChunk, chunkKey, mod} from "../../shared/helpers";
 import {TERRAIN_CHUNK_SIZE} from "../../shared/constants";
@@ -47,11 +47,16 @@ export function updatePlayerInputs(em: EntityManager, dt) {
         }
 
         // Mouse
-        let yaw = em.getComponent(entity, 'yaw') as YawComponent;
+        let rot = em.getComponent(entity, 'rotation') as RotationComponent;
         let [dx, dy] = MouseManager.delta();
+        console.log(dx, dy)
         if (dx !== 0) {
-            yaw.rot -= dx / 5.0 * dt;
-            yaw.setDirty(true);
+            rot.y -= dx / 5.0 * dt;
+            rot.setDirty(true);
+        }
+        if(dy !== 0) {
+            rot.x -= dy / 5.0 * dt;
+            rot.setDirty(true);
         }
     })
 }
@@ -72,16 +77,36 @@ export function syncPlayer(em: EntityManager, server: Server) {
             input.setDirty(false);
         }
 
-        let yaw = em.getComponent(entity, 'yaw');
-        if (yaw.isDirty()) {
+        let rot = em.getComponent(entity, 'rotation') as RotationComponent;
+        if (rot.isDirty()) {
             server.send({
                 entity: entity,
                 components: {
-                    yaw: yaw,
+                    rotation: rot,
                 }
             });
-            yaw.setDirty(false);
+            rot.setDirty(false);
         }
+    })
+}
+
+export function updatePlayerMeshes(em: EntityManager, scene: Scene) {
+    em.getEntities('player').forEach((component, entity) => {
+        let playerComponent = component as PlayerComponent;
+
+        if(!playerComponent.mesh.parent) {
+            scene.add(playerComponent.mesh);
+        }
+
+        let position = em.getComponent(entity, 'position') as PositionComponent;
+        playerComponent.mesh.position.x = position.x;
+        playerComponent.mesh.position.y = position.y;
+        playerComponent.mesh.position.z = position.z;
+
+        let rot = em.getComponent(entity, 'rotation') as RotationComponent;
+        playerComponent.mesh.rotation.y = rot.y;
+
+        playerComponent.mesh.getObjectByName('camera').rotation.x = rot.x
     })
 }
 
@@ -98,8 +123,10 @@ export function updateMeshes(em: EntityManager, scene: Scene) {
         meshComponent.mesh.position.y = position.y;
         meshComponent.mesh.position.z = position.z;
 
-        let yaw = em.getComponent(entity, 'yaw') as YawComponent;
-        meshComponent.mesh.rotation.y = yaw.rot;
+        let rot = em.getComponent(entity, 'rotation') as RotationComponent;
+        meshComponent.mesh.rotation.x = rot.x;
+        meshComponent.mesh.rotation.y = rot.y;
+        meshComponent.mesh.rotation.z = rot.z;
     })
 }
 

@@ -1,20 +1,22 @@
 import EntityManager from "./EntityManager";
-import {PositionComponent, InputComponent, YawComponent, PhysicsComponent, WallCollisionComponent} from "./components";
+import {
+    PositionComponent, InputComponent, PhysicsComponent, WallCollisionComponent,
+    RotationComponent
+} from "./components";
 
 
 export function updateMovement(em: EntityManager, dt) {
     em.getEntities('physics').forEach((component, entity) => {
         let input = em.getComponent(entity, 'input') as InputComponent;
 
-        let yaw = em.getComponent(entity, 'yaw') as YawComponent;
-        let rotation = yaw.rot;
+        let rotation = em.getComponent(entity, 'rotation') as RotationComponent;
 
         let physComponent = component as PhysicsComponent;
         physComponent.setDirty(false);
 
         let speed = dt * 4;
-        let sinSpeed = Math.sin(rotation) * speed;
-        let cosSpeed = Math.cos(rotation) * speed;
+        let sinSpeed = Math.sin(rotation.y) * speed;
+        let cosSpeed = Math.cos(rotation.y) * speed;
         if (input.moveForward) {
             physComponent.velX -= sinSpeed;
             physComponent.velZ -= cosSpeed;

@@ -1,9 +1,10 @@
 import EntityManager from "../../shared/EntityManager";
-import {MeshComponent} from "./components";
+import {MeshComponent, PlayerComponent} from "./components";
 import {Mesh, BoxGeometry, Object3D, SphereGeometry, MeshBasicMaterial, PerspectiveCamera} from 'three';
 import {WallCollisionComponent} from "../../shared/components";
 
 export function initPlayerEntity(em: EntityManager, entity: string, initialData: Object, camera: PerspectiveCamera) {
+    console.log(initialData);
     // TODO: This should be cleaner.
     em.deserializeAndSetEntity(JSON.stringify({entity: entity, components: initialData}));
 
@@ -13,8 +14,8 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
 
     let head = new Mesh(new SphereGeometry(0.5, 5, 5), mat);
     head.position.y = 2.5;
-    head.scale.x = 1.2;
-    head.add(camera);
+
+    if('currentplayer' in initialData) head.add(camera);
 
     let body = new Mesh(new BoxGeometry(1.5, 2, 1.1), mat);
     body.position.y = 1;
@@ -26,9 +27,9 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
 
 
 
-    let meshComponent = new MeshComponent();
-    meshComponent.mesh = mesh;
-    em.addComponent(entity, meshComponent);
+    let playerComponent = new PlayerComponent();
+    playerComponent.mesh = mesh;
+    em.addComponent(entity, playerComponent);
 
     // Add local component to track wall / block collisions.
     em.addComponent(entity, new WallCollisionComponent());
