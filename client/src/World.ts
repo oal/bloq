@@ -41,6 +41,7 @@ export default class World extends BaseWorld {
 
         this.renderer = new WebGLRenderer();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setClearColor(0xBFF0FF);
 
         document.body.appendChild(this.renderer.domElement);
 

@@ -1,0 +1,8 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/99b618fb39f2e23f8428ddf01bba1f9c9fb2f416/fast-simplex-noise/fast-simplex-noise.d.ts",
+    "raw": "registry:dt/fast-simplex-noise#2.1.1+20160613153230",
+    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/99b618fb39f2e23f8428ddf01bba1f9c9fb2f416/fast-simplex-noise/fast-simplex-noise.d.ts"
+  }
+}

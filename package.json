@@ -11,9 +11,11 @@
   "author": "Olav Andreas Lindekleiv",
   "license": "UNLICENSED",
   "devDependencies": {
+    "fast-simplex-noise": "^2.2.0",
     "json-loader": "^0.5.4",
     "keymaster": "^1.6.2",
     "node-uuid": "^1.4.7",
+    "simplex-noise": "^2.2.0",
     "stats.js": "^0.16.0",
     "three": "^0.80.1",
     "ts-loader": "^0.8.2",

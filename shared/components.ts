@@ -101,15 +101,6 @@ export class TerrainChunkComponent extends Component {
         this.x = x || 0;
         this.y = y || 0;
         this.z = z || 0;
-
-        // TODO: Sample for simplex noise or similar.
-        for (let x = 0; x < TERRAIN_CHUNK_SIZE; x++) {
-            for (let z = 0; z < TERRAIN_CHUNK_SIZE; z++) {
-                let maxy = (Math.sin(-x/5+z/6.5)+1)*5;
-                for(let y = 0; y < maxy; y++) this.setValue(x, y, z, 2);
-                this.setValue(x, 0, z, 1);
-            }
-        }
     }
 
     getValue(x: number, y: number, z: number) {
