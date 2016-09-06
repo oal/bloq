@@ -1,4 +1,3 @@
-import EntityManager from "../../shared/EntityManager";
 import {NetworkComponent} from "./components";
 import {InputComponent, RotationComponent} from "../../shared/components";
 import {System} from "../../shared/systems";
@@ -78,7 +77,6 @@ export class RemoveEntitySystem extends System {
     update(dt: number) {
         this.entityManager.getEntities('removedentity').forEach((component, entity) => {
             let data = this.entityManager.serializeEntity(entity, ['removedentity']);
-            console.log(data)
             this.entityManager.removeEntity(entity);
             this.entityManager.getEntities('player').forEach((component, entity) => {
                 let netComponent = this.entityManager.getComponent(entity, 'network') as NetworkComponent;
@@ -87,3 +85,4 @@ export class RemoveEntitySystem extends System {
         })
     }
 }
+

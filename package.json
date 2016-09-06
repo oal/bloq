@@ -17,6 +17,7 @@
     "node-uuid": "^1.4.7",
     "simplex-noise": "^2.2.0",
     "stats.js": "^0.16.0",
+    "text-encoding": "^0.6.0",
     "three": "^0.80.1",
     "ts-loader": "^0.8.2",
     "typescript": "^1.8.10",

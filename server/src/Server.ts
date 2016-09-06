@@ -1,4 +1,5 @@
 import {Server as WebSocketServer} from 'ws';
+import {TextEncoder} from 'text-encoding';
 import uuid = require('node-uuid');
 import World from "./World";
 import {initPlayerEntity, updatePlayerInput, updatePlayerRotation} from "./entities";
@@ -47,25 +48,54 @@ export default class Server {
         this.world.tick(dt);
     }
 
+    sendString(ws: WebSocket, str: string) {
+        let encoder = new TextEncoder();
+        let bytes = encoder.encode(str);
+
+        let packet = new ArrayBuffer(Uint16Array.BYTES_PER_ELEMENT + bytes.length * bytes.BYTES_PER_ELEMENT);
+        let packetView = new DataView(packet);
+        for (let i = 0; i < bytes.length; i++) {
+            packetView.setUint8(i + Uint16Array.BYTES_PER_ELEMENT, bytes[i]);
+        }
+        packetView.setUint16(0, 1);
+
+        ws.send(packet);
+    }
+
+    sendBuffer(ws: WebSocket, buf: ArrayBuffer) {
+        let packet = new ArrayBuffer(Uint16Array.BYTES_PER_ELEMENT + buf.byteLength);
+        let data = new Uint8Array(buf);
+
+        // TODO: There might be a builtin way to do this faster.
+        let packetView = new DataView(packet);
+        for (let i = 0; i < buf.byteLength; i++) {
+            packetView.setUint8(i + Uint16Array.BYTES_PER_ELEMENT, data[i]);
+        }
+
+        packetView.setUint16(0, 2);
+        ws.send(packet);
+    }
+
+
     onConnect(ws) {
         let playerEntity = uuid.v4();
         initPlayerEntity(this.world.entityManager, playerEntity, ws);
 
         let netComponent = this.world.entityManager.getComponent(playerEntity, 'network') as NetworkComponent;
-        netComponent.websocket.send(this.world.entityManager.serializeEntity(playerEntity));
-        netComponent.websocket.send((this.world.entityManager.getComponent(chunkKey(0, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize());
-        netComponent.websocket.send((this.world.entityManager.getComponent(chunkKey(1, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize());
-        netComponent.websocket.send((this.world.entityManager.getComponent(chunkKey(0, 0, 1), 'terrainchunk') as TerrainChunkComponent).serialize());
-        netComponent.websocket.send((this.world.entityManager.getComponent(chunkKey(1, 0, 1), 'terrainchunk') as TerrainChunkComponent).serialize());
-        netComponent.websocket.send((this.world.entityManager.getComponent(chunkKey(-1, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize());
+        this.sendString(netComponent.websocket, this.world.entityManager.serializeEntity(playerEntity));
+        this.sendBuffer(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(0, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
+        this.sendBuffer(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(1, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
+        this.sendBuffer(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(0, 0, 1), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
+        this.sendBuffer(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(1, 0, 1), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
+        this.sendBuffer(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(-1, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
 
         ws.on('message', (data, flags) => {
             let obj = JSON.parse(data);
             if (obj.entity == playerEntity) {
-                if(objectHasKeys(obj.components, ['input', 'position'])) {
+                if (objectHasKeys(obj.components, ['input', 'position'])) {
                     updatePlayerInput(this.world.entityManager, playerEntity, obj);
                 }
-                if(objectHasKeys(obj.components, ['rotation'])) {
+                if (objectHasKeys(obj.components, ['rotation'])) {
                     updatePlayerRotation(this.world.entityManager, playerEntity, obj);
                 }
             }

@@ -8,7 +8,7 @@ let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponen
     let x = view.getInt32(0);
     let y = view.getInt32(Int32Array.BYTES_PER_ELEMENT);
     let z = view.getInt32(Int32Array.BYTES_PER_ELEMENT * 2);
-    let chunkData = new Uint8Array(data.slice(Int32Array.BYTES_PER_ELEMENT*3));
+    let chunkData = new Uint8Array(data.slice(Int32Array.BYTES_PER_ELEMENT * 3));
 
     let chunkComponent = new TerrainChunkComponent(x, y, z);
     chunkComponent.data = chunkData;
@@ -36,12 +36,22 @@ export default class Server {
     }
 
     onMessage(evt: MessageEvent) {
-        console.log(evt.data)
-        if (evt.data instanceof ArrayBuffer) {
-            let [entity, component] = deserializeTerrainChunk(evt.data);
-            this.game.world.entityManager.addComponent(entity, component);
-        } else {
-            let obj = JSON.parse(evt.data);
+        console.log('Got message');
+        if (!(evt.data instanceof ArrayBuffer)) {
+            console.error('Not array buffer!', evt.data);
+        }
+
+        let bufView = new DataView(evt.data);
+        let msgType = bufView.getUint16(0);
+        let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
+
+        console.log(msgType, data)
+
+        if (msgType === 1) { // Text
+            let decoder = new TextDecoder();
+            let jsonStr = decoder.decode(data);
+            let obj = JSON.parse(jsonStr);
+
             if (objectHasKeys(obj.components, ['player'])) {
                 console.log('create player')
                 initPlayerEntity(this.game.world.entityManager, obj.entity, obj.components, this.game.world.camera);
@@ -54,6 +64,11 @@ export default class Server {
             } else {
                 console.warn('Unknown packet: ', evt.data)
             }
+        } else if (msgType === 2) { // Binary
+            let [entity, component] = deserializeTerrainChunk(data);
+            this.game.world.entityManager.addComponent(entity, component);
+        } else {
+            console.warn('Unknown message type: ', msgType)
         }
     }
 
