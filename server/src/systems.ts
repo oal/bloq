@@ -3,6 +3,8 @@ import {InputComponent, RotationComponent, PositionComponent, TerrainChunkCompon
 import {System} from "../../shared/systems";
 import {arraysEqual, chunkKey} from "../../shared/helpers";
 import Server from "./Server";
+import {Terrain} from "./terrain";
+import EntityManager from "../../shared/EntityManager";
 
 
 export class InformNewPlayersSystem extends System {
@@ -89,6 +91,13 @@ export class RemoveEntitySystem extends System {
 }
 
 export class ChunkSubscriptionSystem extends System {
+    terrain: Terrain;
+
+    constructor(em: EntityManager, terrain: Terrain) {
+        super(em);
+        this.terrain = terrain;
+    }
+
     update(dt: number) {
         this.entityManager.getEntities('chunksubscription').forEach((component, entity) => {
             let chunkSubComponent = component as ChunkSubscriptionComponent;
@@ -101,15 +110,21 @@ export class ChunkSubscriptionSystem extends System {
                 let newChunkSubs = new Map<string, boolean>();
                 chunkSubComponent.inChunk = currChunk;
 
-                const viewDist = 1;
+                const viewDist = 2;
                 for (let z = -viewDist; z <= viewDist; z++) {
                     for (let y = -viewDist; y <= viewDist; y++) {
                         for (let x = -viewDist; x <= viewDist; x++) {
-                            // TODO: Generate chunks on demand.
-                            let key = chunkKey(x, y, z);
+                            let [cx, cy, cz] = [currChunk[0]+x, currChunk[1]+y, currChunk[2]+z];
+                            let key = chunkKey(cx, cy, cz);
                             if (!chunkSubComponent.chunks.has(key)) {
+                                let chunkComponent = this.entityManager.getComponent(key, 'terrainchunk') as TerrainChunkComponent;
+                                if (!chunkComponent) {
+                                    chunkComponent = this.terrain.generateChunk(cx, cy, cz);
+                                    this.entityManager.addComponent(key, chunkComponent);
+                                }
+
                                 newChunkSubs.set(key, true);
-                                Server.sendTerrainChunk(netComponent.websocket, (this.entityManager.getComponent(key, 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
+                                Server.sendTerrainChunk(netComponent.websocket, chunkComponent.serialize().buffer);
                             }
                         }
                     }

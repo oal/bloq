@@ -57,7 +57,7 @@ export default class World extends BaseWorld {
         this.addSystem(new PlayerInputSyncSystem(this.entityManager, this.game.server), 10);
         this.addSystem(new MeshSystem(this.entityManager, this.scene), 11);
         this.addSystem(new PlayerMeshSystem(this.entityManager, this.scene), 12);
-        
+
         console.log(this.systems);
         console.log(this.systemsOrder)
     }

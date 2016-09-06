@@ -3,9 +3,9 @@ import {TextEncoder} from 'text-encoding';
 import uuid = require('node-uuid');
 import World from "./World";
 import {initPlayerEntity, updatePlayerInput, updatePlayerRotation} from "./entities";
-import {objectHasKeys, chunkKey} from "../../shared/helpers";
+import {objectHasKeys} from "../../shared/helpers";
 import {NetworkComponent} from "./components";
-import {RemovedEntityComponent, TerrainChunkComponent} from "../../shared/components";
+import {RemovedEntityComponent} from "../../shared/components";
 import {MSG_ENTITY, MSG_TERRAIN} from "../../shared/constants";
 
 let hrtimeToSeconds = (hrtime: number[]) => hrtime[0] + hrtime[1] / 1000000000;
@@ -85,11 +85,6 @@ export default class Server {
 
         let netComponent = this.world.entityManager.getComponent(playerEntity, 'network') as NetworkComponent;
         Server.sendEntity(netComponent.websocket, this.world.entityManager.serializeEntity(playerEntity));
-        // Server.sendTerrainChunk(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(0, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
-        // Server.sendTerrainChunk(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(1, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
-        // Server.sendTerrainChunk(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(0, 0, 1), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
-        // Server.sendTerrainChunk(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(1, 0, 1), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
-        // Server.sendTerrainChunk(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(-1, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
 
         ws.on('message', (data, flags) => {
             let obj = JSON.parse(data);

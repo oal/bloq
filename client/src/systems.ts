@@ -1,5 +1,5 @@
 import * as Keymaster from 'keymaster';
-import {Scene, Mesh, ShaderMaterial} from 'three';
+import {Scene, Mesh, ShaderMaterial, Geometry, CubeGeometry} from 'three';
 import MouseManager from '../lib/MouseManager';
 
 import EntityManager from "../../shared/EntityManager";
@@ -191,7 +191,9 @@ export class TerrainChunkSystem extends System {
 
             if (!meshComponent.mesh) {
                 let chunkGeom = buildChunkGeometry(chunkComponent.data);
-                let mesh = new Mesh(chunkGeom, this.material);
+                let mesh;
+                if(chunkGeom) mesh = new Mesh(chunkGeom, this.material);
+                else mesh = new Mesh(new CubeGeometry(0.1, 0.1, 0.1), this.material); // Debug
                 mesh.position.x = chunkComponent.x * TERRAIN_CHUNK_SIZE;
                 mesh.position.y = chunkComponent.y * TERRAIN_CHUNK_SIZE;
                 mesh.position.z = chunkComponent.z * TERRAIN_CHUNK_SIZE;

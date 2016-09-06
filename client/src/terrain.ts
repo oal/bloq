@@ -235,16 +235,17 @@ let buildChunkArrays = (data) => {
     }
 };
 
-let buildChunkGeometry = (data) => {
+function buildChunkGeometry(data): BufferGeometry {
     let arrays = buildChunkArrays(data);
-    var geometry = new BufferGeometry();
+    if(arrays.vertices.length === 0) return null;
 
+    var geometry = new BufferGeometry();
     geometry.addAttribute('material', new BufferAttribute(arrays.materials, 1));
     geometry.addAttribute('position', new BufferAttribute(arrays.vertices, 3));
     geometry.computeVertexNormals();
 
     return geometry;
-};
+}
 
 export {
     buildChunkGeometry
