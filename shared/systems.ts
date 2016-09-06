@@ -107,9 +107,7 @@ export class TerrainCollisionSystem extends System {
             let physComponent = component as PhysicsComponent;
 
             // Find the chunk coordinates based on current global position (12 -> 0 etc.)
-            let cx = globalToChunk(posComponent.x);
-            let cy = globalToChunk(posComponent.y);
-            let cz = globalToChunk(posComponent.z);
+            let [cx, cy, cz] = posComponent.toChunk();
 
             // Build a list of all neighbor chunks. These are the only ones we can possibly collide with.
             let chunks = {};

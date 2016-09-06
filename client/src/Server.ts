@@ -2,6 +2,7 @@ import Game from "./Game";
 import {objectHasKeys} from "../../shared/helpers";
 import {initPlayerEntity} from "./entities";
 import {TerrainChunkComponent} from "../../shared/components";
+import {MSG_ENTITY, MSG_TERRAIN} from "../../shared/constants";
 
 let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponent] => {
     let view = new DataView(data);
@@ -45,26 +46,17 @@ export default class Server {
         let msgType = bufView.getUint16(0);
         let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
 
-        console.log(msgType, data)
-
-        if (msgType === 1) { // Text
+        if (msgType === MSG_ENTITY) { // Entity as text
             let decoder = new TextDecoder();
             let jsonStr = decoder.decode(data);
             let obj = JSON.parse(jsonStr);
 
             if (objectHasKeys(obj.components, ['player'])) {
-                console.log('create player')
                 initPlayerEntity(this.game.world.entityManager, obj.entity, obj.components, this.game.world.camera);
-            } else if (objectHasKeys(obj.components, ['input'])) {
-                this.game.world.entityManager.deserializeAndSetEntity(evt.data);
-            } else if (objectHasKeys(obj.components, ['yaw'])) {
-                this.game.world.entityManager.deserializeAndSetEntity(evt.data);
-            } else if (objectHasKeys(obj.components, ['removedentity'])) {
-                this.game.world.entityManager.deserializeAndSetEntity(evt.data);
             } else {
-                console.warn('Unknown packet: ', evt.data)
+                this.game.world.entityManager.deserializeAndSetEntity(evt.data);
             }
-        } else if (msgType === 2) { // Binary
+        } else if (msgType === MSG_TERRAIN) { // Binary terrain message
             let [entity, component] = deserializeTerrainChunk(data);
             this.game.world.entityManager.addComponent(entity, component);
         } else {
@@ -76,7 +68,7 @@ export default class Server {
         console.log('error');
     }
 
-    send(data) {
+    sendEntity(data: Object) {
         this.ws.send(JSON.stringify(data));
     }
 }

@@ -5,6 +5,11 @@ export class NetworkComponent extends Component {
     websocket: WebSocket;
 }
 
+export class ChunkSubscriptionComponent extends Component {
+    inChunk: [number, number, number];
+    chunks: Map<string, boolean> = new Map<string, boolean>();
+}
+
 export class NewPlayerComponent extends Component {
 
 }
@@ -15,6 +20,7 @@ export class PlayerComponent extends SerializableComponent {
 
 export function registerServerComponents(manager: EntityManager) {
     manager.registerComponentType(new NetworkComponent());
+    manager.registerComponentType(new ChunkSubscriptionComponent());
     manager.registerComponentType(new NewPlayerComponent());
     manager.registerComponentType(new PlayerComponent());
 }

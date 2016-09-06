@@ -1,5 +1,6 @@
 import EntityManager from "./EntityManager";
 import {TERRAIN_CHUNK_SIZE} from "./constants";
+import {globalToChunk} from "./helpers";
 
 // Used when serializing component to avoid "dirty" flag being serialized. It is only needed locally at runtime.
 let componentReplacer = (key, value) => {
@@ -46,6 +47,10 @@ export class PositionComponent extends SerializableComponent {
     x: number = 0;
     y: number = 0;
     z: number = 0;
+
+    toChunk(): [number, number, number] {
+        return [globalToChunk(this.x), globalToChunk(this.y), globalToChunk(this.z)]
+    }
 }
 
 export class RotationComponent extends SerializableComponent {

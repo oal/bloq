@@ -19,9 +19,6 @@ export default class BaseWorld {
         this.addSystem(new TerrainCollisionSystem(em), 2);
         this.addSystem(new MovementSystem(em), 3);
         this.addSystem(new PositionSystem(em), 4);
-
-        console.log(this.systems);
-        console.log(this.systemsOrder)
     }
 
     addSystem(system: System, order: number = 0.0) {

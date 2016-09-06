@@ -1,6 +1,8 @@
-import {NetworkComponent} from "./components";
-import {InputComponent, RotationComponent} from "../../shared/components";
+import {NetworkComponent, ChunkSubscriptionComponent} from "./components";
+import {InputComponent, RotationComponent, PositionComponent, TerrainChunkComponent} from "../../shared/components";
 import {System} from "../../shared/systems";
+import {arraysEqual, chunkKey} from "../../shared/helpers";
+import Server from "./Server";
 
 
 export class InformNewPlayersSystem extends System {
@@ -86,3 +88,38 @@ export class RemoveEntitySystem extends System {
     }
 }
 
+export class ChunkSubscriptionSystem extends System {
+    update(dt: number) {
+        this.entityManager.getEntities('chunksubscription').forEach((component, entity) => {
+            let chunkSubComponent = component as ChunkSubscriptionComponent;
+            let posComponent = this.entityManager.getComponent(entity, 'position') as PositionComponent;
+            let netComponent = this.entityManager.getComponent(entity, 'network') as NetworkComponent;
+
+            // Do we need to update chunk subscriptions?
+            let currChunk = posComponent.toChunk();
+            if (!arraysEqual(currChunk, chunkSubComponent.inChunk)) {
+                let newChunkSubs = new Map<string, boolean>();
+                chunkSubComponent.inChunk = currChunk;
+
+                const viewDist = 1;
+                for (let z = -viewDist; z <= viewDist; z++) {
+                    for (let y = -viewDist; y <= viewDist; y++) {
+                        for (let x = -viewDist; x <= viewDist; x++) {
+                            // TODO: Generate chunks on demand.
+                            let key = chunkKey(x, y, z);
+                            if (!chunkSubComponent.chunks.has(key)) {
+                                newChunkSubs.set(key, true);
+                                Server.sendTerrainChunk(netComponent.websocket, (this.entityManager.getComponent(key, 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
+                            }
+                        }
+                    }
+                }
+
+                chunkSubComponent.chunks = newChunkSubs;
+                chunkSubComponent.setDirty(true);
+
+                // TODO: Take difference of old and new chunk subs and send RemoveEntityComponent?
+            }
+        })
+    }
+}

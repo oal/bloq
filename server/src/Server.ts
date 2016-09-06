@@ -6,6 +6,7 @@ import {initPlayerEntity, updatePlayerInput, updatePlayerRotation} from "./entit
 import {objectHasKeys, chunkKey} from "../../shared/helpers";
 import {NetworkComponent} from "./components";
 import {RemovedEntityComponent, TerrainChunkComponent} from "../../shared/components";
+import {MSG_ENTITY, MSG_TERRAIN} from "../../shared/constants";
 
 let hrtimeToSeconds = (hrtime: number[]) => hrtime[0] + hrtime[1] / 1000000000;
 
@@ -48,7 +49,7 @@ export default class Server {
         this.world.tick(dt);
     }
 
-    sendString(ws: WebSocket, str: string) {
+    static sendEntity(ws: WebSocket, str: string) {
         let encoder = new TextEncoder();
         let bytes = encoder.encode(str);
 
@@ -57,12 +58,13 @@ export default class Server {
         for (let i = 0; i < bytes.length; i++) {
             packetView.setUint8(i + Uint16Array.BYTES_PER_ELEMENT, bytes[i]);
         }
-        packetView.setUint16(0, 1);
+        packetView.setUint16(0, MSG_ENTITY);
 
         ws.send(packet);
     }
 
-    sendBuffer(ws: WebSocket, buf: ArrayBuffer) {
+    // Could have been sendBinary or something, but currently only terrain is sent as binary
+    static sendTerrainChunk(ws: WebSocket, buf: ArrayBuffer) {
         let packet = new ArrayBuffer(Uint16Array.BYTES_PER_ELEMENT + buf.byteLength);
         let data = new Uint8Array(buf);
 
@@ -72,7 +74,7 @@ export default class Server {
             packetView.setUint8(i + Uint16Array.BYTES_PER_ELEMENT, data[i]);
         }
 
-        packetView.setUint16(0, 2);
+        packetView.setUint16(0, MSG_TERRAIN);
         ws.send(packet);
     }
 
@@ -82,12 +84,12 @@ export default class Server {
         initPlayerEntity(this.world.entityManager, playerEntity, ws);
 
         let netComponent = this.world.entityManager.getComponent(playerEntity, 'network') as NetworkComponent;
-        this.sendString(netComponent.websocket, this.world.entityManager.serializeEntity(playerEntity));
-        this.sendBuffer(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(0, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
-        this.sendBuffer(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(1, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
-        this.sendBuffer(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(0, 0, 1), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
-        this.sendBuffer(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(1, 0, 1), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
-        this.sendBuffer(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(-1, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
+        Server.sendEntity(netComponent.websocket, this.world.entityManager.serializeEntity(playerEntity));
+        // Server.sendTerrainChunk(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(0, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
+        // Server.sendTerrainChunk(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(1, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
+        // Server.sendTerrainChunk(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(0, 0, 1), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
+        // Server.sendTerrainChunk(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(1, 0, 1), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
+        // Server.sendTerrainChunk(netComponent.websocket, (this.world.entityManager.getComponent(chunkKey(-1, 0, 0), 'terrainchunk') as TerrainChunkComponent).serialize().buffer);
 
         ws.on('message', (data, flags) => {
             let obj = JSON.parse(data);

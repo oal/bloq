@@ -78,7 +78,7 @@ export class PlayerInputSyncSystem extends System {
             let input = this.entityManager.getComponent(entity, 'input');
 
             if (input.isDirty()) {
-                this.server.send({
+                this.server.sendEntity({
                     entity: entity,
                     components: {
                         position: position,
@@ -90,7 +90,7 @@ export class PlayerInputSyncSystem extends System {
 
             let rot = this.entityManager.getComponent(entity, 'rotation') as RotationComponent;
             if (rot.isDirty()) {
-                this.server.send({
+                this.server.sendEntity({
                     entity: entity,
                     components: {
                         rotation: rot,

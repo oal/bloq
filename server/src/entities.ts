@@ -3,7 +3,7 @@ import {
     InputComponent, PositionComponent,
     CurrentPlayerComponent, PhysicsComponent, RotationComponent, WallCollisionComponent
 } from "../../shared/components";
-import {NetworkComponent, NewPlayerComponent, PlayerComponent} from "./components";
+import {NetworkComponent, NewPlayerComponent, PlayerComponent, ChunkSubscriptionComponent} from "./components";
 
 
 export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocket) {
@@ -23,6 +23,8 @@ export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocke
     em.addComponent(entity, new CurrentPlayerComponent()); // Treat as current player. A temporary way to signalize that this is the player to control.
     em.addComponent(entity, new NewPlayerComponent()); // Deleted as soon as all players have been informed of this new player
     em.addComponent(entity, new WallCollisionComponent()); // For wall collisions.
+
+    em.addComponent(entity, new ChunkSubscriptionComponent())
 }
 
 export function updatePlayerInput(em: EntityManager, playerEntity, obj) {
