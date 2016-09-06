@@ -86,6 +86,7 @@ export function updatePositions(em: EntityManager, dt) {
 export function updateTerrainCollision(em: EntityManager) {
     em.getEntities('physics').forEach((component, entity) => {
         let posComponent = em.getComponent(entity, 'position') as PositionComponent;
+        let physComponent = component as PhysicsComponent;
 
         // Find the chunk coordinates based on current global position (12 -> 0 etc.)
         let cx = globalToChunk(posComponent.x);
@@ -106,7 +107,7 @@ export function updateTerrainCollision(em: EntityManager) {
 
         // Helper function for collision checks below.
         let checkCollisionAt = (nx, ny, nz) => {
-            let [gx, gy, gz] = [posComponent.x + nx, posComponent.y + ny, posComponent.z + nz].map(c => Math.round(Math.abs(c))*Math.sign(c));
+            let [gx, gy, gz] = [posComponent.x + nx/2, posComponent.y + ny, posComponent.z + nz/2].map(c => Math.round(Math.abs(c))*Math.sign(c));
             let [lx, ly, lz] = [
                 mod(gx, TERRAIN_CHUNK_SIZE),
                 mod(gy, TERRAIN_CHUNK_SIZE),
@@ -124,10 +125,8 @@ export function updateTerrainCollision(em: EntityManager) {
             return chunk.getValue(lx, ly, lz)
         };
 
-        // TODO: Actually hit ground instead of hover.
         // Check and handle ground collisions.
-        if (checkCollisionAt(0, -1, 0) || checkCollisionAt(0, 2, 0)) {
-            let physComponent = component as PhysicsComponent;
+        if (checkCollisionAt(0, -0.25, 0) || checkCollisionAt(0, 2, 0)) {
             physComponent.velY = 0.0;
             em.addComponent(entity, new OnGroundComponent());
         } else {
@@ -137,9 +136,9 @@ export function updateTerrainCollision(em: EntityManager) {
 
         // Check and update block collision component (wall collisions).
         let bcComponent = em.getComponent(entity, 'wallcollision') as WallCollisionComponent;
-        bcComponent.px = !!(checkCollisionAt(1, 0, 0) || checkCollisionAt(1, 1, 0));
-        bcComponent.nx = !!(checkCollisionAt(-1, 0, 0) || checkCollisionAt(-1, 1, 0));
-        bcComponent.pz = !!(checkCollisionAt(0, 0, 1) || checkCollisionAt(0, 1, 1));
-        bcComponent.nz = !!(checkCollisionAt(0, 0, -1) || checkCollisionAt(0, 1, -1));
+        bcComponent.px = !!(checkCollisionAt(1, 0.25, 0) || checkCollisionAt(1, 1.25, 0));
+        bcComponent.nx = !!(checkCollisionAt(-1, 0.25, 0) || checkCollisionAt(-1, 1.25, 0));
+        bcComponent.pz = !!(checkCollisionAt(0, 0.25, 1) || checkCollisionAt(0, 1.25, 1));
+        bcComponent.nz = !!(checkCollisionAt(0, 0.25, -1) || checkCollisionAt(0, 1.25, -1));
     })
 }

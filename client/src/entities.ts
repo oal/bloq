@@ -1,6 +1,6 @@
 import EntityManager from "../../shared/EntityManager";
 import {PlayerComponent} from "./components";
-import {Mesh, BoxGeometry, Object3D, SphereGeometry, MeshBasicMaterial, PerspectiveCamera} from 'three';
+import {Mesh, BoxGeometry, Object3D, SphereGeometry, MeshBasicMaterial, PerspectiveCamera, ArrowHelper, Vector3} from 'three';
 import {WallCollisionComponent} from "../../shared/components";
 
 export function initPlayerEntity(em: EntityManager, entity: string, initialData: Object, camera: PerspectiveCamera) {
@@ -15,7 +15,7 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
     let head = new Mesh(new SphereGeometry(0.5, 5, 5), mat);
     head.position.y = 2.5;
 
-    if('currentplayer' in initialData) head.add(camera);
+
 
     let body = new Mesh(new BoxGeometry(1.5, 2, 1.1), mat);
     body.position.y = 1;
@@ -23,7 +23,10 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
 
     let mesh = new Object3D();
     mesh.add(head);
-    mesh.add(body);
+    if('currentplayer' in initialData) head.add(camera);
+    else mesh.add(body);
+
+    mesh.add(new ArrowHelper(new Vector3(0, 0, -1), new Vector3(0, 0, 0), 1));
 
 
 
