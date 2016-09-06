@@ -16,9 +16,10 @@ export default class Game {
 
     constructor() {
         this.loadAssets(() => {
-            this.world = new World(this);
-            this.server = new Server(this);
-            this.startGameLoop();
+            this.server = new Server(this, () => {
+                this.world = new World(this);
+                this.startGameLoop();
+            });
         });
     }
 

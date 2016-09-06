@@ -2,12 +2,10 @@ import {Scene, WebGLRenderer, PerspectiveCamera, ShaderMaterial} from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
 import {
-    updatePlayerInputs, syncPlayer, updateMeshes, updateTerrainChunks,
-    updatePlayerMeshes
+    RemoveEntitySystem, TerrainChunkSystem, PlayerInputSystem, PlayerInputSyncSystem, MeshSystem, PlayerMeshSystem
 } from "./systems";
 import Game from "./Game";
 import {registerClientComponents} from "./components";
-import {removeEntities} from "./systems";
 
 
 export default class World extends BaseWorld {
@@ -49,23 +47,20 @@ export default class World extends BaseWorld {
         this.renderer.domElement.onclick = () => {
             this.renderer.domElement.requestPointerLock();
             this.renderer.domElement.onclick = null;
-        }
+        };
+
+        // TODO: Store system orders as constants in one place.
+        this.addSystem(new RemoveEntitySystem(this.entityManager), -10);
+        this.addSystem(new TerrainChunkSystem(this.entityManager, this.scene, this.terrainMaterial), -9);
+        this.addSystem(new PlayerInputSystem(this.entityManager), -8);
+
+        this.addSystem(new PlayerInputSyncSystem(this.entityManager, this.game.server), 10);
+        this.addSystem(new MeshSystem(this.entityManager, this.scene), 11);
+        this.addSystem(new PlayerMeshSystem(this.entityManager, this.scene), 12);
     }
 
     tick(dt) {
-        // Client only
-        removeEntities(this.entityManager);
-        updateTerrainChunks(this.entityManager, this.scene, this.terrainMaterial);
-        updatePlayerInputs(this.entityManager, dt);
-
-        // Shared systems
         super.tick(dt);
-
-        // Only client
-        syncPlayer(this.entityManager, this.game.server);
-        updateMeshes(this.entityManager, this.scene);
-        updatePlayerMeshes(this.entityManager, this.scene);
-
         this.renderer.render(this.scene, this.camera);
     }
 }

@@ -20,19 +20,15 @@ export default class Server {
     ws: WebSocket;
     game: Game;
 
-    constructor(game: Game) {
+    constructor(game: Game, connCallback: Function) {
         this.game = game;
 
         this.ws = new WebSocket(this.url);
         this.ws.binaryType = 'arraybuffer';
-        this.ws.onopen = this.onOpen.bind(this);
+        this.ws.onopen = connCallback;
         this.ws.onclose = this.onClose.bind(this);
         this.ws.onmessage = this.onMessage.bind(this);
         this.ws.onerror = this.onError.bind(this);
-    }
-
-    onOpen(evt: MessageEvent) {
-        console.log('open');
     }
 
     onClose(evt: MessageEvent) {
