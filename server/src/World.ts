@@ -1,6 +1,8 @@
 import BaseWorld from "../../shared/BaseWorld";
 import {registerServerComponents} from "./components";
-import {informNewPlayers, broadcastPlayerInput, removeEntities} from "./systems";
+import {
+    RemoveEntitySystem, InformNewPlayersSystem, BroadcastPlayerInputSystem
+} from "./systems";
 import {TerrainChunkComponent} from "../../shared/components";
 import {Terrain} from "./terrain";
 import {TERRAIN_CHUNK_SIZE} from "../../shared/constants";
@@ -31,16 +33,14 @@ export default class World extends BaseWorld {
             }
         }
         registerServerComponents(this.entityManager);
+
+        this.addSystem(new RemoveEntitySystem(this.entityManager), -10);
+        this.addSystem(new InformNewPlayersSystem(this.entityManager), -9);
+        this.addSystem(new BroadcastPlayerInputSystem(this.entityManager), -8);
     }
 
 
     tick(dt) {
-        // Server only
-        removeEntities(this.entityManager);
-        informNewPlayers(this.entityManager);
-        broadcastPlayerInput(this.entityManager);
-
-        // Shared systems
         super.tick(dt);
     }
 }

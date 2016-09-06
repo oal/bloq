@@ -53,6 +53,8 @@ export function updatePlayerInputs(em: EntityManager, dt) {
         }
         if (dy !== 0) {
             rot.x -= dy / 5.0 * dt;
+            if(rot.x < -Math.PI/2.0) rot.x = -Math.PI/2.0;
+            else if(rot.x > Math.PI/2.0) rot.x = Math.PI/2.0;
             rot.setDirty(true);
         }
     })

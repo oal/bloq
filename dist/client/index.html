@@ -19,7 +19,7 @@
 	varying float mat;
 
 	float rand(vec3 pos){
-        return fract(sin(dot(pos.xy, vec2(17.5623,49.2314))) * 4391.3521)-0.5;
+        return fract(sin(dot(vec2(mod(pos.x, 16.0), mod(pos.z, 16.0)), vec2(17.5623,49.2314))) * 4391.3521)-0.5;
     }
 
     void main()
@@ -44,11 +44,6 @@
         float offset_y = float(int(((float(mat)-offset_x)/8.0))) / 8.0; // int?
         vec2 pos2 = mod(pos/8.0, 1.0/8.0) + vec2(offset_x, offset_y);
         return pos2;
-    }
-
-
-	float rand(vec3 pos){
-        return fract(sin(dot(pos.xy, vec2(17.5623,49.2314))) * 4391.3521)-0.5;
     }
 
     void main() {
