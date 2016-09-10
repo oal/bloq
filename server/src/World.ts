@@ -1,7 +1,7 @@
 import BaseWorld from "../../shared/BaseWorld";
 import {registerServerComponents} from "./components";
 import {
-    RemoveEntitySystem, InformNewPlayersSystem, BroadcastPlayerInputSystem, ChunkSubscriptionSystem
+    RemoveEntitySystem, InformNewPlayersSystem, BroadcastPlayerInputSystem, ChunkSubscriptionSystem, PlayerActionSystem
 } from "./systems";
 import {Terrain} from "./terrain";
 import {ActionExecutionSystem} from "../../shared/systems";
@@ -21,6 +21,7 @@ export default class World extends BaseWorld {
         this.addSystem(new InformNewPlayersSystem(this.entityManager), -9);
         this.addSystem(new BroadcastPlayerInputSystem(this.entityManager), -8);
         this.addSystem(new ChunkSubscriptionSystem(this.entityManager, this.terrain), 100);
+        this.addSystem(new PlayerActionSystem(this.entityManager), 101);
 
         console.log(this.systems);
         console.log(this.systemsOrder)

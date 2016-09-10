@@ -82,6 +82,10 @@ export class InputComponent extends SerializableComponent {
     moveRight: boolean = false;
     moveBackward: boolean = false;
     jump: boolean = false;
+
+    primaryAction: boolean = false; // Left mouse button
+    secondaryAction: boolean = false; // Right mouse button
+    actionTarget: [number, number, number] = [0, 0, 0]; // Where in space the action is performed.
 }
 
 

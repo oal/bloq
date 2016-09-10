@@ -15,7 +15,7 @@ export class MeshComponent extends Component {
 }
 
 export class PlayerSelectionComponent extends MeshComponent {
-
+    target: [number, number, number] = [0, 0, 0];
 }
 
 

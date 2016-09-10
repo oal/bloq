@@ -1,5 +1,5 @@
 import * as Keymaster from 'keymaster';
-import {Scene, Mesh, ShaderMaterial, Geometry, CubeGeometry} from 'three';
+import {Scene, Mesh, ShaderMaterial, Vector3, CubeGeometry} from 'three';
 import MouseManager from '../lib/MouseManager';
 
 import EntityManager from "../../shared/EntityManager";
@@ -46,7 +46,7 @@ export class PlayerInputSystem extends System {
                 input.setDirty(true);
             }
 
-            // Mouse
+            // Mouse movement
             let rot = this.entityManager.getComponent(entity, 'rotation') as RotationComponent;
             let [dx, dy] = MouseManager.delta();
             if (dx !== 0) {
@@ -58,6 +58,22 @@ export class PlayerInputSystem extends System {
                 if (rot.x < -Math.PI / 2.0) rot.x = -Math.PI / 2.0;
                 else if (rot.x > Math.PI / 2.0) rot.x = Math.PI / 2.0;
                 rot.setDirty(true);
+            }
+
+            // Mouse clicks (and maybe also keypad in the future)
+            let actionPrimary = MouseManager.isLeftButtonPressed();
+            let actionSecondary = MouseManager.isLeftButtonPressed();
+            if((actionPrimary && !input.primaryAction) || (actionSecondary && !input.secondaryAction)) {
+                let selectionComponent = this.entityManager.getComponent(entity, 'playerselection') as PlayerSelectionComponent;
+                input.actionTarget = selectionComponent.target;
+            }
+            if(actionPrimary != input.primaryAction) {
+                input.primaryAction = actionPrimary;
+                input.setDirty(true);
+            }
+            if(actionSecondary != input.secondaryAction) {
+                input.secondaryAction = actionSecondary;
+                input.setDirty(true);
             }
         })
     }
@@ -147,13 +163,26 @@ export class PlayerSelectionSystem extends System {
             let positionComponent = this.entityManager.getComponent(entity, 'position') as PositionComponent;
             let rotComponent = this.entityManager.getComponent(entity, 'rotation') as PositionComponent;
 
-            selectionComponent.mesh.position.set(
-                (positionComponent.x - Math.sin(rotComponent.y) * 5)|0,
-                positionComponent.y|0,
-                (positionComponent.z - Math.cos(rotComponent.y) * 5)|0
-            );
+            let [x, y, z] = [positionComponent.x, positionComponent.y, positionComponent.z];
 
-            if(!selectionComponent.mesh.parent) this.scene.add(selectionComponent.mesh);
+            let pos = new Vector3(x, y, z);
+            let xRot = new Vector3(1, 0, 0);
+            let yRot = new Vector3(0, 1, 0);
+
+            let rotVec = new Vector3(0, 0, -1).applyAxisAngle(xRot, rotComponent.x).applyAxisAngle(yRot, rotComponent.y);
+            let dist = 5; // TODO: Use loop and do collision detection.
+            //for(let dist = 1; dist < 5; dist++) {
+            // Update rotation vector's length to project further and further away.
+            rotVec.setLength(dist);
+
+            // Take rotation, add 2 for head position, and add player's position.
+            let target = new Vector3().copy(rotVec).setY(rotVec.y + 2).add(pos).round();
+            selectionComponent.target = [target.x, target.y, target.z];
+
+            selectionComponent.mesh.position.set(target.x, target.y, target.z);
+            //}
+
+            if (!selectionComponent.mesh.parent) this.scene.add(selectionComponent.mesh);
         })
     }
 }
@@ -215,17 +244,17 @@ export class TerrainChunkSystem extends System {
             let meshComponent = (this.entityManager.getComponent(entity, 'mesh') || this.entityManager.addComponent(entity, new MeshComponent())) as MeshComponent;
 
             if (chunkComponent.isDirty() || !meshComponent.mesh) {
-                if(meshComponent.mesh) console.log('Rebuilding existing chunk!');
+                if (meshComponent.mesh) console.log('Rebuilding existing chunk!');
                 let chunkGeom = buildChunkGeometry(chunkComponent.data);
                 let mesh;
-                if(chunkGeom) mesh = new Mesh(chunkGeom, this.material);
+                if (chunkGeom) mesh = new Mesh(chunkGeom, this.material);
                 else mesh = new Mesh(new CubeGeometry(0.1, 0.1, 0.1), this.material); // Debug
                 mesh.position.x = chunkComponent.x * TERRAIN_CHUNK_SIZE;
                 mesh.position.y = chunkComponent.y * TERRAIN_CHUNK_SIZE;
                 mesh.position.z = chunkComponent.z * TERRAIN_CHUNK_SIZE;
 
                 // Remove old (if any) and insert new.
-                if(meshComponent.mesh) this.scene.remove(meshComponent.mesh);
+                if (meshComponent.mesh) this.scene.remove(meshComponent.mesh);
                 meshComponent.mesh = mesh;
                 this.scene.add(mesh);
                 chunkComponent.setDirty(false);

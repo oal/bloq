@@ -120,7 +120,7 @@ export class ChunkSubscriptionSystem extends System {
                 for (let z = -viewDist; z <= viewDist; z++) {
                     for (let y = -viewDist; y <= viewDist; y++) {
                         for (let x = -viewDist; x <= viewDist; x++) {
-                            let [cx, cy, cz] = [currChunk[0]+x, currChunk[1]+y, currChunk[2]+z];
+                            let [cx, cy, cz] = [currChunk[0] + x, currChunk[1] + y, currChunk[2] + z];
                             let key = chunkKey(cx, cy, cz);
                             newChunkSubs.set(key, true);
 
@@ -141,17 +141,28 @@ export class ChunkSubscriptionSystem extends System {
                 // Signal that the chunks too far away be removed.
                 let unsubChunks = [];
                 chunkSubComponent.chunks.forEach((_, chunkKey) => {
-                    if(!newChunkSubs.has(chunkKey)) unsubChunks.push(chunkKey)
+                    if (!newChunkSubs.has(chunkKey)) unsubChunks.push(chunkKey)
                 });
-                if(unsubChunks.length) {
+                if (unsubChunks.length) {
                     Server.sendAction(netComponent.websocket, new UnsubscribeTerrainChunksAction(unsubChunks));
-                    // WIP:
-                    Server.sendAction(netComponent.websocket, new RemoveBlocksAction([[(Math.random()*4-10)|0, 17, (Math.random()*4-10)|0]]));
                 }
 
                 // Update chunk subscription.
                 chunkSubComponent.chunks = newChunkSubs;
                 chunkSubComponent.setDirty(true);
+            }
+        })
+    }
+}
+
+export class PlayerActionSystem extends System {
+    update(dt: number): any {
+        this.entityManager.getEntities('input').forEach((component, entity) => {
+            let inputComponent = component as InputComponent;
+            // TODO: Broadcast instead of just sending back to the player owning this input component.
+            let netComponent = this.entityManager.getComponent(entity, 'network') as NetworkComponent;
+            if (inputComponent.primaryAction) {
+                Server.sendAction(netComponent.websocket, new RemoveBlocksAction([inputComponent.actionTarget]));
             }
         })
     }

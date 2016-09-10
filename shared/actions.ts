@@ -65,7 +65,6 @@ export class RemoveBlocksAction extends Action {
     }
 
     execute(entityManager: EntityManager) {
-        console.log(this.blocks)
         this.blocks.forEach(coord => {
             let [x, y, z] = coord;
             let [cx, cy, cz] = coord.map(globalToChunk);
@@ -74,7 +73,7 @@ export class RemoveBlocksAction extends Action {
             let chunk = entityManager.getComponent(chunkKey(cx, cy, cz), 'terrainchunk') as TerrainChunkComponent;
             if(!chunk) return;
 
-            chunk.setValue(lx, ly, lz, 2);
+            chunk.setValue(lx, ly, lz, 0);
             chunk.setDirty(true);
         })
     }
