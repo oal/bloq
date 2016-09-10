@@ -1,10 +1,14 @@
 import {NetworkComponent, ChunkSubscriptionComponent} from "./components";
-import {InputComponent, RotationComponent, PositionComponent, TerrainChunkComponent} from "../../shared/components";
+import {
+    InputComponent, RotationComponent, PositionComponent, TerrainChunkComponent,
+    RemovedEntityComponent
+} from "../../shared/components";
 import {System} from "../../shared/systems";
 import {arraysEqual, chunkKey} from "../../shared/helpers";
 import Server from "./Server";
 import {Terrain} from "./terrain";
 import EntityManager from "../../shared/EntityManager";
+import {UnsubscribeTerrainChunksAction} from "../../shared/actions";
 
 
 export class InformNewPlayersSystem extends System {
@@ -84,7 +88,7 @@ export class RemoveEntitySystem extends System {
             this.entityManager.removeEntity(entity);
             this.entityManager.getEntities('player').forEach((component, entity) => {
                 let netComponent = this.entityManager.getComponent(entity, 'network') as NetworkComponent;
-                netComponent.websocket.send(data);
+                Server.sendEntity(netComponent.websocket, data);
             });
         })
     }
@@ -110,12 +114,16 @@ export class ChunkSubscriptionSystem extends System {
                 let newChunkSubs = new Map<string, boolean>();
                 chunkSubComponent.inChunk = currChunk;
 
+                // Look through the view area for the player and notify of new chunks in view.
                 const viewDist = 2;
                 for (let z = -viewDist; z <= viewDist; z++) {
                     for (let y = -viewDist; y <= viewDist; y++) {
                         for (let x = -viewDist; x <= viewDist; x++) {
                             let [cx, cy, cz] = [currChunk[0]+x, currChunk[1]+y, currChunk[2]+z];
                             let key = chunkKey(cx, cy, cz);
+                            newChunkSubs.set(key, true);
+
+                            // If this chunk key wasn't already subscribed to, player needs to receive chunk data:
                             if (!chunkSubComponent.chunks.has(key)) {
                                 let chunkComponent = this.entityManager.getComponent(key, 'terrainchunk') as TerrainChunkComponent;
                                 if (!chunkComponent) {
@@ -123,17 +131,24 @@ export class ChunkSubscriptionSystem extends System {
                                     this.entityManager.addComponent(key, chunkComponent);
                                 }
 
-                                newChunkSubs.set(key, true);
                                 Server.sendTerrainChunk(netComponent.websocket, chunkComponent.serialize().buffer);
                             }
                         }
                     }
                 }
 
+                // Signal that the chunks too far away be removed.
+                let unsubChunks = [];
+                chunkSubComponent.chunks.forEach((_, chunkKey) => {
+                    if(!newChunkSubs.has(chunkKey)) unsubChunks.push(chunkKey)
+                });
+                if(unsubChunks.length) {
+                    Server.sendAction(netComponent.websocket, new UnsubscribeTerrainChunksAction(unsubChunks));
+                }
+
+                // Update chunk subscription.
                 chunkSubComponent.chunks = newChunkSubs;
                 chunkSubComponent.setDirty(true);
-
-                // TODO: Take difference of old and new chunk subs and send RemoveEntityComponent?
             }
         })
     }

@@ -2,7 +2,7 @@ import Game from "./Game";
 import {objectHasKeys} from "../../shared/helpers";
 import {initPlayerEntity} from "./entities";
 import {TerrainChunkComponent} from "../../shared/components";
-import {MSG_ENTITY, MSG_TERRAIN} from "../../shared/constants";
+import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION} from "../../shared/constants";
 
 let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponent] => {
     let view = new DataView(data);
@@ -56,7 +56,17 @@ export default class Server {
             } else {
                 this.game.world.entityManager.deserializeAndSetEntity(evt.data);
             }
-        } else if (msgType === MSG_TERRAIN) { // Binary terrain message
+        } else if (msgType === MSG_ACTION) { // Action message
+            let decoder = new TextDecoder();
+            let jsonStr = decoder.decode(data);
+            let obj = JSON.parse(jsonStr);
+
+            if(obj.action === 'unsubscribeterrainchunks') {
+                for(let chunkKey of obj.data.chunkKeys) {
+                    this.game.world.entityManager.removeEntity(chunkKey);
+                }
+            }
+        }  else if (msgType === MSG_TERRAIN) { // Binary terrain message
             let [entity, component] = deserializeTerrainChunk(data);
             this.game.world.entityManager.addComponent(entity, component);
         } else {

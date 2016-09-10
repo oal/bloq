@@ -6,7 +6,8 @@ import {initPlayerEntity, updatePlayerInput, updatePlayerRotation} from "./entit
 import {objectHasKeys} from "../../shared/helpers";
 import {NetworkComponent} from "./components";
 import {RemovedEntityComponent} from "../../shared/components";
-import {MSG_ENTITY, MSG_TERRAIN} from "../../shared/constants";
+import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION} from "../../shared/constants";
+import {Action} from "../../shared/actions";
 
 let hrtimeToSeconds = (hrtime: number[]) => hrtime[0] + hrtime[1] / 1000000000;
 
@@ -50,6 +51,7 @@ export default class Server {
     }
 
     static sendEntity(ws: WebSocket, str: string) {
+        console.log(str)
         let encoder = new TextEncoder();
         let bytes = encoder.encode(str);
 
@@ -75,6 +77,20 @@ export default class Server {
         }
 
         packetView.setUint16(0, MSG_TERRAIN);
+        ws.send(packet);
+    }
+
+    static sendAction(ws: WebSocket, action: Action) {
+        let bytes = action.serialize();
+
+        let packet = new ArrayBuffer(Uint16Array.BYTES_PER_ELEMENT + bytes.length * bytes.BYTES_PER_ELEMENT);
+        let packetView = new DataView(packet);
+        for (let i = 0; i < bytes.length; i++) {
+            packetView.setUint8(i + Uint16Array.BYTES_PER_ELEMENT, bytes[i]);
+        }
+        packetView.setUint16(0, MSG_ACTION);
+        // packetView.setUint16(Uint16Array.BYTES_PER_ELEMENT, 1); // TODO: For when I add action IDs instead of name
+
         ws.send(packet);
     }
 
