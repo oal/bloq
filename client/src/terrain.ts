@@ -17,13 +17,13 @@ let buildChunkArrays = (data) => {
     };
 
     for (let z = 0; z < size; z++) {
-        let oz = z; // z - size / 2;
+        let oz = z;
         for (let y = 0; y < size; y++) {
-            let oy = y; // y - size / 2;
+            let oy = y;
             for (let x = 0; x < size; x++) {
                 let val = getPoint(x, y, z);
                 if (val) {
-                    let ox = x; // = x - size / 2;
+                    let ox = x;
                     if (!getPoint(x, y, z + 1)) {
                         verts[i++] = ox - 0.5;
                         verts[i++] = oy - 0.5;

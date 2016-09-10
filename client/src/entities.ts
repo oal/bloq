@@ -1,6 +1,16 @@
 import EntityManager from "../../shared/EntityManager";
 import {PlayerComponent, PlayerSelectionComponent} from "./components";
-import {Mesh, BoxGeometry, Object3D, SphereGeometry, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, ArrowHelper, Vector3} from 'three';
+import {
+    Mesh,
+    BoxGeometry,
+    Object3D,
+    SphereGeometry,
+    MeshBasicMaterial,
+    MeshPhongMaterial,
+    PerspectiveCamera,
+    ArrowHelper,
+    Vector3
+} from 'three';
 import {WallCollisionComponent} from "../../shared/components";
 
 export function initPlayerEntity(em: EntityManager, entity: string, initialData: Object, camera: PerspectiveCamera) {
@@ -18,26 +28,32 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
     let body = new Mesh(new BoxGeometry(1.5, 2, 1.1), mat);
     body.position.y = 1;
 
-    let mesh = new Object3D();
-    mesh.add(head);
-    if('currentplayer' in initialData) head.add(camera);
-    else mesh.add(body);
+    let object = new Object3D();
+    object.add(head);
 
-    mesh.add(new ArrowHelper(new Vector3(0, 0, -1), new Vector3(0, 0, 0), 1));
+    // Only current player needs a camera attached.
+    if ('currentplayer' in initialData) head.add(camera);
+    else object.add(body);
 
-    let selectionComponent = new PlayerSelectionComponent();
-    let selectionGeom = new BoxGeometry(1.5, 1.5, 1.5);
-    let selectionCube = new Mesh(selectionGeom, new MeshBasicMaterial({
-        color: 0xffffff,
-        wireframe: true,
-        wireframeLinewidth: 3
-    }));
-    selectionCube.position.z = -5;
-    selectionComponent.mesh = selectionCube;
-    em.addComponent(entity, selectionComponent);
+    // Debug helper to see how ground detection works.
+    object.add(new ArrowHelper(new Vector3(0, 0, -1), new Vector3(0, 0, 0), 1));
+
+    // Only show selection box for current player.
+    if ('currentplayer' in initialData) {
+        let selectionComponent = new PlayerSelectionComponent();
+        let selectionGeom = new BoxGeometry(1.1, 1.1, 1.1);
+        let selectionCube = new Mesh(selectionGeom, new MeshBasicMaterial({
+            color: 0xffffff,
+            wireframe: true,
+            wireframeLinewidth: 3
+        }));
+        selectionCube.position.z = -5;
+        selectionComponent.mesh = selectionCube;
+        em.addComponent(entity, selectionComponent);
+    }
 
     let playerComponent = new PlayerComponent();
-    playerComponent.mesh = mesh;
+    playerComponent.mesh = object;
     em.addComponent(entity, playerComponent);
 
     // Add local component to track wall / block collisions.

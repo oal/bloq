@@ -1,7 +1,7 @@
 class MouseManager {
     x: number = 0;
     y: number = 0;
-    private buttonsPressed: [number, number, number] =  [false, false, false];
+    private buttonsPressed: [boolean, boolean, boolean] =  [false, false, false];
 
     constructor() {
         document.addEventListener('mousemove', evt => {

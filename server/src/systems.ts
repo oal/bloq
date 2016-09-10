@@ -3,11 +3,12 @@ import {
     InputComponent, RotationComponent, PositionComponent, TerrainChunkComponent
 } from "../../shared/components";
 import {System} from "../../shared/systems";
-import {arraysEqual, chunkKey} from "../../shared/helpers";
+import {arraysEqual, chunkKey, globalToChunk} from "../../shared/helpers";
 import Server from "./Server";
 import {Terrain} from "./terrain";
 import EntityManager from "../../shared/EntityManager";
 import {UnsubscribeTerrainChunksAction, RemoveBlocksAction} from "../../shared/actions";
+import {broadcastAction} from "./helpers";
 
 
 export class InformNewPlayersSystem extends System {
@@ -159,11 +160,13 @@ export class PlayerActionSystem extends System {
     update(dt: number): any {
         this.entityManager.getEntities('input').forEach((component, entity) => {
             let inputComponent = component as InputComponent;
-            // TODO: Broadcast instead of just sending back to the player owning this input component.
-            let netComponent = this.entityManager.getComponent(entity, 'network') as NetworkComponent;
+
             if (inputComponent.primaryAction) {
-                Server.sendAction(netComponent.websocket, new RemoveBlocksAction([inputComponent.actionTarget]));
+                let action = new RemoveBlocksAction([inputComponent.actionTarget]);
+
+                let [cx, cy, cz] = inputComponent.actionTarget.map(globalToChunk);
+                broadcastAction(this.entityManager, [cx, cy, cz], action);
             }
-        })
+        });
     }
 }

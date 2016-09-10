@@ -11,6 +11,7 @@ import {MeshComponent, PlayerComponent, PlayerSelectionComponent} from "./compon
 import {buildChunkGeometry} from "./terrain";
 import {TERRAIN_CHUNK_SIZE} from "../../shared/constants";
 import {System} from "../../shared/systems";
+import {findBlockMaterial} from "./helpers";
 
 
 export class PlayerInputSystem extends System {
@@ -63,15 +64,15 @@ export class PlayerInputSystem extends System {
             // Mouse clicks (and maybe also keypad in the future)
             let actionPrimary = MouseManager.isLeftButtonPressed();
             let actionSecondary = MouseManager.isLeftButtonPressed();
-            if((actionPrimary && !input.primaryAction) || (actionSecondary && !input.secondaryAction)) {
+            if ((actionPrimary && !input.primaryAction) || (actionSecondary && !input.secondaryAction)) {
                 let selectionComponent = this.entityManager.getComponent(entity, 'playerselection') as PlayerSelectionComponent;
                 input.actionTarget = selectionComponent.target;
             }
-            if(actionPrimary != input.primaryAction) {
+            if (actionPrimary != input.primaryAction) {
                 input.primaryAction = actionPrimary;
                 input.setDirty(true);
             }
-            if(actionSecondary != input.secondaryAction) {
+            if (actionSecondary != input.secondaryAction) {
                 input.secondaryAction = actionSecondary;
                 input.setDirty(true);
             }
@@ -163,24 +164,35 @@ export class PlayerSelectionSystem extends System {
             let positionComponent = this.entityManager.getComponent(entity, 'position') as PositionComponent;
             let rotComponent = this.entityManager.getComponent(entity, 'rotation') as PositionComponent;
 
-            let [x, y, z] = [positionComponent.x, positionComponent.y, positionComponent.z];
+            let [x, y, z] = [positionComponent.x, positionComponent.y+2, positionComponent.z];
 
             let pos = new Vector3(x, y, z);
             let xRot = new Vector3(1, 0, 0);
             let yRot = new Vector3(0, 1, 0);
 
             let rotVec = new Vector3(0, 0, -1).applyAxisAngle(xRot, rotComponent.x).applyAxisAngle(yRot, rotComponent.y);
-            let dist = 5; // TODO: Use loop and do collision detection.
-            //for(let dist = 1; dist < 5; dist++) {
-            // Update rotation vector's length to project further and further away.
-            rotVec.setLength(dist);
 
-            // Take rotation, add 2 for head position, and add player's position.
-            let target = new Vector3().copy(rotVec).setY(rotVec.y + 2).add(pos).round();
-            selectionComponent.target = [target.x, target.y, target.z];
+            let targetValid = false;
+            for (let dist = 0.1; dist < 5; dist++) {
+                // Update rotation vector's length to project further and further away.
+                rotVec.setLength(dist);
 
-            selectionComponent.mesh.position.set(target.x, target.y, target.z);
-            //}
+                // Take rotation, add 2 for head position, and add player's position.
+                let target = new Vector3().copy(rotVec).add(pos).round();
+                if (findBlockMaterial(this.entityManager, target.x, target.y, target.z) !== 0) {
+                    selectionComponent.target = [target.x, target.y, target.z];
+
+                    //selectionComponent.mesh.position.set(target.x+1, target.y+0.5, target.z+1);
+                    selectionComponent.mesh.position.lerp(target, 0.6); // Lerp because it looks good. :-)
+                    targetValid = true;
+                    break;
+                }
+            }
+
+            // Hide if target is not valid.
+            if(selectionComponent.targetValid != targetValid) selectionComponent.setDirty(true);
+            selectionComponent.targetValid = targetValid;
+            selectionComponent.mesh.visible = targetValid;
 
             if (!selectionComponent.mesh.parent) this.scene.add(selectionComponent.mesh);
         })
