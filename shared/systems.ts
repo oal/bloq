@@ -5,6 +5,7 @@ import {
 } from "./components";
 import {chunkKey, globalToChunk, mod} from "./helpers";
 import {TERRAIN_CHUNK_SIZE} from "./constants";
+import {ActionManager} from "./actions";
 
 export class System {
     entityManager: EntityManager;
@@ -157,5 +158,18 @@ export class TerrainCollisionSystem extends System {
             bcComponent.pz = !!(checkCollisionAt(0, 0.25, 1) || checkCollisionAt(0, 1.25, 1));
             bcComponent.nz = !!(checkCollisionAt(0, 0.25, -1) || checkCollisionAt(0, 1.25, -1));
         })
+    }
+}
+
+export class ActionExecutionSystem extends System {
+    actionManager: ActionManager;
+
+    constructor(entityManager: EntityManager, actionManager: ActionManager) {
+        super(entityManager);
+        this.actionManager = actionManager;
+    }
+
+    update(dt: number): any {
+        this.actionManager.executeAll(this.entityManager);
     }
 }

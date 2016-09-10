@@ -51,7 +51,7 @@ export default class Server {
     }
 
     static sendEntity(ws: WebSocket, str: string) {
-        console.log(str)
+        console.log(str);
         let encoder = new TextEncoder();
         let bytes = encoder.encode(str);
 
@@ -83,13 +83,19 @@ export default class Server {
     static sendAction(ws: WebSocket, action: Action) {
         let bytes = action.serialize();
 
-        let packet = new ArrayBuffer(Uint16Array.BYTES_PER_ELEMENT + bytes.length * bytes.BYTES_PER_ELEMENT);
+        // Give room for message type and action ID.
+        const extraSpace = Uint16Array.BYTES_PER_ELEMENT * 2;
+        let packet = new ArrayBuffer(bytes.length * bytes.BYTES_PER_ELEMENT + extraSpace);
         let packetView = new DataView(packet);
-        for (let i = 0; i < bytes.length; i++) {
-            packetView.setUint8(i + Uint16Array.BYTES_PER_ELEMENT, bytes[i]);
-        }
+
+        // Set header data
         packetView.setUint16(0, MSG_ACTION);
-        // packetView.setUint16(Uint16Array.BYTES_PER_ELEMENT, 1); // TODO: For when I add action IDs instead of name
+        packetView.setUint16(Uint16Array.BYTES_PER_ELEMENT, action.ID);
+
+        // Copy over message data.
+        for (let i = 0; i < bytes.length; i++) {
+            packetView.setUint8(i + extraSpace, bytes[i]);
+        }
 
         ws.send(packet);
     }

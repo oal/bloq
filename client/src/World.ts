@@ -6,6 +6,8 @@ import {
 } from "./systems";
 import Game from "./Game";
 import {registerClientComponents} from "./components";
+import {ClientActionManager} from "./actions";
+import {ActionExecutionSystem} from "../../shared/systems";
 
 
 export default class World extends BaseWorld {
@@ -18,6 +20,7 @@ export default class World extends BaseWorld {
 
     constructor(game: Game) {
         super();
+        this.actionManager = new ClientActionManager();
         this.game = game;
 
         registerClientComponents(this.entityManager);
@@ -50,6 +53,7 @@ export default class World extends BaseWorld {
         };
 
         // TODO: Store system orders as constants in one place.
+        this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), -1000); // Always process first
         this.addSystem(new RemoveEntitySystem(this.entityManager), -10);
         this.addSystem(new TerrainChunkSystem(this.entityManager, this.scene, this.terrainMaterial), -9);
         this.addSystem(new PlayerInputSystem(this.entityManager), -8);

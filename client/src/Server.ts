@@ -3,6 +3,7 @@ import {objectHasKeys} from "../../shared/helpers";
 import {initPlayerEntity} from "./entities";
 import {TerrainChunkComponent} from "../../shared/components";
 import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION} from "../../shared/constants";
+import {UnsubscribeTerrainChunksAction} from "../../shared/actions";
 
 let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponent] => {
     let view = new DataView(data);
@@ -44,29 +45,34 @@ export default class Server {
 
         let bufView = new DataView(evt.data);
         let msgType = bufView.getUint16(0);
-        let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
 
         if (msgType === MSG_ENTITY) { // Entity as text
+            let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
+
+            // Bytes -> JSON string -> Object.
             let decoder = new TextDecoder();
             let jsonStr = decoder.decode(data);
             let obj = JSON.parse(jsonStr);
 
+            // Player component needs special care. For all others, just deserialize and update the entity manager.
             if (objectHasKeys(obj.components, ['player'])) {
                 initPlayerEntity(this.game.world.entityManager, obj.entity, obj.components, this.game.world.camera);
             } else {
                 this.game.world.entityManager.deserializeAndSetEntity(evt.data);
             }
         } else if (msgType === MSG_ACTION) { // Action message
+            let actionId = bufView.getUint16(Uint16Array.BYTES_PER_ELEMENT);
+            let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT * 2);
+
+            // Bytes -> JSON string -> Object.
             let decoder = new TextDecoder();
             let jsonStr = decoder.decode(data);
             let obj = JSON.parse(jsonStr);
 
-            if(obj.action === 'unsubscribeterrainchunks') {
-                for(let chunkKey of obj.data.chunkKeys) {
-                    this.game.world.entityManager.removeEntity(chunkKey);
-                }
-            }
-        }  else if (msgType === MSG_TERRAIN) { // Binary terrain message
+            // Queue action.
+            this.game.world.actionManager.queueAction(actionId, obj);
+        } else if (msgType === MSG_TERRAIN) { // Binary terrain message
+            let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
             let [entity, component] = deserializeTerrainChunk(data);
             this.game.world.entityManager.addComponent(entity, component);
         } else {

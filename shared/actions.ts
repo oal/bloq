@@ -1,26 +1,53 @@
 import {TextEncoder} from 'text-encoding';
+import EntityManager from "./EntityManager";
+
+export class ActionManager {
+    queue: Array<Action> = [];
+
+    executeAll(entityManager: EntityManager) {
+        this.queue.forEach(action => {
+            action.execute(entityManager);
+        });
+        // For debugging:
+        if (this.queue.length) console.log(`Processed ${this.queue.length} actions.`);
+
+        this.queue = [];
+    }
+
+    queueAction(id: number, data: Object) {
+    }
+}
 
 export class Action {
-    typeName(): string {
-        let fullName = (this.constructor as any).name.toLowerCase();
-        return fullName.substring(0, fullName.length - 6); // Everything except "Action".
+    static ID: number = 0;
+
+    get ID(): number {
+        return this.constructor['ID'];
     }
 
     serialize(): Uint8Array {
-        // TODO: Should probably use an ID field instead of serializing the whole name of the action. Same for components.
-        let str = JSON.stringify({action: this.typeName(), data: this});
+        let str = JSON.stringify(this);
         let encoder = new TextEncoder();
-        let bytes = encoder.encode(str);
-        return bytes;
+        return encoder.encode(str);
+    }
+
+    execute(entityManager: EntityManager) {
     }
 }
 
 
 export class UnsubscribeTerrainChunksAction extends Action {
-    chunkKeys: Array<string>;
+    static ID: number = 1;
+    chunkKeys: Array<string> = [];
 
     constructor(chunkKeys: Array<string>) {
         super();
         this.chunkKeys = chunkKeys;
+    }
+
+    execute(entityManager: EntityManager) {
+        for (let chunkKey of this.chunkKeys) {
+            entityManager.removeEntity(chunkKey);
+        }
     }
 }

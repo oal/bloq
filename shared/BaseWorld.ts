@@ -3,9 +3,12 @@ import {registerSharedComponents} from "./components";
 import {
     System, MovementSystem, PhysicsSystem, TerrainCollisionSystem, PositionSystem
 } from "./systems";
+import {ActionManager} from "./actions";
 
 export default class BaseWorld {
     entityManager: EntityManager;
+    actionManager: ActionManager;
+
     systems: Array<System> = [];
     systemsOrder: Array<number> = [];
 
