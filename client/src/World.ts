@@ -2,7 +2,8 @@ import {Scene, WebGLRenderer, PerspectiveCamera, ShaderMaterial} from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
 import {
-    RemoveEntitySystem, TerrainChunkSystem, PlayerInputSystem, PlayerInputSyncSystem, MeshSystem, PlayerMeshSystem
+    RemoveEntitySystem, TerrainChunkSystem, PlayerInputSystem, PlayerInputSyncSystem, MeshSystem, PlayerMeshSystem,
+    PlayerSelectionSystem
 } from "./systems";
 import Game from "./Game";
 import {registerClientComponents} from "./components";
@@ -61,6 +62,7 @@ export default class World extends BaseWorld {
         this.addSystem(new PlayerInputSyncSystem(this.entityManager, this.game.server), 10);
         this.addSystem(new MeshSystem(this.entityManager, this.scene), 11);
         this.addSystem(new PlayerMeshSystem(this.entityManager, this.scene), 12);
+        this.addSystem(new PlayerSelectionSystem(this.entityManager, this.scene), 13);
 
         console.log(this.systems);
         console.log(this.systemsOrder)

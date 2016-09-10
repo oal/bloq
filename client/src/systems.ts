@@ -7,7 +7,7 @@ import {
     InputComponent, PositionComponent, RotationComponent, TerrainChunkComponent
 } from "../../shared/components";
 import Server from "./Server";
-import {MeshComponent, PlayerComponent} from "./components";
+import {MeshComponent, PlayerComponent, PlayerSelectionComponent} from "./components";
 import {buildChunkGeometry} from "./terrain";
 import {TERRAIN_CHUNK_SIZE} from "../../shared/constants";
 import {System} from "../../shared/systems";
@@ -129,6 +129,31 @@ export class PlayerMeshSystem extends System {
             if (this.entityManager.getComponent(entity, 'currentplayer')) {
                 playerComponent.mesh.getObjectByName('camera').rotation.x = rot.x
             }
+        })
+    }
+}
+
+export class PlayerSelectionSystem extends System {
+    scene: Scene;
+
+    constructor(em: EntityManager, scene: Scene) {
+        super(em);
+        this.scene = scene;
+    }
+
+    update(dt: number) {
+        this.entityManager.getEntities('playerselection').forEach((component, entity) => {
+            let selectionComponent = component as PlayerSelectionComponent;
+            let positionComponent = this.entityManager.getComponent(entity, 'position') as PositionComponent;
+            let rotComponent = this.entityManager.getComponent(entity, 'rotation') as PositionComponent;
+
+            selectionComponent.mesh.position.set(
+                (positionComponent.x - Math.sin(rotComponent.y) * 5)|0,
+                positionComponent.y|0,
+                (positionComponent.z - Math.cos(rotComponent.y) * 5)|0
+            );
+
+            if(!selectionComponent.mesh.parent) this.scene.add(selectionComponent.mesh);
         })
     }
 }

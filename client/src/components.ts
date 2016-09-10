@@ -14,6 +14,10 @@ export class MeshComponent extends Component {
     }
 }
 
+export class PlayerSelectionComponent extends MeshComponent {
+
+}
+
 
 // Similar, but simpler component is found on server. Server version doesn't need to be concerned with meshes etc.
 export class PlayerComponent extends MeshComponent {
@@ -22,4 +26,5 @@ export class PlayerComponent extends MeshComponent {
 export function registerClientComponents(manager: EntityManager) {
     manager.registerComponentType(new MeshComponent());
     manager.registerComponentType(new PlayerComponent());
+    manager.registerComponentType(new PlayerSelectionComponent());
 }

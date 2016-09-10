@@ -1,6 +1,6 @@
 import EntityManager from "../../shared/EntityManager";
-import {PlayerComponent} from "./components";
-import {Mesh, BoxGeometry, Object3D, SphereGeometry, MeshPhongMaterial, PerspectiveCamera, ArrowHelper, Vector3} from 'three';
+import {PlayerComponent, PlayerSelectionComponent} from "./components";
+import {Mesh, BoxGeometry, Object3D, SphereGeometry, MeshBasicMaterial, MeshPhongMaterial, PerspectiveCamera, ArrowHelper, Vector3} from 'three';
 import {WallCollisionComponent} from "../../shared/components";
 
 export function initPlayerEntity(em: EntityManager, entity: string, initialData: Object, camera: PerspectiveCamera) {
@@ -25,7 +25,16 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
 
     mesh.add(new ArrowHelper(new Vector3(0, 0, -1), new Vector3(0, 0, 0), 1));
 
-
+    let selectionComponent = new PlayerSelectionComponent();
+    let selectionGeom = new BoxGeometry(1.5, 1.5, 1.5);
+    let selectionCube = new Mesh(selectionGeom, new MeshBasicMaterial({
+        color: 0xffffff,
+        wireframe: true,
+        wireframeLinewidth: 3
+    }));
+    selectionCube.position.z = -5;
+    selectionComponent.mesh = selectionCube;
+    em.addComponent(entity, selectionComponent);
 
     let playerComponent = new PlayerComponent();
     playerComponent.mesh = mesh;
