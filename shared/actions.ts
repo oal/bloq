@@ -1,5 +1,8 @@
 import {TextEncoder} from 'text-encoding';
 import EntityManager from "./EntityManager";
+import {globalToChunk, mod, chunkKey} from "./helpers";
+import {TERRAIN_CHUNK_SIZE} from "./constants";
+import {TerrainChunkComponent} from "./components";
 
 export class ActionManager {
     queue: Array<Action> = [];
@@ -49,5 +52,30 @@ export class UnsubscribeTerrainChunksAction extends Action {
         for (let chunkKey of this.chunkKeys) {
             entityManager.removeEntity(chunkKey);
         }
+    }
+}
+
+export class RemoveBlocksAction extends Action {
+    static ID: number = 2;
+    blocks: Array<[number, number, number]>;
+
+    constructor(blocks: Array<[number, number, number]>) {
+        super();
+        this.blocks = blocks;
+    }
+
+    execute(entityManager: EntityManager) {
+        console.log(this.blocks)
+        this.blocks.forEach(coord => {
+            let [x, y, z] = coord;
+            let [cx, cy, cz] = coord.map(globalToChunk);
+            let [lx, ly, lz] = [mod(x, TERRAIN_CHUNK_SIZE), mod(y, TERRAIN_CHUNK_SIZE), mod(z, TERRAIN_CHUNK_SIZE)];
+
+            let chunk = entityManager.getComponent(chunkKey(cx, cy, cz), 'terrainchunk') as TerrainChunkComponent;
+            if(!chunk) return;
+
+            chunk.setValue(lx, ly, lz, 2);
+            chunk.setDirty(true);
+        })
     }
 }

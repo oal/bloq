@@ -189,7 +189,8 @@ export class TerrainChunkSystem extends System {
             let chunkComponent = component as TerrainChunkComponent;
             let meshComponent = (this.entityManager.getComponent(entity, 'mesh') || this.entityManager.addComponent(entity, new MeshComponent())) as MeshComponent;
 
-            if (!meshComponent.mesh) {
+            if (chunkComponent.isDirty() || !meshComponent.mesh) {
+                if(meshComponent.mesh) console.log('Rebuilding existing chunk!');
                 let chunkGeom = buildChunkGeometry(chunkComponent.data);
                 let mesh;
                 if(chunkGeom) mesh = new Mesh(chunkGeom, this.material);
@@ -197,8 +198,12 @@ export class TerrainChunkSystem extends System {
                 mesh.position.x = chunkComponent.x * TERRAIN_CHUNK_SIZE;
                 mesh.position.y = chunkComponent.y * TERRAIN_CHUNK_SIZE;
                 mesh.position.z = chunkComponent.z * TERRAIN_CHUNK_SIZE;
+
+                // Remove old (if any) and insert new.
+                if(meshComponent.mesh) this.scene.remove(meshComponent.mesh);
                 meshComponent.mesh = mesh;
                 this.scene.add(mesh);
+                chunkComponent.setDirty(false);
             }
         })
     }

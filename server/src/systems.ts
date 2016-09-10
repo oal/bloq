@@ -1,14 +1,13 @@
 import {NetworkComponent, ChunkSubscriptionComponent} from "./components";
 import {
-    InputComponent, RotationComponent, PositionComponent, TerrainChunkComponent,
-    RemovedEntityComponent
+    InputComponent, RotationComponent, PositionComponent, TerrainChunkComponent
 } from "../../shared/components";
 import {System} from "../../shared/systems";
 import {arraysEqual, chunkKey} from "../../shared/helpers";
 import Server from "./Server";
 import {Terrain} from "./terrain";
 import EntityManager from "../../shared/EntityManager";
-import {UnsubscribeTerrainChunksAction} from "../../shared/actions";
+import {UnsubscribeTerrainChunksAction, RemoveBlocksAction} from "../../shared/actions";
 
 
 export class InformNewPlayersSystem extends System {
@@ -144,6 +143,8 @@ export class ChunkSubscriptionSystem extends System {
                 });
                 if(unsubChunks.length) {
                     Server.sendAction(netComponent.websocket, new UnsubscribeTerrainChunksAction(unsubChunks));
+                    // WIP:
+                    Server.sendAction(netComponent.websocket, new RemoveBlocksAction([[(Math.random()*4-10)|0, 17, (Math.random()*4-10)|0]]));
                 }
 
                 // Update chunk subscription.
