@@ -182,8 +182,8 @@ export class PlayerSelectionSystem extends System {
                 if (findBlockMaterial(this.entityManager, target.x, target.y, target.z) !== 0) {
                     selectionComponent.target = [target.x, target.y, target.z];
 
-                    //selectionComponent.mesh.position.set(target.x+1, target.y+0.5, target.z+1);
-                    selectionComponent.mesh.position.lerp(target, 0.6); // Lerp because it looks good. :-)
+                    //selectionComponent.mesh.position.set(target.x, target.y, target.z);
+                    selectionComponent.mesh.position.lerp(target, 0.75); // Lerp because it looks good. :-)
                     targetValid = true;
                     break;
                 }
@@ -261,9 +261,12 @@ export class TerrainChunkSystem extends System {
                 let mesh;
                 if (chunkGeom) mesh = new Mesh(chunkGeom, this.material);
                 else mesh = new Mesh(new CubeGeometry(0.1, 0.1, 0.1), this.material); // Debug
-                mesh.position.x = chunkComponent.x * TERRAIN_CHUNK_SIZE;
-                mesh.position.y = chunkComponent.y * TERRAIN_CHUNK_SIZE;
-                mesh.position.z = chunkComponent.z * TERRAIN_CHUNK_SIZE;
+
+                // Set chunk position. Add offsets so displayed mesh corresponds with collision detection and
+                // lookups on the underlying data for the terrain chunk.
+                mesh.position.x = chunkComponent.x * TERRAIN_CHUNK_SIZE - 1;
+                mesh.position.y = chunkComponent.y * TERRAIN_CHUNK_SIZE - 0.5;
+                mesh.position.z = chunkComponent.z * TERRAIN_CHUNK_SIZE - 1;
 
                 // Remove old (if any) and insert new.
                 if (meshComponent.mesh) this.scene.remove(meshComponent.mesh);

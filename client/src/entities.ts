@@ -9,7 +9,10 @@ import {
     MeshPhongMaterial,
     PerspectiveCamera,
     ArrowHelper,
-    Vector3
+    Vector3,
+    Color,
+    BoxHelper,
+    LineBasicMaterial
 } from 'three';
 import {WallCollisionComponent} from "../../shared/components";
 
@@ -41,14 +44,22 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
     // Only show selection box for current player.
     if ('currentplayer' in initialData) {
         let selectionComponent = new PlayerSelectionComponent();
-        let selectionGeom = new BoxGeometry(1.1, 1.1, 1.1);
-        let selectionCube = new Mesh(selectionGeom, new MeshBasicMaterial({
-            color: 0xffffff,
-            wireframe: true,
-            wireframeLinewidth: 3
-        }));
-        selectionCube.position.z = -5;
-        selectionComponent.mesh = selectionCube;
+
+        // Need an underlying box for the Box helper to work.
+        // Could also render this BoxGeometry in wireframe mode, but then we get diagonal lines,
+        // as it renders triangles.
+        let selectionGeom = new BoxGeometry(1.01, 1.01, 1.01);
+        let selectionCube = new Mesh(selectionGeom, new MeshBasicMaterial());
+
+        // Box helper will only render edges.
+        let cube = new BoxHelper(selectionCube, new Color(0xffffff));
+        let mat = cube.material as LineBasicMaterial;
+        mat.linewidth = 4;
+        mat.transparent = true;
+        mat.opacity = 0.5;
+
+        // Update and add component.
+        selectionComponent.mesh = cube;
         em.addComponent(entity, selectionComponent);
     }
 
