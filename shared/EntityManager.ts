@@ -57,6 +57,11 @@ export default class EntityManager {
 
             let data = components[type];
             let constructor = this.componentConstructors.get(type);
+            if(!constructor) {
+                console.error('Tried to deserialize unknown component:', type);
+                continue;
+            }
+
             let instance = new (constructor as any)();
             instance.update(data);
 

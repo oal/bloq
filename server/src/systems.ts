@@ -23,14 +23,16 @@ export class InformNewPlayersSystem extends System {
             this.entityManager.getEntities('player').forEach((component, existingEntity) => {
                 if (existingEntity == newEntity) return; // Never send info about the new player to themselves.
                 let ws = this.entityManager.getComponent(existingEntity, 'network') as NetworkComponent;
-                ws.websocket.send(newPlayerData);
+                Server.sendEntity(ws.websocket, newPlayerData);
 
                 existingPlayerDatas.push(this.entityManager.serializeEntity(existingEntity, syncComponents));
             });
 
             // Inform new player about existing players.
             let ws = this.entityManager.getComponent(newEntity, 'network') as NetworkComponent;
-            existingPlayerDatas.forEach(data => ws.websocket.send(data));
+            existingPlayerDatas.forEach(data => {
+                Server.sendEntity(ws.websocket, data);
+            });
 
             console.log('New player informed.');
             this.entityManager.removeComponent(newEntity, component);
@@ -63,7 +65,7 @@ export class BroadcastPlayerInputSystem extends System {
                 let netComponent = component as NetworkComponent;
                 changedInputs.forEach((serializedInputs, changedEntity) => {
                     if (changedEntity === entity) return;
-                    netComponent.websocket.send(`{"entity":"${changedEntity}","components":{"input":${serializedInputs}}}`)
+                    Server.sendEntity(netComponent.websocket, `{"entity":"${changedEntity}","components":{"input":${serializedInputs}}}`);
                 });
             })
         }
@@ -71,9 +73,9 @@ export class BroadcastPlayerInputSystem extends System {
         if (changedRots.size > 0) {
             this.entityManager.getEntities('network').forEach((component, entity) => {
                 let netComponent = component as NetworkComponent;
-                changedRots.forEach((serializedYaw, changedEntity) => {
+                changedRots.forEach((serializedRot, changedEntity) => {
                     if (changedEntity === entity) return;
-                    netComponent.websocket.send(`{"entity":"${changedEntity}","components":{"yaw":${serializedYaw}}}`)
+                    Server.sendEntity(netComponent.websocket, `{"entity":"${changedEntity}","components":{"rotation":${serializedRot}}}`)
                 })
             })
         }

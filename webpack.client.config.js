@@ -32,6 +32,7 @@ module.exports = {
 
     devServer: {
         historyApiFallback: true,
-        hot: true
+        hot: true,
+        host: '0.0.0.0'
     }
 };

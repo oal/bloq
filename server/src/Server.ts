@@ -19,6 +19,7 @@ export default class Server {
         this.world = new World();
 
         this.wss = new WebSocketServer({
+            host: '0.0.0.0',
             port: 8081
         });
         this.wss.on('connection', this.onConnect.bind(this));
@@ -51,7 +52,7 @@ export default class Server {
     }
 
     static sendEntity(ws: WebSocket, str: string) {
-        console.log(str);
+        console.log('Sending:', str);
         let encoder = new TextEncoder();
         let bytes = encoder.encode(str);
 

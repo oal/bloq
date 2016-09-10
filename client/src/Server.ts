@@ -18,12 +18,14 @@ let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponen
 };
 
 export default class Server {
-    url: string = 'ws://localhost:8081';
+    url: string;
     ws: WebSocket;
     game: Game;
 
     constructor(game: Game, connCallback: Function) {
         this.game = game;
+
+        this.url = `ws://${location.hostname}:${parseInt(location.port)+1}`;
 
         this.ws = new WebSocket(this.url);
         this.ws.binaryType = 'arraybuffer';
@@ -58,7 +60,7 @@ export default class Server {
             if (objectHasKeys(obj.components, ['player'])) {
                 initPlayerEntity(this.game.world.entityManager, obj.entity, obj.components, this.game.world.camera);
             } else {
-                this.game.world.entityManager.deserializeAndSetEntity(evt.data);
+                this.game.world.entityManager.deserializeAndSetEntity(jsonStr);
             }
         } else if (msgType === MSG_ACTION) { // Action message
             let actionId = bufView.getUint16(Uint16Array.BYTES_PER_ELEMENT);
