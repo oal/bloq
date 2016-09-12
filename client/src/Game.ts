@@ -27,6 +27,7 @@ export default class Game {
     loadAssets(callback: Function) {
         let assets = new AssetManager();
         assets.add('texture', 'terrain', './assets/textures.png');
+        assets.add('texture', 'player', './assets/player.png');
         assets.load(progress => {
             // TODO: Show loading progress in GUI.
             console.log(progress);

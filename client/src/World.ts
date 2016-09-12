@@ -1,4 +1,4 @@
-import {Scene, WebGLRenderer, PerspectiveCamera, ShaderMaterial} from 'three';
+import {Scene, WebGLRenderer, PerspectiveCamera, ShaderMaterial, SkeletonHelper, AnimationMixer, JSONLoader, SkinnedMesh, MeshBasicMaterial} from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
 import {
@@ -16,6 +16,7 @@ export default class World extends BaseWorld {
     renderer: WebGLRenderer;
     camera: PerspectiveCamera;
     terrainMaterial: ShaderMaterial;
+    mixer: any;
 
     game: Game;
 
@@ -53,6 +54,32 @@ export default class World extends BaseWorld {
             this.renderer.domElement.onclick = null;
         };
 
+        this.addSystems();
+
+        var loader = new JSONLoader();
+        loader.load('./assets/player.json', ( geometry, materials ) => {
+            let m = new MeshBasicMaterial({
+                map: this.game.assetManager.findTexture('player'),
+                skinning: true,
+                morphTargets: true
+            });
+
+            let mesh = new SkinnedMesh( geometry, m );
+            mesh.name = "Test";
+            mesh.position.set( 0, 10, 0 );
+            this.scene.add( mesh );
+
+            this.mixer = new AnimationMixer( mesh );
+
+            let clip = geometry.animations[3];
+            let action = this.mixer.clipAction( clip, mesh );
+            action.play();
+        } );
+
+
+    }
+
+    addSystems() {
         // TODO: Store system orders as constants in one place.
         this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), -1000); // Always process first
         this.addSystem(new RemoveEntitySystem(this.entityManager), -10);
@@ -70,6 +97,11 @@ export default class World extends BaseWorld {
 
     tick(dt) {
         super.tick(dt);
+
+        if( this.mixer ) {
+            this.mixer.update( dt );
+            //helper.update();
+        }
         this.renderer.render(this.scene, this.camera);
     }
 }

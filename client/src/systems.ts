@@ -273,6 +273,9 @@ export class TerrainChunkSystem extends System {
                 meshComponent.mesh = mesh;
                 this.scene.add(mesh);
                 chunkComponent.setDirty(false);
+
+                // Only build one mesh per frame to avoid FPS drop.
+                return;
             }
         })
     }

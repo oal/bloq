@@ -73,7 +73,7 @@ export class BroadcastPlayerInputSystem extends System {
                 let netComponent = component as NetworkComponent;
                 changedInputs.forEach((serializedInputs, changedEntity) => {
                     if (changedEntity === entity) return;
-                    Server.sendEntity(netComponent.websocket, `{"entity":"${changedEntity}","components":{"input":${serializedInputs}}}`);
+                    Server.sendEntity(netComponent.websocket, `{"entity":"${changedEntity}","components":{"${ComponentId.Input}":${serializedInputs}}}`);
                 });
             })
         }
@@ -83,7 +83,7 @@ export class BroadcastPlayerInputSystem extends System {
                 let netComponent = component as NetworkComponent;
                 changedRots.forEach((serializedRot, changedEntity) => {
                     if (changedEntity === entity) return;
-                    Server.sendEntity(netComponent.websocket, `{"entity":"${changedEntity}","components":{"rotation":${serializedRot}}}`)
+                    Server.sendEntity(netComponent.websocket, `{"entity":"${changedEntity}","components":{"${ComponentId.Rotation}":${serializedRot}}}`)
                 })
             })
         }
