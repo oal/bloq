@@ -1,7 +1,7 @@
 import {TextEncoder} from 'text-encoding';
 import EntityManager from "./EntityManager";
 import {globalToChunk, mod, chunkKey} from "./helpers";
-import {TERRAIN_CHUNK_SIZE} from "./constants";
+import {TERRAIN_CHUNK_SIZE, ComponentId} from "./constants";
 import {TerrainChunkComponent} from "./components";
 
 export class ActionManager {
@@ -70,7 +70,7 @@ export class RemoveBlocksAction extends Action {
             let [cx, cy, cz] = coord.map(globalToChunk);
             let [lx, ly, lz] = [mod(x, TERRAIN_CHUNK_SIZE), mod(y, TERRAIN_CHUNK_SIZE), mod(z, TERRAIN_CHUNK_SIZE)];
 
-            let chunk = entityManager.getComponent(chunkKey(cx, cy, cz), 'terrainchunk') as TerrainChunkComponent;
+            let chunk = entityManager.getComponent(chunkKey(cx, cy, cz), ComponentId.TerrainChunk) as TerrainChunkComponent;
             if(!chunk) return;
 
             chunk.setValue(lx, ly, lz, 0);

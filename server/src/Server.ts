@@ -6,7 +6,7 @@ import {initPlayerEntity, updatePlayerInput, updatePlayerRotation} from "./entit
 import {objectHasKeys} from "../../shared/helpers";
 import {NetworkComponent} from "./components";
 import {RemovedEntityComponent} from "../../shared/components";
-import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION} from "../../shared/constants";
+import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION, ComponentId} from "../../shared/constants";
 import {Action} from "../../shared/actions";
 
 let hrtimeToSeconds = (hrtime: number[]) => hrtime[0] + hrtime[1] / 1000000000;
@@ -106,16 +106,16 @@ export default class Server {
         let playerEntity = uuid.v4();
         initPlayerEntity(this.world.entityManager, playerEntity, ws);
 
-        let netComponent = this.world.entityManager.getComponent(playerEntity, 'network') as NetworkComponent;
+        let netComponent = this.world.entityManager.getComponent(playerEntity, ComponentId.Network) as NetworkComponent;
         Server.sendEntity(netComponent.websocket, this.world.entityManager.serializeEntity(playerEntity));
 
         ws.on('message', (data, flags) => {
             let obj = JSON.parse(data);
             if (obj.entity == playerEntity) {
-                if (objectHasKeys(obj.components, ['input', 'position'])) {
+                if (objectHasKeys(obj.components, [ComponentId.Input, ComponentId.Position])) {
                     updatePlayerInput(this.world.entityManager, playerEntity, obj);
                 }
-                if (objectHasKeys(obj.components, ['rotation'])) {
+                if (objectHasKeys(obj.components, [ComponentId.Rotation])) {
                     updatePlayerRotation(this.world.entityManager, playerEntity, obj);
                 }
             }

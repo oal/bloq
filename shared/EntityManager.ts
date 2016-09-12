@@ -1,12 +1,13 @@
 import {Component, SerializableComponent} from "./components";
+import {ComponentId} from "./constants";
 
 export default class EntityManager {
-    private components: Map<string, Map<string, Component>>;
-    private componentConstructors: Map<string, Function>;
+    private components: Map<ComponentId, Map<string, Component>>;
+    private componentConstructors: Map<ComponentId, Function>;
 
     constructor() {
-        this.components = new Map<string, Map<string, Component>>();
-        this.componentConstructors = new Map<string, Function>();
+        this.components = new Map<ComponentId, Map<string, Component>>();
+        this.componentConstructors = new Map<ComponentId, Function>();
     }
 
     registerComponentType(instance: Component) {
@@ -19,11 +20,11 @@ export default class EntityManager {
         this.components.set(type, new Map<string, Component>());
     }
 
-    getRegisteredComponentTypes(): Iterator<string> {
+    getRegisteredComponentTypes(): Iterator<ComponentId> {
         return this.componentConstructors.keys();
     }
 
-    serializeEntity(entity: string, withComponents: Array<string> = null) {
+    serializeEntity(entity: string, withComponents: Array<ComponentId> = null) {
         // Each component needs to be serialized individually, then a JSON string is manually created.
         // Just using JSON.stringify would cause each component's serialized string to be escaped.
 
@@ -54,9 +55,10 @@ export default class EntityManager {
         // Loop over and construct new instances of components.
         for (let type in components) {
             if (!components.hasOwnProperty(type)) continue;
+            let typeI = parseInt(type);
 
             let data = components[type];
-            let constructor = this.componentConstructors.get(type);
+            let constructor = this.componentConstructors.get(typeI as ComponentId);
             if(!constructor) {
                 console.error('Tried to deserialize unknown component:', type);
                 continue;
@@ -76,11 +78,11 @@ export default class EntityManager {
         });
     }
 
-    getEntities(componentType: string): Map<string, Component> {
+    getEntities(componentType: ComponentId): Map<string, Component> {
         return this.components.get(componentType);
     }
 
-    getComponent(entity: string, componentType: string): Component {
+    getComponent(entity: string, componentType: ComponentId): Component {
         return this.components.get(componentType).get(entity);
     }
 
@@ -91,7 +93,7 @@ export default class EntityManager {
         return component;
     }
 
-    removeComponentType(entity: string, type: string) {
+    removeComponentType(entity: string, type: ComponentId) {
         let componentEntities = this.components.get(type);
         let component = componentEntities.get(entity);
         if (component) {

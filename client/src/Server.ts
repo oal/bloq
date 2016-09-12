@@ -2,7 +2,7 @@ import Game from "./Game";
 import {objectHasKeys} from "../../shared/helpers";
 import {initPlayerEntity} from "./entities";
 import {TerrainChunkComponent} from "../../shared/components";
-import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION} from "../../shared/constants";
+import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION, ComponentId} from "../../shared/constants";
 import {UnsubscribeTerrainChunksAction} from "../../shared/actions";
 
 let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponent] => {
@@ -57,7 +57,7 @@ export default class Server {
             let obj = JSON.parse(jsonStr);
 
             // Player component needs special care. For all others, just deserialize and update the entity manager.
-            if (objectHasKeys(obj.components, ['player'])) {
+            if (objectHasKeys(obj.components, [ComponentId.Player])) {
                 initPlayerEntity(this.game.world.entityManager, obj.entity, obj.components, this.game.world.camera);
             } else {
                 this.game.world.entityManager.deserializeAndSetEntity(jsonStr);

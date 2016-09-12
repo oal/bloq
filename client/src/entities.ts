@@ -15,6 +15,7 @@ import {
     LineBasicMaterial
 } from 'three';
 import {WallCollisionComponent} from "../../shared/components";
+import {ComponentId} from "../../shared/constants";
 
 export function initPlayerEntity(em: EntityManager, entity: string, initialData: Object, camera: PerspectiveCamera) {
     console.log(initialData);
@@ -35,14 +36,14 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
     object.add(head);
 
     // Only current player needs a camera attached.
-    if ('currentplayer' in initialData) head.add(camera);
+    if (ComponentId.CurrentPlayer in initialData) head.add(camera);
     else object.add(body);
 
     // Debug helper to see how ground detection works.
     object.add(new ArrowHelper(new Vector3(0, 0, -1), new Vector3(0, 0, 0), 1));
 
     // Only show selection box for current player.
-    if ('currentplayer' in initialData) {
+    if (ComponentId.CurrentPlayer in initialData) {
         let selectionComponent = new PlayerSelectionComponent();
 
         // Need an underlying box for the Box helper to work.

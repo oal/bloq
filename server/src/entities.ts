@@ -4,6 +4,7 @@ import {
     CurrentPlayerComponent, PhysicsComponent, RotationComponent, WallCollisionComponent
 } from "../../shared/components";
 import {NetworkComponent, NewPlayerComponent, PlayerComponent, ChunkSubscriptionComponent} from "./components";
+import {ComponentId} from "../../shared/constants";
 
 
 export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocket) {
@@ -28,13 +29,13 @@ export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocke
 }
 
 export function updatePlayerInput(em: EntityManager, playerEntity, obj) {
-    let input = obj.components['input'];
-    let existingInput = em.getComponent(playerEntity, 'input');
+    let input = obj.components[ComponentId.Input];
+    let existingInput = em.getComponent(playerEntity, ComponentId.Input);
     existingInput.update(input);
     existingInput.setDirty(true);
 
-    let position = obj.components['position'];
-    let existingPosition = em.getComponent(playerEntity, 'position') as PositionComponent;
+    let position = obj.components[ComponentId.Position];
+    let existingPosition = em.getComponent(playerEntity, ComponentId.Position) as PositionComponent;
     let dist = Math.sqrt(Math.pow(position.x - existingPosition.x, 2) + Math.pow(position.y - existingPosition.y, 2) + Math.pow(position.z - existingPosition.z, 2));
 
     existingPosition.update(position);
@@ -45,7 +46,7 @@ export function updatePlayerInput(em: EntityManager, playerEntity, obj) {
 }
 
 export function updatePlayerRotation(em: EntityManager, playerEntity, obj) {
-    let rot = obj.components['rotation'];
-    let existingRot = em.getComponent(playerEntity, 'rotation') as RotationComponent;
+    let rot = obj.components[ComponentId.Rotation];
+    let existingRot = em.getComponent(playerEntity, ComponentId.Rotation) as RotationComponent;
     existingRot.update(rot);
 }

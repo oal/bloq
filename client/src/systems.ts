@@ -9,16 +9,16 @@ import {
 import Server from "./Server";
 import {MeshComponent, PlayerComponent, PlayerSelectionComponent} from "./components";
 import {buildChunkGeometry} from "./terrain";
-import {TERRAIN_CHUNK_SIZE} from "../../shared/constants";
+import {TERRAIN_CHUNK_SIZE, ComponentId} from "../../shared/constants";
 import {System} from "../../shared/systems";
 import {findBlockMaterial} from "./helpers";
 
 
 export class PlayerInputSystem extends System {
     update(dt: number) {
-        this.entityManager.getEntities('currentplayer').forEach((component, entity) => {
+        this.entityManager.getEntities(ComponentId.CurrentPlayer).forEach((component, entity) => {
             // Keyboard
-            let input = this.entityManager.getComponent(entity, 'input') as InputComponent;
+            let input = this.entityManager.getComponent(entity, ComponentId.Input) as InputComponent;
 
             let moveForward = Keymaster.isPressed('W'.charCodeAt(0));
             let moveLeft = Keymaster.isPressed('A'.charCodeAt(0));
@@ -48,7 +48,7 @@ export class PlayerInputSystem extends System {
             }
 
             // Mouse movement
-            let rot = this.entityManager.getComponent(entity, 'rotation') as RotationComponent;
+            let rot = this.entityManager.getComponent(entity, ComponentId.Rotation) as RotationComponent;
             let [dx, dy] = MouseManager.delta();
             if (dx !== 0) {
                 rot.y -= dx / 5.0 * dt;
@@ -65,7 +65,7 @@ export class PlayerInputSystem extends System {
             let actionPrimary = MouseManager.isLeftButtonPressed();
             let actionSecondary = MouseManager.isLeftButtonPressed();
             if ((actionPrimary && !input.primaryAction) || (actionSecondary && !input.secondaryAction)) {
-                let selectionComponent = this.entityManager.getComponent(entity, 'playerselection') as PlayerSelectionComponent;
+                let selectionComponent = this.entityManager.getComponent(entity, ComponentId.PlayerSelection) as PlayerSelectionComponent;
                 input.actionTarget = selectionComponent.target;
             }
             if (actionPrimary != input.primaryAction) {
@@ -90,28 +90,28 @@ export class PlayerInputSyncSystem extends System {
     }
 
     update(dt: number) {
-        this.entityManager.getEntities('currentplayer').forEach((component, entity) => {
-            let position = this.entityManager.getComponent(entity, 'position');
-            let input = this.entityManager.getComponent(entity, 'input');
+        this.entityManager.getEntities(ComponentId.CurrentPlayer).forEach((component, entity) => {
+            let position = this.entityManager.getComponent(entity, ComponentId.Position);
+            let input = this.entityManager.getComponent(entity, ComponentId.Input);
 
             if (input.isDirty()) {
+                let components = {};
+                components[ComponentId.Position] = position;
+                components[ComponentId.Input] = input;
                 this.server.sendEntity({
                     entity: entity,
-                    components: {
-                        position: position,
-                        input: input,
-                    }
+                    components: components
                 });
                 input.setDirty(false);
             }
 
-            let rot = this.entityManager.getComponent(entity, 'rotation') as RotationComponent;
+            let rot = this.entityManager.getComponent(entity, ComponentId.Rotation) as RotationComponent;
             if (rot.isDirty()) {
+                let components = {};
+                components[ComponentId.Rotation] = rot;
                 this.server.sendEntity({
                     entity: entity,
-                    components: {
-                        rotation: rot,
-                    }
+                    components: components
                 });
                 rot.setDirty(false);
             }
@@ -128,22 +128,22 @@ export class PlayerMeshSystem extends System {
     }
 
     update(dt: number) {
-        this.entityManager.getEntities('player').forEach((component, entity) => {
+        this.entityManager.getEntities(ComponentId.Player).forEach((component, entity) => {
             let playerComponent = component as PlayerComponent;
 
             if (!playerComponent.mesh.parent) {
                 this.scene.add(playerComponent.mesh);
             }
 
-            let position = this.entityManager.getComponent(entity, 'position') as PositionComponent;
+            let position = this.entityManager.getComponent(entity, ComponentId.Position) as PositionComponent;
             playerComponent.mesh.position.x = position.x;
             playerComponent.mesh.position.y = position.y;
             playerComponent.mesh.position.z = position.z;
 
-            let rot = this.entityManager.getComponent(entity, 'rotation') as RotationComponent;
+            let rot = this.entityManager.getComponent(entity, ComponentId.Rotation) as RotationComponent;
             playerComponent.mesh.rotation.y = rot.y;
 
-            if (this.entityManager.getComponent(entity, 'currentplayer')) {
+            if (this.entityManager.getComponent(entity, ComponentId.CurrentPlayer)) {
                 playerComponent.mesh.getObjectByName('camera').rotation.x = rot.x
             }
         })
@@ -159,10 +159,10 @@ export class PlayerSelectionSystem extends System {
     }
 
     update(dt: number) {
-        this.entityManager.getEntities('playerselection').forEach((component, entity) => {
+        this.entityManager.getEntities(ComponentId.PlayerSelection).forEach((component, entity) => {
             let selectionComponent = component as PlayerSelectionComponent;
-            let positionComponent = this.entityManager.getComponent(entity, 'position') as PositionComponent;
-            let rotComponent = this.entityManager.getComponent(entity, 'rotation') as PositionComponent;
+            let positionComponent = this.entityManager.getComponent(entity, ComponentId.Position) as PositionComponent;
+            let rotComponent = this.entityManager.getComponent(entity, ComponentId.Rotation) as PositionComponent;
 
             let [x, y, z] = [positionComponent.x, positionComponent.y+2, positionComponent.z];
 
@@ -208,21 +208,21 @@ export class MeshSystem extends System {
     }
 
     update(dt: number) {
-        this.entityManager.getEntities('mesh').forEach((component, entity) => {
+        this.entityManager.getEntities(ComponentId.Mesh).forEach((component, entity) => {
             let meshComponent = component as MeshComponent;
 
             if (!meshComponent.mesh.parent) {
                 this.scene.add(meshComponent.mesh);
             }
 
-            let position = this.entityManager.getComponent(entity, 'position') as PositionComponent;
+            let position = this.entityManager.getComponent(entity, ComponentId.Position) as PositionComponent;
             if (position) {
                 meshComponent.mesh.position.x = position.x;
                 meshComponent.mesh.position.y = position.y;
                 meshComponent.mesh.position.z = position.z;
             }
 
-            let rot = this.entityManager.getComponent(entity, 'rotation') as RotationComponent;
+            let rot = this.entityManager.getComponent(entity, ComponentId.Rotation) as RotationComponent;
             if (rot) {
                 meshComponent.mesh.rotation.x = rot.x;
                 meshComponent.mesh.rotation.y = rot.y;
@@ -234,7 +234,7 @@ export class MeshSystem extends System {
 
 export class RemoveEntitySystem extends System {
     update(dt: number) {
-        this.entityManager.getEntities('removedentity').forEach((component, entity) => {
+        this.entityManager.getEntities(ComponentId.RemovedEntity).forEach((component, entity) => {
             this.entityManager.removeEntity(entity);
         })
     }
@@ -251,9 +251,9 @@ export class TerrainChunkSystem extends System {
     }
 
     update(dt: number) {
-        this.entityManager.getEntities('terrainchunk').forEach((component, entity) => {
+        this.entityManager.getEntities(ComponentId.TerrainChunk).forEach((component, entity) => {
             let chunkComponent = component as TerrainChunkComponent;
-            let meshComponent = (this.entityManager.getComponent(entity, 'mesh') || this.entityManager.addComponent(entity, new MeshComponent())) as MeshComponent;
+            let meshComponent = (this.entityManager.getComponent(entity, ComponentId.Mesh) || this.entityManager.addComponent(entity, new MeshComponent())) as MeshComponent;
 
             if (chunkComponent.isDirty() || !meshComponent.mesh) {
                 if (meshComponent.mesh) console.log('Rebuilding existing chunk!');

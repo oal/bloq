@@ -1,5 +1,5 @@
 import EntityManager from "./EntityManager";
-import {TERRAIN_CHUNK_SIZE} from "./constants";
+import {TERRAIN_CHUNK_SIZE, ComponentId} from "./constants";
 import {globalToChunk} from "./helpers";
 
 // Used when serializing component to avoid "dirty" flag being serialized. It is only needed locally at runtime.
@@ -9,6 +9,12 @@ let componentReplacer = (key, value) => {
 };
 
 export class Component {
+    static ID = 0;
+
+    get ID(): number {
+        return this.constructor['ID'];
+    }
+
     private dirty: boolean = false;
 
     setDirty(state: boolean) {
@@ -19,9 +25,10 @@ export class Component {
         return this.dirty;
     }
 
-    typeName(): string {
-        let fullName = (this.constructor as any).name.toLowerCase();
-        return fullName.substring(0, fullName.length - 9); // Everything except "Component".
+    typeName(): ComponentId {
+        return this.ID;
+        //let fullName = (this.constructor as any).name.toLowerCase();
+        //return fullName.substring(0, fullName.length - 9); // Everything except "Component".
     }
 
     // Pretty much full / partial deserialization, but JSON is already deserialized in entity deserializer.
@@ -44,6 +51,8 @@ export class SerializableComponent extends Component {
 }
 
 export class PositionComponent extends SerializableComponent {
+    static ID = ComponentId.Position;
+
     x: number = 0;
     y: number = 0;
     z: number = 0;
@@ -54,22 +63,29 @@ export class PositionComponent extends SerializableComponent {
 }
 
 export class RotationComponent extends SerializableComponent {
+    static ID = ComponentId.Rotation;
+
     x: number = 0.0;
     y: number = 0.0;
     z: number = 0.0;
 }
 
 export class PhysicsComponent extends SerializableComponent {
+    static ID = ComponentId.Physics;
+
     velX: number = 0;
     velY: number = 0;
     velZ: number = 0;
 }
 
 export class OnGroundComponent extends Component {
+    static ID = ComponentId.OnGround;
 }
 
 // TODO: Use setters or something for these values, and use on server as well.
 export class WallCollisionComponent extends Component {
+    static ID = ComponentId.WallCollision;
+
     public px: boolean = false;
     public pz: boolean = false;
     public nx: boolean = false;
@@ -77,6 +93,8 @@ export class WallCollisionComponent extends Component {
 }
 
 export class InputComponent extends SerializableComponent {
+    static ID = ComponentId.Input;
+
     moveForward: boolean = false;
     moveLeft: boolean = false;
     moveRight: boolean = false;
@@ -91,14 +109,18 @@ export class InputComponent extends SerializableComponent {
 
 
 export class CurrentPlayerComponent extends SerializableComponent {
+    static ID = ComponentId.CurrentPlayer;
 }
 
 
 export class RemovedEntityComponent extends SerializableComponent {
+    static ID = ComponentId.RemovedEntity;
 }
 
 
 export class TerrainChunkComponent extends Component {
+    static ID = ComponentId.TerrainChunk;
+
     x: number;
     y: number;
     z: number;

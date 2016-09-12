@@ -1,7 +1,7 @@
-import {TERRAIN_CHUNK_SIZE} from "./constants";
+import {TERRAIN_CHUNK_SIZE, ComponentId} from "./constants";
 
 
-let objectHasKeys = (obj: Object, keys: Array<string>) => keys.filter(key => key in obj).length == keys.length;
+let objectHasKeys = (obj: Object, keys: Array<ComponentId>) => keys.filter(key => key in obj).length == keys.length;
 
 let mod = (a, b) => ((a % b) + b) % b;
 

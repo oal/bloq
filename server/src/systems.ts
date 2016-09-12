@@ -9,28 +9,35 @@ import {Terrain} from "./terrain";
 import EntityManager from "../../shared/EntityManager";
 import {UnsubscribeTerrainChunksAction, RemoveBlocksAction} from "../../shared/actions";
 import {broadcastAction} from "./helpers";
+import {ComponentId} from "../../shared/constants";
 
 
 export class InformNewPlayersSystem extends System {
     update(dt: number) {
         // Will ~99.999% only ever be one new player per tick.
-        let syncComponents = ['position', 'rotation', 'physics', 'input', 'player'];
+        let syncComponents = [
+            ComponentId.Position,
+            ComponentId.Rotation,
+            ComponentId.Physics,
+            ComponentId.Input,
+            ComponentId.Player
+        ];
 
-        this.entityManager.getEntities('newplayer').forEach((component, newEntity) => {
+        this.entityManager.getEntities(ComponentId.NewPlayer).forEach((component, newEntity) => {
             let newPlayerData = this.entityManager.serializeEntity(newEntity, syncComponents);
             let existingPlayerDatas = [];
 
             // Send info about new player to existing players.
-            this.entityManager.getEntities('player').forEach((component, existingEntity) => {
+            this.entityManager.getEntities(ComponentId.Player).forEach((component, existingEntity) => {
                 if (existingEntity == newEntity) return; // Never send info about the new player to themselves.
-                let ws = this.entityManager.getComponent(existingEntity, 'network') as NetworkComponent;
+                let ws = this.entityManager.getComponent(existingEntity, ComponentId.Network) as NetworkComponent;
                 Server.sendEntity(ws.websocket, newPlayerData);
 
                 existingPlayerDatas.push(this.entityManager.serializeEntity(existingEntity, syncComponents));
             });
 
             // Inform new player about existing players.
-            let ws = this.entityManager.getComponent(newEntity, 'network') as NetworkComponent;
+            let ws = this.entityManager.getComponent(newEntity, ComponentId.Network) as NetworkComponent;
             existingPlayerDatas.forEach(data => {
                 Server.sendEntity(ws.websocket, data);
             });
@@ -44,7 +51,7 @@ export class InformNewPlayersSystem extends System {
 export class BroadcastPlayerInputSystem extends System {
     update(dt: number) {
         let changedInputs = new Map();
-        this.entityManager.getEntities('input').forEach((component, entity) => {
+        this.entityManager.getEntities(ComponentId.Input).forEach((component, entity) => {
             let inputComponent = component as InputComponent;
             if (inputComponent.isDirty()) {
                 changedInputs.set(entity, inputComponent.serialize());
@@ -53,7 +60,7 @@ export class BroadcastPlayerInputSystem extends System {
         });
 
         let changedRots = new Map();
-        this.entityManager.getEntities('rotation').forEach((component, entity) => {
+        this.entityManager.getEntities(ComponentId.Rotation).forEach((component, entity) => {
             let rot = component as RotationComponent;
             if (rot.isDirty()) {
                 changedRots.set(entity, rot.serialize());
@@ -62,7 +69,7 @@ export class BroadcastPlayerInputSystem extends System {
         });
 
         if (changedInputs.size > 0) {
-            this.entityManager.getEntities('network').forEach((component, entity) => {
+            this.entityManager.getEntities(ComponentId.Network).forEach((component, entity) => {
                 let netComponent = component as NetworkComponent;
                 changedInputs.forEach((serializedInputs, changedEntity) => {
                     if (changedEntity === entity) return;
@@ -72,7 +79,7 @@ export class BroadcastPlayerInputSystem extends System {
         }
 
         if (changedRots.size > 0) {
-            this.entityManager.getEntities('network').forEach((component, entity) => {
+            this.entityManager.getEntities(ComponentId.Network).forEach((component, entity) => {
                 let netComponent = component as NetworkComponent;
                 changedRots.forEach((serializedRot, changedEntity) => {
                     if (changedEntity === entity) return;
@@ -85,11 +92,11 @@ export class BroadcastPlayerInputSystem extends System {
 
 export class RemoveEntitySystem extends System {
     update(dt: number) {
-        this.entityManager.getEntities('removedentity').forEach((component, entity) => {
-            let data = this.entityManager.serializeEntity(entity, ['removedentity']);
+        this.entityManager.getEntities(ComponentId.RemovedEntity).forEach((component, entity) => {
+            let data = this.entityManager.serializeEntity(entity, [ComponentId.RemovedEntity]);
             this.entityManager.removeEntity(entity);
-            this.entityManager.getEntities('player').forEach((component, entity) => {
-                let netComponent = this.entityManager.getComponent(entity, 'network') as NetworkComponent;
+            this.entityManager.getEntities(ComponentId.Player).forEach((component, entity) => {
+                let netComponent = this.entityManager.getComponent(entity, ComponentId.Network) as NetworkComponent;
                 Server.sendEntity(netComponent.websocket, data);
             });
         })
@@ -105,10 +112,10 @@ export class ChunkSubscriptionSystem extends System {
     }
 
     update(dt: number) {
-        this.entityManager.getEntities('chunksubscription').forEach((component, entity) => {
+        this.entityManager.getEntities(ComponentId.ChunkSubscription).forEach((component, entity) => {
             let chunkSubComponent = component as ChunkSubscriptionComponent;
-            let posComponent = this.entityManager.getComponent(entity, 'position') as PositionComponent;
-            let netComponent = this.entityManager.getComponent(entity, 'network') as NetworkComponent;
+            let posComponent = this.entityManager.getComponent(entity, ComponentId.Position) as PositionComponent;
+            let netComponent = this.entityManager.getComponent(entity, ComponentId.Network) as NetworkComponent;
 
             // Do we need to update chunk subscriptions?
             let currChunk = posComponent.toChunk();
@@ -127,7 +134,7 @@ export class ChunkSubscriptionSystem extends System {
 
                             // If this chunk key wasn't already subscribed to, player needs to receive chunk data:
                             if (!chunkSubComponent.chunks.has(key)) {
-                                let chunkComponent = this.entityManager.getComponent(key, 'terrainchunk') as TerrainChunkComponent;
+                                let chunkComponent = this.entityManager.getComponent(key, ComponentId.TerrainChunk) as TerrainChunkComponent;
                                 if (!chunkComponent) {
                                     chunkComponent = this.terrain.generateChunk(cx, cy, cz);
                                     this.entityManager.addComponent(key, chunkComponent);
@@ -158,7 +165,7 @@ export class ChunkSubscriptionSystem extends System {
 
 export class PlayerActionSystem extends System {
     update(dt: number): any {
-        this.entityManager.getEntities('input').forEach((component, entity) => {
+        this.entityManager.getEntities(ComponentId.Input).forEach((component, entity) => {
             let inputComponent = component as InputComponent;
 
             if (inputComponent.primaryAction) {
