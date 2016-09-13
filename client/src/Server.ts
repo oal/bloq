@@ -1,8 +1,10 @@
+import {SkinnedMesh} from 'three';
 import Game from "./Game";
 import {objectHasKeys} from "../../shared/helpers";
 import {initPlayerEntity} from "./entities";
 import {TerrainChunkComponent} from "../../shared/components";
 import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION, ComponentId} from "../../shared/constants";
+import AnimatedMesh from "./AnimatedMesh";
 
 let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponent] => {
     let view = new DataView(data);
@@ -57,7 +59,7 @@ export default class Server {
 
             // Player component needs special care. For all others, just deserialize and update the entity manager.
             if (objectHasKeys(obj.components, [ComponentId.Player])) {
-                initPlayerEntity(this.game.world.entityManager, obj.entity, obj.components, this.game.world.camera);
+                initPlayerEntity(this.game.world.entityManager, obj.entity, obj.components, this.game.assetManager.getMesh('player') as AnimatedMesh, this.game.world.camera);
             } else {
                 this.game.world.entityManager.deserializeAndSetEntity(jsonStr);
             }

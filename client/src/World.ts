@@ -23,7 +23,6 @@ export default class World extends BaseWorld {
     renderer: WebGLRenderer;
     camera: PerspectiveCamera;
     terrainMaterial: ShaderMaterial;
-    mixer: any;
 
     game: Game;
 
@@ -64,15 +63,15 @@ export default class World extends BaseWorld {
         this.addSystems();
 
 
-        let playerMesh = this.game.assetManager.getMesh('player') as SkinnedMesh;
-
-        playerMesh.position.set(0, 10, 0);
-        this.scene.add(playerMesh);
-        this.mixer = new AnimationMixer(playerMesh);
-
-        let clip = playerMesh.geometry.animations[3];
-        let action = this.mixer.clipAction(clip, playerMesh);
-        action.play();
+        // let playerMesh = this.game.assetManager.getMesh('player') as SkinnedMesh;
+        //
+        // playerMesh.position.set(0, 10, 0);
+        // this.scene.add(playerMesh);
+        // this.mixer = new AnimationMixer(playerMesh);
+        //
+        // let clip = playerMesh.geometry.animations[3];
+        // let action = this.mixer.clipAction(clip, playerMesh);
+        // action.play();
 
 
     }
@@ -95,10 +94,10 @@ export default class World extends BaseWorld {
 
     tick(dt) {
         super.tick(dt);
-
-        if (this.mixer) {
-            this.mixer.update(dt);
-        }
+        //
+        // if (this.mixer) {
+        //     this.mixer.update(dt);
+        // }
         this.renderer.render(this.scene, this.camera);
     }
 }

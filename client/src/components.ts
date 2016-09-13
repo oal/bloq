@@ -3,6 +3,7 @@ import {Object3D} from 'three';
 import {Component} from '../../shared/components';
 import EntityManager from "../../shared/EntityManager";
 import {ComponentId} from "../../shared/constants";
+import AnimatedMesh from "./AnimatedMesh";
 
 export class MeshComponent extends Component {
     static ID = ComponentId.Mesh;
@@ -28,6 +29,8 @@ export class PlayerSelectionComponent extends MeshComponent {
 // Similar, but simpler component is found on server. Server version doesn't need to be concerned with meshes etc.
 export class PlayerComponent extends MeshComponent {
     static ID = ComponentId.Player;
+
+    mesh: AnimatedMesh;
 }
 
 export function registerClientComponents(manager: EntityManager) {

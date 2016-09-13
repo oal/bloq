@@ -3,10 +3,7 @@ import {PlayerComponent, PlayerSelectionComponent} from "./components";
 import {
     Mesh,
     BoxGeometry,
-    Object3D,
-    SphereGeometry,
     MeshBasicMaterial,
-    MeshPhongMaterial,
     PerspectiveCamera,
     ArrowHelper,
     Vector3,
@@ -16,31 +13,23 @@ import {
 } from 'three';
 import {WallCollisionComponent} from "../../shared/components";
 import {ComponentId} from "../../shared/constants";
+import AnimatedMesh from "./AnimatedMesh";
 
-export function initPlayerEntity(em: EntityManager, entity: string, initialData: Object, camera: PerspectiveCamera) {
+export function initPlayerEntity(em: EntityManager, entity: string, initialData: Object, mesh: AnimatedMesh, camera: PerspectiveCamera) {
     console.log(entity, initialData);
     // TODO: This should be cleaner.
     em.deserializeAndSetEntity(JSON.stringify({entity: entity, components: initialData}));
 
-    let color = parseInt(entity.substr(0, 6), 16);
+    camera.position.y = 2.5;
+    camera.position.z = -0.5;
 
-    let mat = new MeshPhongMaterial({color: color});
-
-    let head = new Mesh(new SphereGeometry(0.5, 5, 5), mat);
-    head.position.y = 2.5;
-
-    let body = new Mesh(new BoxGeometry(1.5, 2, 1.1), mat);
-    body.position.y = 1;
-
-    let object = new Object3D();
-    object.add(head);
+    let playerMesh = mesh.clone() as AnimatedMesh;
 
     // Only current player needs a camera attached.
-    if (ComponentId.CurrentPlayer in initialData) head.add(camera);
-    else object.add(body);
+    if (ComponentId.CurrentPlayer in initialData) playerMesh.add(camera);
 
     // Debug helper to see how ground detection works.
-    object.add(new ArrowHelper(new Vector3(0, 0, -1), new Vector3(0, 0, 0), 1));
+    playerMesh.add(new ArrowHelper(new Vector3(0, 0, -1), new Vector3(0, 0, 0), 1));
 
     // Only show selection box for current player.
     if (ComponentId.CurrentPlayer in initialData) {
@@ -65,7 +54,7 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
     }
 
     let playerComponent = new PlayerComponent();
-    playerComponent.mesh = object;
+    playerComponent.mesh = playerMesh;
     em.addComponent(entity, playerComponent);
 
     // Add local component to track wall / block collisions.

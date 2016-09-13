@@ -1,4 +1,5 @@
 import {TextureLoader, JSONLoader, NearestFilter, Texture, MeshBasicMaterial, SkinnedMesh, Mesh} from 'three';
+import AnimatedMesh from "./AnimatedMesh";
 
 
 export default class AssetManager {
@@ -13,7 +14,7 @@ export default class AssetManager {
 
     assets: {
         textures: Map<string, Texture>,
-        meshes: Map<string, Mesh | SkinnedMesh>
+        meshes: Map<string, Mesh | AnimatedMesh>
     };
 
     constructor() {
@@ -78,7 +79,7 @@ export default class AssetManager {
                 if (geometry.animations) {
                     material.skinning = true;
                     material.morphTargets = true;
-                    this.assets.meshes.set(name, new SkinnedMesh(geometry, material));
+                    this.assets.meshes.set(name, new AnimatedMesh(geometry, material));
                 } else {
                     this.assets.meshes.set(name, new Mesh(geometry, material));
                 }

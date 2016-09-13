@@ -1,10 +1,10 @@
 import * as Keymaster from 'keymaster';
-import {Scene, Mesh, ShaderMaterial, Vector3, CubeGeometry} from 'three';
+import {Scene, Mesh, ShaderMaterial, Vector3, CubeGeometry, AnimationMixer} from 'three';
 import MouseManager from '../lib/MouseManager';
 
 import EntityManager from "../../shared/EntityManager";
 import {
-    InputComponent, PositionComponent, RotationComponent, TerrainChunkComponent
+    InputComponent, PositionComponent, RotationComponent, TerrainChunkComponent, PhysicsComponent
 } from "../../shared/components";
 import Server from "./Server";
 import {MeshComponent, PlayerComponent, PlayerSelectionComponent} from "./components";
@@ -130,23 +130,34 @@ export class PlayerMeshSystem extends System {
     update(dt: number) {
         this.entityManager.getEntities(ComponentId.Player).forEach((component, entity) => {
             let playerComponent = component as PlayerComponent;
+            let mesh = playerComponent.mesh;
 
-            if (!playerComponent.mesh.parent) {
-                this.scene.add(playerComponent.mesh);
+            if (!mesh.parent) {
+                this.scene.add(mesh);
             }
 
             let position = this.entityManager.getComponent(entity, ComponentId.Position) as PositionComponent;
-            playerComponent.mesh.position.x = position.x;
-            playerComponent.mesh.position.y = position.y;
-            playerComponent.mesh.position.z = position.z;
+            mesh.position.x = position.x;
+            mesh.position.y = position.y;
+            mesh.position.z = position.z;
 
             let rot = this.entityManager.getComponent(entity, ComponentId.Rotation) as RotationComponent;
-            playerComponent.mesh.rotation.y = rot.y;
+            mesh.rotation.y = rot.y;
 
             if (this.entityManager.getComponent(entity, ComponentId.CurrentPlayer)) {
-                let cam = playerComponent.mesh.getObjectByName('camera');
-                if(cam) cam.rotation.x = rot.x
+                mesh.getObjectByName('camera').rotation.x = rot.x;
             }
+
+            // Animation
+            let physComponent = this.entityManager.getComponent(entity, ComponentId.Physics) as PhysicsComponent;
+            if(Math.abs(physComponent.velX) > 0.01 || Math.abs(physComponent.velZ) > 0.01) {
+                if(mesh.getCurrentAnimation() != 'walk') {
+                    mesh.playAnimation('walk');
+                }
+            } else {
+                mesh.playAnimation('idle');
+            }
+            playerComponent.mesh.mixer.update(dt);
         })
     }
 }
@@ -232,14 +243,6 @@ export class MeshSystem extends System {
         })
     }
 }
-//
-// export class RemoveEntitySystem extends System {
-//     update(dt: number) {
-//         this.entityManager.getEntities(ComponentId.RemovedEntity).forEach((component, entity) => {
-//             this.entityManager.removeEntity(entity);
-//         })
-//     }
-// }
 
 export class TerrainChunkSystem extends System {
     scene: Scene;
