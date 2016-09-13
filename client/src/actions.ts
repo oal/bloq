@@ -1,4 +1,7 @@
-import {ActionManager, UnsubscribeTerrainChunksAction, RemoveBlocksAction} from "../../shared/actions";
+import {
+    ActionManager, UnsubscribeTerrainChunksAction, RemoveBlocksAction,
+    RemoveEntitiesAction
+} from "../../shared/actions";
 
 
 export class ClientActionManager extends ActionManager {
@@ -10,6 +13,9 @@ export class ClientActionManager extends ActionManager {
             case RemoveBlocksAction.ID:
                 let blocks = data['blocks'].map(coord => [coord[0], coord[1], coord[2]]);
                 this.queue.push(new RemoveBlocksAction(blocks));
+                break;
+            case RemoveEntitiesAction.ID:
+                this.queue.push(new RemoveBlocksAction(data['entities']));
                 break;
             default:
                 console.warn('Unknown action ID: ', id);

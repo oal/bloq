@@ -144,7 +144,8 @@ export class PlayerMeshSystem extends System {
             playerComponent.mesh.rotation.y = rot.y;
 
             if (this.entityManager.getComponent(entity, ComponentId.CurrentPlayer)) {
-                playerComponent.mesh.getObjectByName('camera').rotation.x = rot.x
+                let cam = playerComponent.mesh.getObjectByName('camera');
+                if(cam) cam.rotation.x = rot.x
             }
         })
     }
@@ -231,14 +232,14 @@ export class MeshSystem extends System {
         })
     }
 }
-
-export class RemoveEntitySystem extends System {
-    update(dt: number) {
-        this.entityManager.getEntities(ComponentId.RemovedEntity).forEach((component, entity) => {
-            this.entityManager.removeEntity(entity);
-        })
-    }
-}
+//
+// export class RemoveEntitySystem extends System {
+//     update(dt: number) {
+//         this.entityManager.getEntities(ComponentId.RemovedEntity).forEach((component, entity) => {
+//             this.entityManager.removeEntity(entity);
+//         })
+//     }
+// }
 
 export class TerrainChunkSystem extends System {
     scene: Scene;

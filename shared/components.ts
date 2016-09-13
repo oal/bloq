@@ -112,12 +112,6 @@ export class CurrentPlayerComponent extends SerializableComponent {
     static ID = ComponentId.CurrentPlayer;
 }
 
-
-export class RemovedEntityComponent extends SerializableComponent {
-    static ID = ComponentId.RemovedEntity;
-}
-
-
 export class TerrainChunkComponent extends Component {
     static ID = ComponentId.TerrainChunk;
 
@@ -168,7 +162,6 @@ export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new OnGroundComponent());
     manager.registerComponentType(new InputComponent());
     manager.registerComponentType(new CurrentPlayerComponent());
-    manager.registerComponentType(new RemovedEntityComponent());
     manager.registerComponentType(new WallCollisionComponent());
     manager.registerComponentType(new TerrainChunkComponent());
 }

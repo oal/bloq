@@ -1,8 +1,15 @@
-import {Scene, WebGLRenderer, PerspectiveCamera, ShaderMaterial, SkeletonHelper, AnimationMixer, JSONLoader, SkinnedMesh, MeshBasicMaterial} from 'three';
+import {
+    Scene,
+    WebGLRenderer,
+    PerspectiveCamera,
+    ShaderMaterial,
+    AnimationMixer,
+    SkinnedMesh,
+} from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
 import {
-    RemoveEntitySystem, TerrainChunkSystem, PlayerInputSystem, PlayerInputSyncSystem, MeshSystem, PlayerMeshSystem,
+    TerrainChunkSystem, PlayerInputSystem, PlayerInputSyncSystem, MeshSystem, PlayerMeshSystem,
     PlayerSelectionSystem
 } from "./systems";
 import Game from "./Game";
@@ -35,7 +42,7 @@ export default class World extends BaseWorld {
         this.terrainMaterial = new ShaderMaterial({
             uniforms: {
                 texture: {
-                    value: this.game.assetManager.findTexture('terrain')
+                    value: this.game.assetManager.getTexture('terrain')
                 }
             },
             vertexShader: document.getElementById('vertexShader').textContent,
@@ -56,25 +63,16 @@ export default class World extends BaseWorld {
 
         this.addSystems();
 
-        var loader = new JSONLoader();
-        loader.load('./assets/player.json', ( geometry, materials ) => {
-            let m = new MeshBasicMaterial({
-                map: this.game.assetManager.findTexture('player'),
-                skinning: true,
-                morphTargets: true
-            });
 
-            let mesh = new SkinnedMesh( geometry, m );
-            mesh.name = "Test";
-            mesh.position.set( 0, 10, 0 );
-            this.scene.add( mesh );
+        let playerMesh = this.game.assetManager.getMesh('player') as SkinnedMesh;
 
-            this.mixer = new AnimationMixer( mesh );
+        playerMesh.position.set(0, 10, 0);
+        this.scene.add(playerMesh);
+        this.mixer = new AnimationMixer(playerMesh);
 
-            let clip = geometry.animations[3];
-            let action = this.mixer.clipAction( clip, mesh );
-            action.play();
-        } );
+        let clip = playerMesh.geometry.animations[3];
+        let action = this.mixer.clipAction(clip, playerMesh);
+        action.play();
 
 
     }
@@ -82,7 +80,7 @@ export default class World extends BaseWorld {
     addSystems() {
         // TODO: Store system orders as constants in one place.
         this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), -1000); // Always process first
-        this.addSystem(new RemoveEntitySystem(this.entityManager), -10);
+        //this.addSystem(new RemoveEntitySystem(this.entityManager), -10);
         this.addSystem(new TerrainChunkSystem(this.entityManager, this.scene, this.terrainMaterial), -9);
         this.addSystem(new PlayerInputSystem(this.entityManager), -8);
 
@@ -98,9 +96,8 @@ export default class World extends BaseWorld {
     tick(dt) {
         super.tick(dt);
 
-        if( this.mixer ) {
-            this.mixer.update( dt );
-            //helper.update();
+        if (this.mixer) {
+            this.mixer.update(dt);
         }
         this.renderer.render(this.scene, this.camera);
     }

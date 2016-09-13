@@ -5,9 +5,9 @@ import World from "./World";
 import {initPlayerEntity, updatePlayerInput, updatePlayerRotation} from "./entities";
 import {objectHasKeys} from "../../shared/helpers";
 import {NetworkComponent} from "./components";
-import {RemovedEntityComponent} from "../../shared/components";
 import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION, ComponentId} from "../../shared/constants";
-import {Action} from "../../shared/actions";
+import {Action, RemoveEntitiesAction} from "../../shared/actions";
+import {broadcastAction} from "./helpers";
 
 let hrtimeToSeconds = (hrtime: number[]) => hrtime[0] + hrtime[1] / 1000000000;
 
@@ -122,8 +122,9 @@ export default class Server {
         });
 
         ws.on('close', () => {
-            console.log('Removing player');
-            this.world.entityManager.addComponent(playerEntity, new RemovedEntityComponent());
+            console.log('Removing player', playerEntity);
+            this.world.entityManager.removeEntity(playerEntity);
+            broadcastAction(this.world.entityManager, [0, 0, 0], new RemoveEntitiesAction([playerEntity]));
         })
 
     }

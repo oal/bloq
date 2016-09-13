@@ -18,7 +18,7 @@ import {WallCollisionComponent} from "../../shared/components";
 import {ComponentId} from "../../shared/constants";
 
 export function initPlayerEntity(em: EntityManager, entity: string, initialData: Object, camera: PerspectiveCamera) {
-    console.log(initialData);
+    console.log(entity, initialData);
     // TODO: This should be cleaner.
     em.deserializeAndSetEntity(JSON.stringify({entity: entity, components: initialData}));
 

@@ -90,19 +90,6 @@ export class BroadcastPlayerInputSystem extends System {
     }
 }
 
-export class RemoveEntitySystem extends System {
-    update(dt: number) {
-        this.entityManager.getEntities(ComponentId.RemovedEntity).forEach((component, entity) => {
-            let data = this.entityManager.serializeEntity(entity, [ComponentId.RemovedEntity]);
-            this.entityManager.removeEntity(entity);
-            this.entityManager.getEntities(ComponentId.Player).forEach((component, entity) => {
-                let netComponent = this.entityManager.getComponent(entity, ComponentId.Network) as NetworkComponent;
-                Server.sendEntity(netComponent.websocket, data);
-            });
-        })
-    }
-}
-
 export class ChunkSubscriptionSystem extends System {
     terrain: Terrain;
 

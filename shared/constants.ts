@@ -14,7 +14,6 @@ export const enum ComponentId {
     WallCollision,
     Input,
     CurrentPlayer,
-    RemovedEntity,
     TerrainChunk,
 
     // Client

@@ -88,7 +88,6 @@ export default class EntityManager {
 
     addComponent(entity: string, component: Component): Component {
         this.components.get(component.ID).set(entity, component);
-
         return component;
     }
 

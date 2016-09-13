@@ -78,3 +78,19 @@ export class RemoveBlocksAction extends Action {
         })
     }
 }
+
+export class RemoveEntitiesAction extends Action {
+    static ID: number = 2;
+    entities: Array<string>;
+
+    constructor(entities: Array<string>) {
+        super();
+        this.entities = entities;
+    }
+
+    execute(entityManager: EntityManager) {
+        for (let entity of this.entities) {
+            entityManager.removeEntity(entity);
+        }
+    }
+}

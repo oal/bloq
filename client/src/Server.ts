@@ -3,7 +3,6 @@ import {objectHasKeys} from "../../shared/helpers";
 import {initPlayerEntity} from "./entities";
 import {TerrainChunkComponent} from "../../shared/components";
 import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION, ComponentId} from "../../shared/constants";
-import {UnsubscribeTerrainChunksAction} from "../../shared/actions";
 
 let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponent] => {
     let view = new DataView(data);
