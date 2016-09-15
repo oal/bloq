@@ -3,8 +3,6 @@ import {
     WebGLRenderer,
     PerspectiveCamera,
     ShaderMaterial,
-    AnimationMixer,
-    SkinnedMesh,
 } from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
@@ -61,25 +59,11 @@ export default class World extends BaseWorld {
         };
 
         this.addSystems();
-
-
-        // let playerMesh = this.game.assetManager.getMesh('player') as SkinnedMesh;
-        //
-        // playerMesh.position.set(0, 10, 0);
-        // this.scene.add(playerMesh);
-        // this.mixer = new AnimationMixer(playerMesh);
-        //
-        // let clip = playerMesh.geometry.animations[3];
-        // let action = this.mixer.clipAction(clip, playerMesh);
-        // action.play();
-
-
     }
 
     addSystems() {
         // TODO: Store system orders as constants in one place.
         this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), -1000); // Always process first
-        //this.addSystem(new RemoveEntitySystem(this.entityManager), -10);
         this.addSystem(new TerrainChunkSystem(this.entityManager, this.scene, this.terrainMaterial), -9);
         this.addSystem(new PlayerInputSystem(this.entityManager), -8);
 
@@ -94,10 +78,6 @@ export default class World extends BaseWorld {
 
     tick(dt) {
         super.tick(dt);
-        //
-        // if (this.mixer) {
-        //     this.mixer.update(dt);
-        // }
         this.renderer.render(this.scene, this.camera);
     }
 }

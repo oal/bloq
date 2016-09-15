@@ -113,7 +113,7 @@ export default class Server {
             let obj = JSON.parse(data);
             if (obj.entity == playerEntity) {
                 if (objectHasKeys(obj.components, [ComponentId.Input, ComponentId.Position])) {
-                    updatePlayerInput(this.world.entityManager, playerEntity, obj);
+                    updatePlayerInput(this.world.entityManager, this.world.actionManager, playerEntity, obj);
                 }
                 if (objectHasKeys(obj.components, [ComponentId.Rotation])) {
                     updatePlayerRotation(this.world.entityManager, playerEntity, obj);

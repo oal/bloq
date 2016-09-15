@@ -2,7 +2,7 @@ import {TextEncoder} from 'text-encoding';
 import EntityManager from "./EntityManager";
 import {globalToChunk, mod, chunkKey} from "./helpers";
 import {TERRAIN_CHUNK_SIZE, ComponentId} from "./constants";
-import {TerrainChunkComponent} from "./components";
+import {TerrainChunkComponent, PositionComponent} from "./components";
 
 export class ActionManager {
     queue: Array<Action> = [];
@@ -84,7 +84,7 @@ export class RemoveBlocksAction extends Action {
 }
 
 export class RemoveEntitiesAction extends Action {
-    static ID: number = 2;
+    static ID: number = 3;
     entities: Array<string>;
 
     constructor(entities: Array<string>) {
@@ -96,5 +96,26 @@ export class RemoveEntitiesAction extends Action {
         for (let entity of this.entities) {
             entityManager.removeEntity(entity);
         }
+    }
+}
+
+
+export class MoveEntityAction extends Action {
+    static ID: number = 4;
+
+    entity: string;
+    position: [number, number, number];
+
+    constructor(entity: string, position: [number, number, number]) {
+        super();
+        this.entity = entity;
+        this.position = position;
+    }
+
+    execute(entityManager: EntityManager) {
+        let posComponent = entityManager.getComponent(this.entity, ComponentId.Position) as PositionComponent;
+        posComponent.x = this.position[0];
+        posComponent.y = this.position[1];
+        posComponent.z = this.position[2];
     }
 }

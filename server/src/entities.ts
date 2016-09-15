@@ -5,6 +5,10 @@ import {
 } from "../../shared/components";
 import {NetworkComponent, NewPlayerComponent, PlayerComponent, ChunkSubscriptionComponent} from "./components";
 import {ComponentId} from "../../shared/constants";
+import {MoveEntityAction} from "../../shared/actions";
+import {globalToChunk} from "../../shared/helpers";
+import {broadcastAction} from "./helpers";
+import {ServerActionManager} from "./actions";
 
 
 export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocket) {
@@ -12,11 +16,13 @@ export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocke
     net.websocket = ws;
     em.addComponent(entity, net); // Keyboard input
     em.addComponent(entity, new InputComponent()); // Keyboard input
+
     let pos = new PositionComponent();
     pos.y = 15;
     pos.x = 5;
     pos.z = 5;
     em.addComponent(entity, pos); // Position tracking
+
     em.addComponent(entity, new PhysicsComponent()); // Physics tracking
     em.addComponent(entity, new RotationComponent()); // Rotation
 
@@ -28,7 +34,7 @@ export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocke
     em.addComponent(entity, new ChunkSubscriptionComponent())
 }
 
-export function updatePlayerInput(em: EntityManager, playerEntity, obj) {
+export function updatePlayerInput(em: EntityManager, am: ServerActionManager, playerEntity: string, obj) {
     let input = obj.components[ComponentId.Input];
     let existingInput = em.getComponent(playerEntity, ComponentId.Input);
     existingInput.update(input);
@@ -36,12 +42,20 @@ export function updatePlayerInput(em: EntityManager, playerEntity, obj) {
 
     let position = obj.components[ComponentId.Position];
     let existingPosition = em.getComponent(playerEntity, ComponentId.Position) as PositionComponent;
+    let prevPos: [number, number, number] = [existingPosition.x, existingPosition.y, existingPosition.z];
     let dist = Math.sqrt(Math.pow(position.x - existingPosition.x, 2) + Math.pow(position.y - existingPosition.y, 2) + Math.pow(position.z - existingPosition.z, 2));
 
-    existingPosition.update(position);
-    if (dist > 0.5) {
-        // TODO: Send correction to client.
+    if (dist < 2) {
+        existingPosition.update(position);
+    } else {
         console.log('Too big difference between client and server!', dist);
+        console.log(playerEntity, prevPos);
+        let action = new MoveEntityAction(playerEntity, prevPos);
+        am.queueAction(action); // Queue on server as well.
+
+        // Broad cast so it's queued on clients.
+        let [cx, cy, cz] = prevPos.map(globalToChunk);
+        broadcastAction(em, [cx, cy, cz], action);
     }
 }
 
