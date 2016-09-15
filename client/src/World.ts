@@ -35,7 +35,7 @@ export default class World extends BaseWorld {
 
         this.scene = new Scene();
 
-        this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.25, 10000);
+        this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 10000);
         this.camera.name = 'camera'; // Used to look up camera from e.g. player's Object3D.
 
         this.terrainMaterial = new ShaderMaterial({

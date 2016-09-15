@@ -73,7 +73,7 @@ export default class Server {
             let obj = JSON.parse(jsonStr);
 
             // Queue action.
-            this.game.world.actionManager.queueAction(actionId, obj);
+            this.game.world.actionManager.queueRawAction(actionId, obj);
         } else if (msgType === MSG_TERRAIN) { // Binary terrain message
             let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
             let [entity, component] = deserializeTerrainChunk(data);

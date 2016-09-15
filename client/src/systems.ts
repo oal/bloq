@@ -1,5 +1,5 @@
 import * as Keymaster from 'keymaster';
-import {Scene, Mesh, ShaderMaterial, Vector3, CubeGeometry, AnimationMixer} from 'three';
+import {Scene, Mesh, ShaderMaterial, Vector3, Object3D} from 'three';
 import MouseManager from '../lib/MouseManager';
 
 import EntityManager from "../../shared/EntityManager";
@@ -146,18 +146,19 @@ export class PlayerMeshSystem extends System {
 
             if (this.entityManager.getComponent(entity, ComponentId.CurrentPlayer)) {
                 mesh.getObjectByName('camera').rotation.x = rot.x;
+            } else {
+                // Animation is only relevant for other players, as current player has no mesh.
+                let physComponent = this.entityManager.getComponent(entity, ComponentId.Physics) as PhysicsComponent;
+                if(Math.abs(physComponent.velX) > 0.01 || Math.abs(physComponent.velZ) > 0.01) {
+                    if(mesh.getCurrentAnimation() != 'walk') {
+                        mesh.playAnimation('walk');
+                    }
+                } else {
+                    mesh.playAnimation('idle');
+                }
+                playerComponent.mesh.mixer.update(dt);
             }
 
-            // Animation
-            let physComponent = this.entityManager.getComponent(entity, ComponentId.Physics) as PhysicsComponent;
-            if(Math.abs(physComponent.velX) > 0.01 || Math.abs(physComponent.velZ) > 0.01) {
-                if(mesh.getCurrentAnimation() != 'walk') {
-                    mesh.playAnimation('walk');
-                }
-            } else {
-                mesh.playAnimation('idle');
-            }
-            playerComponent.mesh.mixer.update(dt);
         })
     }
 }
@@ -260,11 +261,15 @@ export class TerrainChunkSystem extends System {
             let meshComponent = (this.entityManager.getComponent(entity, ComponentId.Mesh) || this.entityManager.addComponent(entity, new MeshComponent())) as MeshComponent;
 
             if (chunkComponent.isDirty() || !meshComponent.mesh) {
-                if (meshComponent.mesh) console.log('Rebuilding existing chunk!');
                 let chunkGeom = buildChunkGeometry(chunkComponent.data);
+
                 let mesh;
-                if (chunkGeom) mesh = new Mesh(chunkGeom, this.material);
-                else mesh = new Mesh(new CubeGeometry(0.1, 0.1, 0.1), this.material); // Debug
+                if (chunkGeom) {
+                    mesh = new Mesh(chunkGeom, this.material);
+                } else {
+                    mesh = new Object3D();
+                    mesh.visible = false;
+                } // Debug
 
                 // Set chunk position. Add offsets so displayed mesh corresponds with collision detection and
                 // lookups on the underlying data for the terrain chunk.

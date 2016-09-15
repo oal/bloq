@@ -10,6 +10,7 @@ import EntityManager from "../../shared/EntityManager";
 import {UnsubscribeTerrainChunksAction, RemoveBlocksAction} from "../../shared/actions";
 import {broadcastAction} from "./helpers";
 import {ComponentId} from "../../shared/constants";
+import {ServerActionManager} from "./actions";
 
 
 export class InformNewPlayersSystem extends System {
@@ -151,6 +152,13 @@ export class ChunkSubscriptionSystem extends System {
 }
 
 export class PlayerActionSystem extends System {
+    actionManager: ServerActionManager;
+
+    constructor(entityManager: EntityManager, actionManager: ServerActionManager) {
+        super(entityManager);
+        this.actionManager = actionManager;
+    }
+
     update(dt: number): any {
         this.entityManager.getEntities(ComponentId.Input).forEach((component, entity) => {
             let inputComponent = component as InputComponent;
@@ -158,6 +166,9 @@ export class PlayerActionSystem extends System {
             if (inputComponent.primaryAction) {
                 let action = new RemoveBlocksAction([inputComponent.actionTarget]);
 
+                this.actionManager.queueAction(action); // Queue on server as well.
+
+                // Broad cast so it's queued on clients.
                 let [cx, cy, cz] = inputComponent.actionTarget.map(globalToChunk);
                 broadcastAction(this.entityManager, [cx, cy, cz], action);
             }

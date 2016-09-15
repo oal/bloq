@@ -5,7 +5,7 @@ import {
 
 
 export class ClientActionManager extends ActionManager {
-    queueAction(id: number, data: Object) {
+    queueRawAction(id: number, data: Object) {
         switch(id) {
             case UnsubscribeTerrainChunksAction.ID:
                 this.queue.push(new UnsubscribeTerrainChunksAction(data['chunkKeys']));

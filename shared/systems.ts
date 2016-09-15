@@ -143,7 +143,7 @@ export class TerrainCollisionSystem extends System {
             };
 
             // Check and handle ground collisions.
-            if (checkCollisionAt(0, -0.25, 0) || checkCollisionAt(0, 2, 0)) {
+            if (checkCollisionAt(0, -0.25, 0) || checkCollisionAt(0, 3, 0)) {
                 physComponent.velY = 0.0;
                 this.entityManager.addComponent(entity, new OnGroundComponent());
             } else {
@@ -153,10 +153,10 @@ export class TerrainCollisionSystem extends System {
 
             // Check and update block collision component (wall collisions).
             let bcComponent = this.entityManager.getComponent(entity, ComponentId.WallCollision) as WallCollisionComponent;
-            bcComponent.px = !!(checkCollisionAt(1, 0.25, 0) || checkCollisionAt(1, 1.25, 0));
-            bcComponent.nx = !!(checkCollisionAt(-1, 0.25, 0) || checkCollisionAt(-1, 1.25, 0));
-            bcComponent.pz = !!(checkCollisionAt(0, 0.25, 1) || checkCollisionAt(0, 1.25, 1));
-            bcComponent.nz = !!(checkCollisionAt(0, 0.25, -1) || checkCollisionAt(0, 1.25, -1));
+            bcComponent.px = !!(checkCollisionAt(1, 0.25, 0) || checkCollisionAt(1, 1.25, 0) || checkCollisionAt(1, 2.25, 0));
+            bcComponent.nx = !!(checkCollisionAt(-1, 0.25, 0) || checkCollisionAt(-1, 1.25, 0) || checkCollisionAt(-1, 2.25, 0));
+            bcComponent.pz = !!(checkCollisionAt(0, 0.25, 1) || checkCollisionAt(0, 1.25, 1) || checkCollisionAt(0, 2.25, 1));
+            bcComponent.nz = !!(checkCollisionAt(0, 0.25, -1) || checkCollisionAt(0, 1.25, -1) || checkCollisionAt(0, 2.25, -1));
         })
     }
 }

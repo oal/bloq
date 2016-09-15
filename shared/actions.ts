@@ -17,7 +17,11 @@ export class ActionManager {
         this.queue = [];
     }
 
-    queueAction(id: number, data: Object) {
+    queueRawAction(id: number, data: Object) {
+    }
+
+    queueAction(action: Action) {
+        this.queue.push(action);
     }
 }
 

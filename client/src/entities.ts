@@ -9,7 +9,8 @@ import {
     Vector3,
     Color,
     BoxHelper,
-    LineBasicMaterial
+    LineBasicMaterial,
+    Object3D
 } from 'three';
 import {WallCollisionComponent} from "../../shared/components";
 import {ComponentId} from "../../shared/constants";
@@ -20,13 +21,15 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
     // TODO: This should be cleaner.
     em.deserializeAndSetEntity(JSON.stringify({entity: entity, components: initialData}));
 
-    camera.position.y = 2.5;
-    camera.position.z = -0.5;
-
-    let playerMesh = mesh.clone() as AnimatedMesh;
-
     // Only current player needs a camera attached.
-    if (ComponentId.CurrentPlayer in initialData) playerMesh.add(camera);
+    let playerMesh;
+    if (ComponentId.CurrentPlayer in initialData) {
+        playerMesh = new Object3D();
+        camera.position.y = 2.5;
+        playerMesh.add(camera);
+    } else {
+        playerMesh = mesh.clone() as AnimatedMesh
+    }
 
     // Debug helper to see how ground detection works.
     playerMesh.add(new ArrowHelper(new Vector3(0, 0, -1), new Vector3(0, 0, 0), 1));
