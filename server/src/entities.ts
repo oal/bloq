@@ -38,7 +38,6 @@ export function updatePlayerInput(em: EntityManager, am: ServerActionManager, pl
     let input = obj.components[ComponentId.Input];
     let existingInput = em.getComponent(playerEntity, ComponentId.Input);
     existingInput.update(input);
-    existingInput.setDirty(true);
 
     let position = obj.components[ComponentId.Position];
     let existingPosition = em.getComponent(playerEntity, ComponentId.Position) as PositionComponent;

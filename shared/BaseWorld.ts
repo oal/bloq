@@ -1,7 +1,7 @@
 import EntityManager from "./EntityManager";
 import {registerSharedComponents} from "./components";
 import {
-    System, MovementSystem, PhysicsSystem, TerrainCollisionSystem, PositionSystem
+    System, MovementSystem, PhysicsSystem, TerrainCollisionSystem, PositionSystem, CleanComponentsSystem
 } from "./systems";
 import {ActionManager} from "./actions";
 
@@ -22,6 +22,9 @@ export default class BaseWorld {
         this.addSystem(new TerrainCollisionSystem(em), 2);
         this.addSystem(new MovementSystem(em), 3);
         this.addSystem(new PositionSystem(em), 4);
+
+        // Cleaning is the last thing we do in each tick.
+        this.addSystem(new CleanComponentsSystem(em), 10000);
     }
 
     addSystem(system: System, order: number = 0.0) {

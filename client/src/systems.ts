@@ -28,23 +28,18 @@ export class PlayerInputSystem extends System {
 
             if (moveForward !== input.moveForward) {
                 input.moveForward = moveForward;
-                input.setDirty(true);
             }
             if (moveLeft !== input.moveLeft) {
                 input.moveLeft = moveLeft;
-                input.setDirty(true);
             }
             if (moveRight !== input.moveRight) {
                 input.moveRight = moveRight;
-                input.setDirty(true);
             }
             if (moveBackward !== input.moveBackward) {
                 input.moveBackward = moveBackward;
-                input.setDirty(true);
             }
             if (jump !== input.jump) {
                 input.jump = jump;
-                input.setDirty(true);
             }
 
             // Mouse movement
@@ -52,13 +47,11 @@ export class PlayerInputSystem extends System {
             let [dx, dy] = MouseManager.delta();
             if (dx !== 0) {
                 rot.y -= dx / 5.0 * dt;
-                rot.setDirty(true);
             }
             if (dy !== 0) {
                 rot.x -= dy / 5.0 * dt;
                 if (rot.x < -Math.PI / 2.0) rot.x = -Math.PI / 2.0;
                 else if (rot.x > Math.PI / 2.0) rot.x = Math.PI / 2.0;
-                rot.setDirty(true);
             }
 
             // Mouse clicks (and maybe also keypad in the future)
@@ -70,11 +63,9 @@ export class PlayerInputSystem extends System {
             }
             if (actionPrimary != input.primaryAction) {
                 input.primaryAction = actionPrimary;
-                input.setDirty(true);
             }
             if (actionSecondary != input.secondaryAction) {
                 input.secondaryAction = actionSecondary;
-                input.setDirty(true);
             }
         })
     }
@@ -102,7 +93,6 @@ export class PlayerInputSyncSystem extends System {
                     entity: entity,
                     components: components
                 });
-                input.setDirty(false);
             }
 
             let rot = this.entityManager.getComponent(entity, ComponentId.Rotation) as RotationComponent;
@@ -113,7 +103,6 @@ export class PlayerInputSyncSystem extends System {
                     entity: entity,
                     components: components
                 });
-                rot.setDirty(false);
             }
         })
     }
@@ -203,7 +192,6 @@ export class PlayerSelectionSystem extends System {
             }
 
             // Hide if target is not valid.
-            if(selectionComponent.targetValid != targetValid) selectionComponent.setDirty(true);
             selectionComponent.targetValid = targetValid;
             selectionComponent.mesh.visible = targetValid;
 
@@ -281,7 +269,6 @@ export class TerrainChunkSystem extends System {
                 if (meshComponent.mesh) this.scene.remove(meshComponent.mesh);
                 meshComponent.mesh = mesh;
                 this.scene.add(mesh);
-                chunkComponent.setDirty(false);
 
                 // Only build one mesh per frame to avoid FPS drop.
                 return;

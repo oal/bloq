@@ -78,7 +78,6 @@ export class RemoveBlocksAction extends Action {
             if(!chunk) return;
 
             chunk.setValue(lx, ly, lz, 0);
-            chunk.setDirty(true);
         })
     }
 }

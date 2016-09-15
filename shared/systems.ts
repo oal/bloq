@@ -27,7 +27,6 @@ export class MovementSystem extends System {
             let rotation = this.entityManager.getComponent(entity, ComponentId.Rotation) as RotationComponent;
 
             let physComponent = component as PhysicsComponent;
-            physComponent.setDirty(false);
 
             let speed = dt * 4;
             let sinSpeed = Math.sin(rotation.y) * speed;
@@ -35,27 +34,22 @@ export class MovementSystem extends System {
             if (input.moveForward) {
                 physComponent.velX -= sinSpeed;
                 physComponent.velZ -= cosSpeed;
-                physComponent.setDirty(true);
             }
             if (input.moveLeft) {
                 physComponent.velX -= cosSpeed;
                 physComponent.velZ += sinSpeed;
-                physComponent.setDirty(true);
             }
             if (input.moveRight) {
                 physComponent.velX += cosSpeed;
                 physComponent.velZ -= sinSpeed;
-                physComponent.setDirty(true);
             }
             if (input.moveBackward) {
                 physComponent.velX += sinSpeed;
                 physComponent.velZ += cosSpeed;
-                physComponent.setDirty(true);
             }
             if (input.jump && this.entityManager.getComponent(entity, ComponentId.OnGround)) {
                 physComponent.velY = 0.25;
                 this.entityManager.removeComponentType(entity, ComponentId.OnGround);
-                physComponent.setDirty(true);
             }
 
             // Are we colliding with a block in the world? If so, allow no more movement in that direction.
@@ -96,7 +90,6 @@ export class PositionSystem extends System {
             posComponent.x += physComponent.velX;
             posComponent.y += physComponent.velY;
             posComponent.z += physComponent.velZ;
-            posComponent.setDirty(true);
         })
     }
 }
@@ -171,5 +164,11 @@ export class ActionExecutionSystem extends System {
 
     update(dt: number): any {
         this.actionManager.executeAll(this.entityManager);
+    }
+}
+
+export class CleanComponentsSystem extends System {
+    update(dt: number): any {
+        this.entityManager.cleanComponents();
     }
 }

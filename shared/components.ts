@@ -10,6 +10,7 @@ let componentReplacer = (key, value) => {
 
 export class Component {
     static ID = 0;
+    dirtyFields: {} = {}; // TODO: Use Set if we can compile without it being transpiled to an Object.
 
     get ID(): number {
         return this.constructor['ID'];
@@ -17,18 +18,13 @@ export class Component {
 
     private dirty: boolean = false;
 
-    setDirty(state: boolean) {
-        this.dirty = state;
-    }
 
     isDirty(): boolean {
-        return this.dirty;
+        return Object.keys(this.dirtyFields).length > 0;
     }
 
     typeName(): ComponentId {
         return this.ID;
-        //let fullName = (this.constructor as any).name.toLowerCase();
-        //return fullName.substring(0, fullName.length - 9); // Everything except "Component".
     }
 
     // Pretty much full / partial deserialization, but JSON is already deserialized in entity deserializer.

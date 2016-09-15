@@ -56,7 +56,6 @@ export class BroadcastPlayerInputSystem extends System {
             let inputComponent = component as InputComponent;
             if (inputComponent.isDirty()) {
                 changedInputs.set(entity, inputComponent.serialize());
-                inputComponent.setDirty(false);
             }
         });
 
@@ -65,7 +64,6 @@ export class BroadcastPlayerInputSystem extends System {
             let rot = component as RotationComponent;
             if (rot.isDirty()) {
                 changedRots.set(entity, rot.serialize());
-                rot.setDirty(false);
             }
         });
 
@@ -145,7 +143,6 @@ export class ChunkSubscriptionSystem extends System {
 
                 // Update chunk subscription.
                 chunkSubComponent.chunks = newChunkSubs;
-                chunkSubComponent.setDirty(true);
             }
         })
     }

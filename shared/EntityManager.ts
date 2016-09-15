@@ -1,6 +1,19 @@
 import {Component, SerializableComponent} from "./components";
 import {ComponentId} from "./constants";
 
+let componentProxyHandler = {
+    // get: (target, name) => {
+    //     return target[name];
+    // },
+    set: (obj, prop, value) => {
+        if(prop != 'dirtyFields') {
+            (obj as Component).dirtyFields[prop] = true;
+            obj[prop] = value;
+        }
+        return true;
+    }
+};
+
 export default class EntityManager {
     private components: Map<ComponentId, Map<string, Component>>;
     private componentConstructors: Map<ComponentId, Function>;
@@ -59,7 +72,7 @@ export default class EntityManager {
 
             let data = components[type];
             let constructor = this.componentConstructors.get(typeI as ComponentId);
-            if(!constructor) {
+            if (!constructor) {
                 console.error('Tried to deserialize unknown component:', type);
                 continue;
             }
@@ -87,7 +100,7 @@ export default class EntityManager {
     }
 
     addComponent(entity: string, component: Component): Component {
-        this.components.get(component.ID).set(entity, component);
+        this.components.get(component.ID).set(entity, new Proxy(component, componentProxyHandler));
         return component;
     }
 
@@ -102,5 +115,13 @@ export default class EntityManager {
 
     removeComponent(entity, component: Component) {
         this.removeComponentType(entity, component.typeName());
+    }
+
+    cleanComponents() {
+        this.components.forEach((entityComponent) => {
+            entityComponent.forEach((component) => {
+                component.dirtyFields = {};
+            })
+        })
     }
 }
