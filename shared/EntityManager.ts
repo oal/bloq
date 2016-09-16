@@ -6,7 +6,8 @@ let componentProxyHandler = {
     //     return target[name];
     // },
     set: (obj, prop, value) => {
-        if(prop != 'dirtyFields') {
+        if (prop != 'dirtyFields' && obj[prop] !== value) {
+            if(prop === 'primaryAction') console.log('New: ', value, "Old: ", obj[prop]);
             (obj as Component).dirtyFields[prop] = true;
             obj[prop] = value;
         }
@@ -120,7 +121,9 @@ export default class EntityManager {
     cleanComponents() {
         this.components.forEach((entityComponent) => {
             entityComponent.forEach((component) => {
-                component.dirtyFields = {};
+                Object.keys(component.dirtyFields).forEach(key => {
+                    if(component.dirtyFields[key]) component.dirtyFields[key] = false;
+                });
             })
         })
     }

@@ -160,7 +160,7 @@ export class PlayerActionSystem extends System {
         this.entityManager.getEntities(ComponentId.Input).forEach((component, entity) => {
             let inputComponent = component as InputComponent;
 
-            if (inputComponent.primaryAction) {
+            if (inputComponent.isDirty('primaryAction') && inputComponent.primaryAction) {
                 let action = new RemoveBlocksAction([inputComponent.actionTarget]);
 
                 this.actionManager.queueAction(action); // Queue on server as well.

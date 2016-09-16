@@ -19,8 +19,9 @@ export class Component {
     private dirty: boolean = false;
 
 
-    isDirty(): boolean {
-        return Object.keys(this.dirtyFields).length > 0;
+    isDirty(field?: string): boolean {
+        if(field) return !!this.dirtyFields[field];
+        else return Object.keys(this.dirtyFields).length > 0;
     }
 
     typeName(): ComponentId {
@@ -132,6 +133,9 @@ export class TerrainChunkComponent extends Component {
     setValue(x: number, y: number, z: number, mat: number): boolean {
         if (x < 0 || y < 0 || z < 0 || x >= TERRAIN_CHUNK_SIZE || y >= TERRAIN_CHUNK_SIZE || z >= TERRAIN_CHUNK_SIZE) return false;
         this.data[(y|0) * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE + (z|0) * TERRAIN_CHUNK_SIZE + (x|0)] = mat;
+
+        // Implicit dirty detection only works when setting attributes, not mutating child structures like an array.
+        this.dirtyFields['data'] = true;
     }
 
     serialize(): Uint8Array {

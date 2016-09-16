@@ -61,10 +61,10 @@ export class PlayerInputSystem extends System {
                 let selectionComponent = this.entityManager.getComponent(entity, ComponentId.PlayerSelection) as PlayerSelectionComponent;
                 input.actionTarget = selectionComponent.target;
             }
-            if (actionPrimary != input.primaryAction) {
+            if (actionPrimary !== input.primaryAction) {
                 input.primaryAction = actionPrimary;
             }
-            if (actionSecondary != input.secondaryAction) {
+            if (actionSecondary !== input.secondaryAction) {
                 input.secondaryAction = actionSecondary;
             }
         })

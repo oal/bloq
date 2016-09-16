@@ -4,6 +4,7 @@ import {globalToChunk, mod, chunkKey} from "./helpers";
 import {TERRAIN_CHUNK_SIZE, ComponentId} from "./constants";
 import {TerrainChunkComponent, PositionComponent} from "./components";
 
+
 export class ActionManager {
     queue: Array<Action> = [];
 
