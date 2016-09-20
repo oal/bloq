@@ -77,7 +77,8 @@ export default class Server {
         } else if (msgType === MSG_TERRAIN) { // Binary terrain message
             let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
             let [entity, component] = deserializeTerrainChunk(data);
-            this.game.world.entityManager.addComponent(entity, component);
+            let chunkComponent = this.game.world.entityManager.addComponent(entity, component) as TerrainChunkComponent;
+            chunkComponent.dirtyFields['data'] = true;
         } else {
             console.warn('Unknown message type: ', msgType)
         }

@@ -211,6 +211,7 @@ export class MeshSystem extends System {
     update(dt: number) {
         this.entityManager.getEntities(ComponentId.Mesh).forEach((component, entity) => {
             let meshComponent = component as MeshComponent;
+            if(!meshComponent.mesh) return; // Mesh may be null.
 
             if (!meshComponent.mesh.parent) {
                 this.scene.add(meshComponent.mesh);
@@ -248,30 +249,28 @@ export class TerrainChunkSystem extends System {
             let chunkComponent = component as TerrainChunkComponent;
             let meshComponent = (this.entityManager.getComponent(entity, ComponentId.Mesh) || this.entityManager.addComponent(entity, new MeshComponent())) as MeshComponent;
 
-            if (chunkComponent.isDirty() || !meshComponent.mesh) {
+            if (chunkComponent.isDirty()) {
+                console.log('Build chunk');
                 let chunkGeom = buildChunkGeometry(chunkComponent.data);
+                if(!chunkGeom) return;
 
-                let mesh;
-                if (chunkGeom) {
-                    mesh = new Mesh(chunkGeom, this.material);
-                } else {
-                    mesh = new Object3D();
-                    mesh.visible = false;
-                } // Debug
+                let mesh = meshComponent.mesh;
+                if (meshComponent.mesh) {
+                    mesh.geometry.dispose();
+                    mesh.geometry = chunkGeom;
+                }
+                else mesh = new Mesh(chunkGeom, this.material);
+
+                if (!meshComponent.mesh) {
+                    meshComponent.mesh = mesh;
+                    this.scene.add(mesh);
+                }
 
                 // Set chunk position. Add offsets so displayed mesh corresponds with collision detection and
                 // lookups on the underlying data for the terrain chunk.
                 mesh.position.x = chunkComponent.x * TERRAIN_CHUNK_SIZE - 1;
                 mesh.position.y = chunkComponent.y * TERRAIN_CHUNK_SIZE - 0.5;
                 mesh.position.z = chunkComponent.z * TERRAIN_CHUNK_SIZE - 1;
-
-                // Remove old (if any) and insert new.
-                if (meshComponent.mesh) this.scene.remove(meshComponent.mesh);
-                meshComponent.mesh = mesh;
-                this.scene.add(mesh);
-
-                // Only build one mesh per frame to avoid FPS drop.
-                return;
             }
         })
     }

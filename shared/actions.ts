@@ -3,6 +3,7 @@ import EntityManager from "./EntityManager";
 import {globalToChunk, mod, chunkKey} from "./helpers";
 import {TERRAIN_CHUNK_SIZE, ComponentId} from "./constants";
 import {TerrainChunkComponent, PositionComponent} from "./components";
+import {MeshComponent} from "../client/src/components";
 
 
 export class ActionManager {

@@ -1,4 +1,4 @@
-import {Object3D} from 'three';
+import {Object3D, Mesh} from 'three';
 
 import {Component} from '../../shared/components';
 import EntityManager from "../../shared/EntityManager";
@@ -8,11 +8,13 @@ import AnimatedMesh from "./AnimatedMesh";
 export class MeshComponent extends Component {
     static ID = ComponentId.Mesh;
 
-    mesh: Object3D;
+    mesh: Mesh = null;
 
     dispose(): void {
         super.dispose();
         if(this.mesh && this.mesh.parent) {
+            console.log('Disposing mesh.');
+            this.mesh.geometry.dispose();
             this.mesh.parent.remove(this.mesh);
         }
     }

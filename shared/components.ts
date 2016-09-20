@@ -4,7 +4,7 @@ import {globalToChunk} from "./helpers";
 
 // Used when serializing component to avoid "dirty" flag being serialized. It is only needed locally at runtime.
 let componentReplacer = (key, value) => {
-    if (key === 'dirty') return undefined;
+    if (key === 'dirtyFields') return undefined;
     return value;
 };
 
@@ -16,12 +16,9 @@ export class Component {
         return this.constructor['ID'];
     }
 
-    private dirty: boolean = false;
-
-
     isDirty(field?: string): boolean {
         if(field) return !!this.dirtyFields[field];
-        else return Object.keys(this.dirtyFields).length > 0;
+        else return Object.keys(this.dirtyFields).some(key => this.dirtyFields[key]);
     }
 
     typeName(): ComponentId {
