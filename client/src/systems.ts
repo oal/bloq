@@ -1,5 +1,5 @@
 import * as Keymaster from 'keymaster';
-import {Scene, Mesh, ShaderMaterial, Vector3, Object3D} from 'three';
+import {Scene, Mesh, ShaderMaterial, Vector3, ArrowHelper, Raycaster} from 'three';
 import MouseManager from '../lib/MouseManager';
 
 import EntityManager from "../../shared/EntityManager";
@@ -12,6 +12,7 @@ import {buildChunkGeometry} from "./terrain";
 import {TERRAIN_CHUNK_SIZE, ComponentId} from "../../shared/constants";
 import {System} from "../../shared/systems";
 import {findBlockMaterial} from "./helpers";
+import {globalToChunk, chunkKey} from "../../shared/helpers";
 
 
 export class PlayerInputSystem extends System {
@@ -154,10 +155,14 @@ export class PlayerMeshSystem extends System {
 
 export class PlayerSelectionSystem extends System {
     scene: Scene;
+    debugArrow: ArrowHelper;
 
     constructor(em: EntityManager, scene: Scene) {
         super(em);
         this.scene = scene;
+
+        this.debugArrow = new ArrowHelper(new Vector3(0, 0, -1), new Vector3(0, 0, 0));
+        this.scene.add(this.debugArrow);
     }
 
     update(dt: number) {
@@ -174,15 +179,23 @@ export class PlayerSelectionSystem extends System {
 
             let rotVec = new Vector3(0, 0, -1).applyAxisAngle(xRot, rotComponent.x).applyAxisAngle(yRot, rotComponent.y);
 
+            this.debugArrow.position.x = pos.x;
+            this.debugArrow.position.y = pos.y;
+            this.debugArrow.position.z = pos.z;
+            this.debugArrow.setDirection(rotVec);
+
             let targetValid = false;
             for (let dist = 0.1; dist < 5; dist++) {
                 // Update rotation vector's length to project further and further away.
                 rotVec.setLength(dist);
 
                 // Take rotation, add 2 for head position, and add player's position.
+                let exactTarget = new Vector3().copy(rotVec).add(pos);
                 let target = new Vector3().copy(rotVec).add(pos).round();
                 if (findBlockMaterial(this.entityManager, target.x, target.y, target.z) !== 0) {
+                    let target = exactTarget.round();
                     selectionComponent.target = [target.x, target.y, target.z];
+                    this.debugArrow.setLength(dist);
 
                     //selectionComponent.mesh.position.set(target.x, target.y, target.z);
                     selectionComponent.mesh.position.lerp(target, 0.75); // Lerp because it looks good. :-)
