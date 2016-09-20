@@ -1,5 +1,5 @@
 import * as Keymaster from 'keymaster';
-import {Scene, Mesh, ShaderMaterial, Vector3, ArrowHelper, Raycaster} from 'three';
+import {Scene, Mesh, ShaderMaterial, Vector3, ArrowHelper, Raycaster, BoxGeometry, MeshBasicMaterial} from 'three';
 import MouseManager from '../lib/MouseManager';
 
 import EntityManager from "../../shared/EntityManager";
@@ -12,7 +12,7 @@ import {buildChunkGeometry} from "./terrain";
 import {TERRAIN_CHUNK_SIZE, ComponentId} from "../../shared/constants";
 import {System} from "../../shared/systems";
 import {findBlockMaterial} from "./helpers";
-import {globalToChunk, chunkKey} from "../../shared/helpers";
+import {globalToChunk, chunkKey, mod} from "../../shared/helpers";
 
 
 export class PlayerInputSystem extends System {
@@ -155,13 +155,13 @@ export class PlayerMeshSystem extends System {
 
 export class PlayerSelectionSystem extends System {
     scene: Scene;
-    debugArrow: ArrowHelper;
+    debugArrow: Mesh;
 
     constructor(em: EntityManager, scene: Scene) {
         super(em);
         this.scene = scene;
 
-        this.debugArrow = new ArrowHelper(new Vector3(0, 0, -1), new Vector3(0, 0, 0));
+        this.debugArrow = new Mesh(new BoxGeometry(0.1, 0.1, 0.1), new MeshBasicMaterial(0xffffff));
         this.scene.add(this.debugArrow);
     }
 
@@ -171,7 +171,7 @@ export class PlayerSelectionSystem extends System {
             let positionComponent = this.entityManager.getComponent(entity, ComponentId.Position) as PositionComponent;
             let rotComponent = this.entityManager.getComponent(entity, ComponentId.Rotation) as PositionComponent;
 
-            let [x, y, z] = [positionComponent.x, positionComponent.y+2, positionComponent.z];
+            let [x, y, z] = [positionComponent.x, positionComponent.y+2.5, positionComponent.z];
 
             let pos = new Vector3(x, y, z);
             let xRot = new Vector3(1, 0, 0);
@@ -179,29 +179,32 @@ export class PlayerSelectionSystem extends System {
 
             let rotVec = new Vector3(0, 0, -1).applyAxisAngle(xRot, rotComponent.x).applyAxisAngle(yRot, rotComponent.y);
 
-            this.debugArrow.position.x = pos.x;
-            this.debugArrow.position.y = pos.y;
-            this.debugArrow.position.z = pos.z;
-            this.debugArrow.setDirection(rotVec);
+            let ray = new Raycaster(pos, rotVec, 0.01, 5);
+
+            // TODO: Check nearby chunks if close to the edge (digging in other chunk)
+            let key = chunkKey(globalToChunk(pos.x), globalToChunk(pos.y), globalToChunk(pos.z));
+            let meshComponent = this.entityManager.getComponent(key, ComponentId.Mesh) as MeshComponent;
+
+            let hitPoint: Vector3 = null;
+            if(meshComponent && meshComponent.mesh) {
+                let hit = ray.intersectObject(meshComponent.mesh);
+                if(hit.length) {
+                    hitPoint = hit[0].point;
+                    this.debugArrow.position.x = hitPoint.x;
+                    this.debugArrow.position.y = hitPoint.y;
+                    this.debugArrow.position.z = hitPoint.z;
+
+                    hitPoint = hitPoint.clone().add(new Vector3(0.5, 0.5, 0.5)).sub(
+                        hit[0].face.normal.clone().divideScalar(2)
+                    ).roundToZero();
+                }
+            }
 
             let targetValid = false;
-            for (let dist = 0.1; dist < 5; dist++) {
-                // Update rotation vector's length to project further and further away.
-                rotVec.setLength(dist);
-
-                // Take rotation, add 2 for head position, and add player's position.
-                let exactTarget = new Vector3().copy(rotVec).add(pos);
-                let target = new Vector3().copy(rotVec).add(pos).round();
-                if (findBlockMaterial(this.entityManager, target.x, target.y, target.z) !== 0) {
-                    let target = exactTarget.round();
-                    selectionComponent.target = [target.x, target.y, target.z];
-                    this.debugArrow.setLength(dist);
-
-                    //selectionComponent.mesh.position.set(target.x, target.y, target.z);
-                    selectionComponent.mesh.position.lerp(target, 0.75); // Lerp because it looks good. :-)
-                    targetValid = true;
-                    break;
-                }
+            if(hitPoint && findBlockMaterial(this.entityManager, hitPoint.x, hitPoint.y, hitPoint.z) !== 0) {
+                targetValid = true;
+                selectionComponent.target = [hitPoint.x, hitPoint.y, hitPoint.z];
+                selectionComponent.mesh.position.lerp(hitPoint, 0.75); // Lerp because it looks good. :-)
             }
 
             // Hide if target is not valid.
@@ -281,9 +284,9 @@ export class TerrainChunkSystem extends System {
 
                 // Set chunk position. Add offsets so displayed mesh corresponds with collision detection and
                 // lookups on the underlying data for the terrain chunk.
-                mesh.position.x = chunkComponent.x * TERRAIN_CHUNK_SIZE - 1;
-                mesh.position.y = chunkComponent.y * TERRAIN_CHUNK_SIZE - 0.5;
-                mesh.position.z = chunkComponent.z * TERRAIN_CHUNK_SIZE - 1;
+                mesh.position.x = chunkComponent.x * TERRAIN_CHUNK_SIZE;
+                mesh.position.y = chunkComponent.y * TERRAIN_CHUNK_SIZE;
+                mesh.position.z = chunkComponent.z * TERRAIN_CHUNK_SIZE;
             }
         })
     }

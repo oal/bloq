@@ -26,8 +26,8 @@
     {
         mat = material;
         pos = position;
-        float noise = 1.0; //rand(position)/2.5;
-        vec3 noisePos = vec3(position.x + noise, position.y + noise/2.0, position.z + noise);
+        //float noise = 0; //rand(position)/2.5;
+        vec3 noisePos = vec3(position.x, position.y, position.z);
         vec4 mvPosition = modelViewMatrix * vec4( noisePos, 1.0 );
         gl_Position = projectionMatrix * mvPosition;
     }

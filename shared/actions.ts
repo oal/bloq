@@ -79,6 +79,7 @@ export class RemoveBlocksAction extends Action {
             let chunk = entityManager.getComponent(chunkKey(cx, cy, cz), ComponentId.TerrainChunk) as TerrainChunkComponent;
             if(!chunk) return;
 
+            console.log('Dig at', lx, ly, lz);
             chunk.setValue(lx, ly, lz, 0);
         })
     }
