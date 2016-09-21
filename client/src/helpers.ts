@@ -13,6 +13,5 @@ export function findBlockMaterial(em: EntityManager, x: number, y: number, z: nu
     if(!chunkComponent) return 0;
 
     let [lx, ly, lz] = [mod(x, TERRAIN_CHUNK_SIZE), mod(y, TERRAIN_CHUNK_SIZE), mod(z, TERRAIN_CHUNK_SIZE)];
-
     return chunkComponent.getValue(lx, ly, lz);
 }
