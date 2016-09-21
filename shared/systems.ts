@@ -47,9 +47,12 @@ export class MovementSystem extends System {
                 physComponent.velX += sinSpeed;
                 physComponent.velZ += cosSpeed;
             }
-            if (input.jump && this.entityManager.getComponent(entity, ComponentId.OnGround)) {
-                physComponent.velY = 0.25;
-                this.entityManager.removeComponentType(entity, ComponentId.OnGround);
+            if (input.jump) {
+                let onGround = this.entityManager.getComponent(entity, ComponentId.OnGround) as OnGroundComponent;
+                if (onGround && onGround.canJump) {
+                    physComponent.velY = 0.25;
+                    this.entityManager.removeComponentType(entity, ComponentId.OnGround);
+                }
             }
 
             // Are we colliding with a block in the world? If so, allow no more movement in that direction.
@@ -136,12 +139,18 @@ export class TerrainCollisionSystem extends System {
             };
 
             // Check and handle ground collisions.
-            if (checkCollisionAt(0, -0.25, 0) || checkCollisionAt(0, 3, 0)) {
+            if (checkCollisionAt(0, -0.25, 0)) {
                 physComponent.velY = 0.0;
-                this.entityManager.addComponent(entity, new OnGroundComponent());
+                let onGround = new OnGroundComponent();
+                onGround.canJump = !checkCollisionAt(0, 3, 0); // Only able to jump unless there is a block overhead
+                this.entityManager.addComponent(entity, onGround);
             } else {
-                //console.log('No gound', posComponent.x, posComponent.z, Object.keys(chunks));
                 this.entityManager.removeComponentType(entity, ComponentId.OnGround);
+            }
+
+            // If there's a block above the player, never allow upward movement.
+            if (checkCollisionAt(0, 3, 0)) {
+                physComponent.velY = Math.min(physComponent.velY, 0.0);
             }
 
             // Check and update block collision component (wall collisions).

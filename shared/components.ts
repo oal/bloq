@@ -74,6 +74,8 @@ export class PhysicsComponent extends SerializableComponent {
 
 export class OnGroundComponent extends Component {
     static ID = ComponentId.OnGround;
+
+    canJump: boolean = true;
 }
 
 // TODO: Use setters or something for these values, and use on server as well.
