@@ -22,6 +22,16 @@ export class Terrain {
             }
         }
 
+        for (let lz = 0; lz < TERRAIN_CHUNK_SIZE; lz++) {
+            for (let lx = 0; lx < TERRAIN_CHUNK_SIZE; lx++) {
+                let maxY = (this.sample2d(3452345345+x * TERRAIN_CHUNK_SIZE + lx, 0, z * TERRAIN_CHUNK_SIZE + lz) | 0) - y * TERRAIN_CHUNK_SIZE;
+                let max = Math.min(maxY, TERRAIN_CHUNK_SIZE);
+                for (let ly = 0; ly < max; ly++) {
+                    chunk.setValue(lx, ly, lz, 3);
+                }
+            }
+        }
+
         return chunk;
     }
 }
