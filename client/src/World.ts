@@ -6,14 +6,17 @@ import {
 } from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
-import {
-    TerrainChunkSystem, PlayerInputSystem, PlayerInputSyncSystem, MeshSystem, PlayerMeshSystem,
-    PlayerSelectionSystem
-} from "./systems";
 import Game from "./Game";
 import {registerClientComponents} from "./components";
 import {ClientActionManager} from "./actions";
+
 import {ActionExecutionSystem} from "../../shared/systems";
+import TerrainChunkSystem from "./systems/TerrainChunkSystem";
+import PlayerInputSystem from "./systems/PlayerInputSystem";
+import PlayerInputSyncSystem from "./systems/PlayerInputSyncSystem";
+import MeshSystem from "./systems/MeshSystem";
+import PlayerMeshSystem from "./systems/PlayerMeshSystem";
+import PlayerSelectionSystem from "./systems/PlayerSelectionSystem";
 
 
 export default class World extends BaseWorld {
