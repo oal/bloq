@@ -4,7 +4,7 @@ import {TERRAIN_CHUNK_SIZE} from "../../shared/constants";
 const size = TERRAIN_CHUNK_SIZE;
 
 
-let buildChunkArrays = (data) => {
+let buildChunkArrays = (data: Uint8Array, neighbors: Array<Array<Array<Uint8Array>>>) => {
     let i = 0;
     let tri = 0;
 
@@ -12,43 +12,128 @@ let buildChunkArrays = (data) => {
     let verts = new Float32Array(size*size*size*32);
 
     let getPoint = (x, y, z) => {
-        if (x < 0 || y < 0 || z < 0 || x >= size || y >= size || z >= size) return 0;
+        if(x < 0) {
+            if(y < 0) {
+                if(z < 0) {
+                    let chunk = neighbors[0][0][0];
+                    if(!chunk) return 0;
+                    return chunk[(size-y) * size * size + (size-z) * size + (size-x)];
+                } else if(z >= size) {
+                    let chunk = neighbors[2][0][0];
+                    if(!chunk) return 0;
+                    return chunk[(size-y) * size * size + (z-size) * size + (size-x)];
+                } else {
+                    let chunk = neighbors[1][0][0];
+                    if(!chunk) return 0;
+                    return chunk[(size-y) * size * size + z * size + (size-x)];
+                }
+            } else if(y >= size) {
+                if(z < 0) {
+                    let chunk = neighbors[0][2][0];
+                    if(!chunk) return 0;
+                    return chunk[(y-size) * size * size + (size-z) * size + (size-x)];
+                } else if(z >= size) {
+                    let chunk = neighbors[2][2][0];
+                    if(!chunk) return 0;
+                    return chunk[(y-size) * size * size + (z-size) * size + (size-x)];
+                } else {
+                    let chunk = neighbors[1][2][0];
+                    if(!chunk) return 0;
+                    return chunk[(y-size) * size * size + z * size + (size-x)];
+                }
+            } else {
+                if(z < 0) {
+                    let chunk = neighbors[0][1][0];
+                    if(!chunk) return 0;
+                    return chunk[y * size * size + (size-z) * size + (size-x)];
+                } else if(z >= size) {
+                    let chunk = neighbors[2][1][0];
+                    if(!chunk) return 0;
+                    return chunk[y * size * size + (z-size) * size + (size-x)];
+                } else {
+                    let chunk = neighbors[1][1][0];
+                    if(!chunk) return 0;
+                    return chunk[y * size * size + z * size + (size-x)];
+                }
+            }
+        } else if(x >= size) {
+            if(y < 0) {
+                if(z < 0) {
+                    let chunk = neighbors[0][0][2];
+                    if(!chunk) return 0;
+                    return chunk[(size-y) * size * size + (size-z) * size + (x-size)];
+                } else if(z >= size) {
+                    let chunk = neighbors[2][0][2];
+                    if(!chunk) return 0;
+                    return chunk[(size-y) * size * size + (z-size) * size + (x-size)];
+                } else {
+                    let chunk = neighbors[1][0][2];
+                    if(!chunk) return 0;
+                    return chunk[(size-y) * size * size + z * size + (x-size)];
+                }
+            } else if(y >= size) {
+                if(z < 0) {
+                    let chunk = neighbors[0][2][2];
+                    if(!chunk) return 0;
+                    return chunk[(y-size) * size * size + (size-z) * size + (x-size)];
+                } else if(z >= size) {
+                    let chunk = neighbors[2][2][2];
+                    if(!chunk) return 0;
+                    return chunk[(y-size) * size * size + (z-size) * size + (x-size)];
+                } else {
+                    let chunk = neighbors[1][2][2];
+                    if(!chunk) return 0;
+                    return chunk[(y-size) * size * size + z * size + (x-size)];
+                }
+            } else {
+                if(z < 0) {
+                    let chunk = neighbors[0][1][2];
+                    if(!chunk) return 0;
+                    return chunk[y * size * size + (size-z) * size + (x-size)];
+                } else if(z >= size) {
+                    let chunk = neighbors[2][1][2];
+                    if(!chunk) return 0;
+                    return chunk[y * size * size + (z-size) * size + (x-size)];
+                } else {
+                    let chunk = neighbors[1][1][2];
+                    if(!chunk) return 0;
+                    return chunk[y * size * size + z * size + (x-size)];
+                }
+            }
+        }
         return data[y * size * size + z * size + x];
     };
 
     for (let z = 0; z < size; z++) {
-        let oz = z;
         for (let y = 0; y < size; y++) {
-            let oy = y;
             for (let x = 0; x < size; x++) {
                 let val = getPoint(x, y, z);
                 if (val) {
-                    let ox = x;
                     if (!getPoint(x, y, z + 1)) {
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z + 0.5;
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z + 0.5;
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z + 0.5;
 
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z + 0.5;
 
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z + 0.5;
 
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z + 0.5;
 
                         mats[tri++] = val;
                         mats[tri++] = val;
@@ -58,30 +143,30 @@ let buildChunkArrays = (data) => {
                         mats[tri++] = val;
                     }
                     if (!getPoint(x, y, z - 1)) {
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z - 0.5;
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z - 0.5;
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z - 0.5;
 
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z - 0.5;
 
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z - 0.5;
 
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z - 0.5;
 
                         mats[tri++] = val;
                         mats[tri++] = val;
@@ -91,30 +176,30 @@ let buildChunkArrays = (data) => {
                         mats[tri++] = val;
                     }
                     if (!getPoint(x, y + 1, z)) {
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z - 0.5;
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z + 0.5;
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z - 0.5;
 
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z + 0.5;
 
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z - 0.5;
 
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z + 0.5;
 
                         mats[tri++] = val;
                         mats[tri++] = val;
@@ -124,30 +209,30 @@ let buildChunkArrays = (data) => {
                         mats[tri++] = val;
                     }
                     if (!getPoint(x, y - 1, z)) {
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z - 0.5;
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z - 0.5;
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z + 0.5;
 
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z + 0.5;
 
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z + 0.5;
 
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z - 0.5;
 
                         mats[tri++] = val;
                         mats[tri++] = val;
@@ -158,30 +243,30 @@ let buildChunkArrays = (data) => {
                     }
                     if (!getPoint(x + 1, y, z)) {
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z - 0.5;
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z - 0.5;
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z + 0.5;
 
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z + 0.5;
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z + 0.5;
 
-                        verts[i++] = ox + 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x + 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z - 0.5;
 
                         mats[tri++] = val;
                         mats[tri++] = val;
@@ -192,30 +277,30 @@ let buildChunkArrays = (data) => {
                     }
 
                     if (!getPoint(x - 1, y, z)) {
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z - 0.5;
 
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z + 0.5;
 
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z - 0.5;
 
 
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy + 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y + 0.5;
+                        verts[i++] = z + 0.5;
 
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz - 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z - 0.5;
 
-                        verts[i++] = ox - 0.5;
-                        verts[i++] = oy - 0.5;
-                        verts[i++] = oz + 0.5;
+                        verts[i++] = x - 0.5;
+                        verts[i++] = y - 0.5;
+                        verts[i++] = z + 0.5;
 
                         mats[tri++] = val;
                         mats[tri++] = val;
@@ -235,8 +320,8 @@ let buildChunkArrays = (data) => {
     }
 };
 
-function buildChunkGeometry(data): BufferGeometry {
-    let arrays = buildChunkArrays(data);
+function buildChunkGeometry(data: Uint8Array, neighbors: Array<Array<Array<Uint8Array>>>): BufferGeometry {
+    let arrays = buildChunkArrays(data, neighbors);
     if(arrays.vertices.length === 0) return null;
 
     var geometry = new BufferGeometry();

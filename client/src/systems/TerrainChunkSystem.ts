@@ -53,8 +53,22 @@ export default class TerrainChunkSystem extends System {
             // If chunk was removed after it was queued.
             if(!chunkComponent) continue;
 
+            // Get all neighbors' chunk data.
+            let neighborData = [-1, 0, 1].map(z => {
+                return [-1, 0, 1].map(y => {
+                    return [-1, 0, 1].map(x => {
+                        if(x === 0 && y === 0 && z === 0) return null;
+
+                        let entity = chunkKey(cx+x, cy+y, cz+z);
+                        let chunk = this.entityManager.getComponent(entity, ComponentId.TerrainChunk) as TerrainChunkComponent;
+                        if(chunk) return chunk.data;
+                        else return null;
+                    })
+                })
+            });
+
             console.log('Build chunk');
-            let chunkGeom = buildChunkGeometry(chunkComponent.data);
+            let chunkGeom = buildChunkGeometry(chunkComponent.data, neighborData);
             if (!chunkGeom) return;
 
             let meshComponent = (this.entityManager.getComponent(entity, ComponentId.Mesh) || this.entityManager.addComponent(entity, new MeshComponent())) as MeshComponent;

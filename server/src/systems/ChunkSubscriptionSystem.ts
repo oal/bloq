@@ -30,7 +30,7 @@ export default class ChunkSubscriptionSystem extends System {
                 chunkSubComponent.inChunk = currChunk;
 
                 // Look through the view area for the player and notify of new chunks in view.
-                const viewDist = 3;
+                const viewDist = 1;
                 for (let z = -viewDist; z <= viewDist; z++) {
                     for (let y = -viewDist; y <= viewDist; y++) {
                         for (let x = -viewDist; x <= viewDist; x++) {
