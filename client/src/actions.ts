@@ -15,7 +15,7 @@ export class ClientActionManager extends ActionManager {
                 this.queue.push(new RemoveBlocksAction(blocks));
                 break;
             case RemoveEntitiesAction.ID:
-                this.queue.push(new RemoveBlocksAction(data['entities']));
+                this.queue.push(new RemoveEntitiesAction(data['entities']));
                 break;
             case MoveEntityAction.ID:
                 this.queue.push(new MoveEntityAction(data['entity'], data['position'].map(num => parseFloat(num))));
