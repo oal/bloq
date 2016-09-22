@@ -17,6 +17,7 @@ import PlayerInputSyncSystem from "./systems/PlayerInputSyncSystem";
 import MeshSystem from "./systems/MeshSystem";
 import PlayerMeshSystem from "./systems/PlayerMeshSystem";
 import PlayerSelectionSystem from "./systems/PlayerSelectionSystem";
+import DebugTextSystem from "./systems/DebugTextSystem";
 
 
 export default class World extends BaseWorld {
@@ -74,6 +75,8 @@ export default class World extends BaseWorld {
         this.addSystem(new MeshSystem(this.entityManager, this.scene), 11);
         this.addSystem(new PlayerMeshSystem(this.entityManager, this.scene), 12);
         this.addSystem(new PlayerSelectionSystem(this.entityManager, this.scene), 13);
+
+        this.addSystem(new DebugTextSystem(this.entityManager), 1000);
 
         console.log(this.systems);
         console.log(this.systemsOrder)
