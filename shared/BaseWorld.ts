@@ -1,9 +1,14 @@
 import EntityManager from "./EntityManager";
 import {registerSharedComponents} from "./components";
-import {
-    System, MovementSystem, PhysicsSystem, TerrainCollisionSystem, PositionSystem, CleanComponentsSystem
-} from "./systems";
+import {System} from "./systems";
 import {ActionManager} from "./actions";
+
+import PhysicsSystem from "./systems/PhysicsSystem";
+import TerrainCollisionSystem from "./systems/TerrainCollisionSystem";
+import MovementSystem from "./systems/MovementSystem";
+import PositionSystem from "./systems/PositionSystem";
+import {CleanComponentsSystem} from "./systems/CleanComponentsSystem";
+
 
 export default class BaseWorld {
     entityManager: EntityManager;

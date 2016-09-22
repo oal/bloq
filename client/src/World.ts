@@ -10,7 +10,7 @@ import Game from "./Game";
 import {registerClientComponents} from "./components";
 import {ClientActionManager} from "./actions";
 
-import {ActionExecutionSystem} from "../../shared/systems";
+import ActionExecutionSystem from "../../shared/systems/ActionExecutionSystem";
 import TerrainChunkSystem from "./systems/TerrainChunkSystem";
 import PlayerInputSystem from "./systems/PlayerInputSystem";
 import PlayerInputSyncSystem from "./systems/PlayerInputSyncSystem";

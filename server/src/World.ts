@@ -1,11 +1,14 @@
 import BaseWorld from "../../shared/BaseWorld";
 import {registerServerComponents} from "./components";
-import {
-    InformNewPlayersSystem, BroadcastPlayerInputSystem, ChunkSubscriptionSystem, PlayerActionSystem
-} from "./systems";
 import {Terrain} from "./terrain";
-import {ActionExecutionSystem} from "../../shared/systems";
 import {ServerActionManager} from "./actions";
+
+import ActionExecutionSystem from "../../shared/systems/ActionExecutionSystem";
+import InformNewPlayersSystem from "./systems/InformNewPlayersSystem";
+import BroadcastPlayerInputSystem from "./systems/BroadcastPlayerInputSystem";
+import ChunkSubscriptionSystem from "./systems/ChunkSubscriptionSystem";
+import PlayerActionSystem from "./systems/PlayerActionSystem";
+
 
 export default class World extends BaseWorld {
     terrain = new Terrain();
