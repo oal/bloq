@@ -40,12 +40,12 @@ export default class PlayerSelectionSystem extends System {
             let rotVec = new Vector3(0, 0, -1).applyAxisAngle(xRot, rotComponent.x).applyAxisAngle(yRot, rotComponent.y);
 
             let chunkKeys = []; // use Array to retain order.
-            for (let i = 0.01; i < 5; i++) {
+            for (let i = 0.01; i <= 5.01; i++) {
                 let blockVec = rotVec.clone().setLength(i).add(pos);
 
                 // Add both rounded, floored and ceiled version of target position so we avoid all edge cases
                 // (when player is in one chunk, and digs in neighbor chunk)
-                let block = blockVec.round();
+                let block = blockVec.roundToZero();
                 let key = chunkKey(globalToChunk(block.x), globalToChunk(block.y), globalToChunk(block.z));
                 if (chunkKeys.indexOf(key) === -1) chunkKeys.push(key);
 
@@ -103,6 +103,8 @@ export default class PlayerSelectionSystem extends System {
                 } else {
                     this.debugSelector.visible = false;
                 }
+
+                if(hitPoint) console.log('CHECKED', hitPoint.x, hitPoint.y, hitPoint.z)
             }
 
             // Hide if target is not valid.

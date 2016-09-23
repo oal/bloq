@@ -73,12 +73,13 @@ export class RemoveBlocksAction extends Action {
     execute(entityManager: EntityManager) {
         this.blocks.forEach(coord => {
             let [x, y, z] = coord;
+
             let [cx, cy, cz] = coord.map(globalToChunk);
             let [lx, ly, lz] = [mod(x, TERRAIN_CHUNK_SIZE), mod(y, TERRAIN_CHUNK_SIZE), mod(z, TERRAIN_CHUNK_SIZE)];
 
             let entityKey = chunkKey(cx, cy, cz);
             let chunk = entityManager.getComponent(entityKey, ComponentId.TerrainChunk) as TerrainChunkComponent;
-            if (!chunk) return;
+            if (!chunk || chunk.getValue(lx, ly, lz) === 0) return;
 
             // Force refresh for neighboring chunks if player is digging at the edge of this chunk.
             [-1, 0, 1].forEach(oz => {
@@ -98,7 +99,9 @@ export class RemoveBlocksAction extends Action {
                 });
             });
 
-            console.log('Dig at', lx, ly, lz, 'in', cx, cy, cz);
+
+            console.log('GLOBAL dig', x, y, z);
+            console.log('LOCAL dig', lx, ly, lz, 'in', cx, cy, cz);
             chunk.setValue(lx, ly, lz, 0);
         })
     }

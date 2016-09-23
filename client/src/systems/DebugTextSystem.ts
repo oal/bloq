@@ -5,6 +5,7 @@ import {mod} from "../../../shared/helpers";
 import {PlayerSelectionComponent} from "../components";
 
 
+// This is ugly, but it changes a lot, and is only for debugging.
 export default class DebugTextSystem extends System {
     domEl = null;
 
@@ -42,7 +43,7 @@ Local:  x: ${mod(positionComponent.x, TERRAIN_CHUNK_SIZE).toFixed(2)} | y: ${mod
 
 On ground: ${!!onGroundComponent} | can jump: ${!!onGroundComponent && onGroundComponent.canJump}
 
-Target: x: ${selectionComponent.target[0]} | y: ${selectionComponent.target[1]} | z: ${selectionComponent.target[2]}
+Target: x: ${selectionComponent.target[0]} | y: ${selectionComponent.target[1]} | z: ${selectionComponent.target[2]} (${selectionComponent.targetValid ? 'valid' : 'invalid'})
 
 Rotation: x: ${rotationComponent.x.toFixed(2)} | y: ${rotationComponent.y.toFixed(2)} | z: ${rotationComponent.z.toFixed(2)}
 `;

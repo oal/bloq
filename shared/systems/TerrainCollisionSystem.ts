@@ -13,7 +13,7 @@ export default class TerrainCollisionSystem extends System {
             let posComponent = this.entityManager.getComponent(entity, ComponentId.Position) as PositionComponent;
             let physComponent = component as PhysicsComponent;
 
-            // Find the chunk coordinates based on current global position (12 -> 0 etc.)
+            // Find the chunk coordinates based on current global position (16 -> 0 etc.)
             let [cx, cy, cz] = posComponent.toChunk();
 
             // Build a list of all neighbor chunks. These are the only ones we can possibly collide with.
@@ -30,18 +30,17 @@ export default class TerrainCollisionSystem extends System {
 
             // Helper function for collision checks below.
             let checkCollisionAt = (nx, ny, nz) => {
-                // Add 0.5 because center of block in the world is half a unit off from underlying chunk data.
-                let [gx, gy, gz] = [posComponent.x + nx+0.5, posComponent.y + ny+0.5, posComponent.z + nz+0.5];
+                let [gx, gy, gz] = [posComponent.x + nx, posComponent.y + ny, posComponent.z + nz].map(c => Math.round(Math.abs(c)) * Math.sign(c));
+                let [lx, ly, lz] = [
+                    mod(gx, TERRAIN_CHUNK_SIZE),
+                    mod(gy, TERRAIN_CHUNK_SIZE),
+                    mod(gz, TERRAIN_CHUNK_SIZE)
+                ];
 
                 let cx = globalToChunk(gx);
                 let cy = globalToChunk(gy);
                 let cz = globalToChunk(gz);
 
-                let [lx, ly, lz] = [
-                    mod(Math.floor(gx), TERRAIN_CHUNK_SIZE),
-                    mod(Math.floor(gy), TERRAIN_CHUNK_SIZE),
-                    mod(Math.floor(gz), TERRAIN_CHUNK_SIZE)
-                ];
 
                 let key = chunkKey(cx, cy, cz);
                 let chunk = chunks[key];
