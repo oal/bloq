@@ -61,25 +61,25 @@ export class UnsubscribeTerrainChunksAction extends Action {
     }
 }
 
-export class RemoveBlocksAction extends Action {
+export class SetBlocksAction extends Action {
     static ID: number = 2;
-    blocks: Array<[number, number, number]>;
+    blocks: Array<[number, number, number, number]>;
 
-    constructor(blocks: Array<[number, number, number]>) {
+    constructor(blocks: Array<[number, number, number, number]>) {
         super();
         this.blocks = blocks;
     }
 
     execute(entityManager: EntityManager) {
-        this.blocks.forEach(coord => {
-            let [x, y, z] = coord;
+        this.blocks.forEach(block => {
+            let [x, y, z, value] = block;
 
-            let [cx, cy, cz] = coord.map(globalToChunk);
+            let [cx, cy, cz] = [x, y, z].map(globalToChunk);
             let [lx, ly, lz] = [mod(x, TERRAIN_CHUNK_SIZE), mod(y, TERRAIN_CHUNK_SIZE), mod(z, TERRAIN_CHUNK_SIZE)];
 
             let entityKey = chunkKey(cx, cy, cz);
             let chunk = entityManager.getComponent(entityKey, ComponentId.TerrainChunk) as TerrainChunkComponent;
-            if (!chunk || chunk.getValue(lx, ly, lz) === 0) return;
+            if (!chunk) return;
 
             // Force refresh for neighboring chunks if player is digging at the edge of this chunk.
             [-1, 0, 1].forEach(oz => {
@@ -100,9 +100,9 @@ export class RemoveBlocksAction extends Action {
             });
 
 
-            console.log('GLOBAL dig', x, y, z);
-            console.log('LOCAL dig', lx, ly, lz, 'in', cx, cy, cz);
-            chunk.setValue(lx, ly, lz, 0);
+            console.log('SET GLOBAL', x, y, z, 'to', value);
+            console.log('SET LOCAL', lx, ly, lz, 'in', cx, cy, cz);
+            chunk.setValue(lx, ly, lz, value);
         })
     }
 }

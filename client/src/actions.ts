@@ -1,5 +1,5 @@
 import {
-    ActionManager, UnsubscribeTerrainChunksAction, RemoveBlocksAction,
+    ActionManager, UnsubscribeTerrainChunksAction, SetBlocksAction,
     RemoveEntitiesAction, MoveEntityAction
 } from "../../shared/actions";
 
@@ -10,9 +10,10 @@ export class ClientActionManager extends ActionManager {
             case UnsubscribeTerrainChunksAction.ID:
                 this.queue.push(new UnsubscribeTerrainChunksAction(data['chunkKeys']));
                 break;
-            case RemoveBlocksAction.ID:
-                let blocks = data['blocks'].map(coord => [coord[0], coord[1], coord[2]]);
-                this.queue.push(new RemoveBlocksAction(blocks));
+            case SetBlocksAction.ID:
+                let blocks = data['blocks'].map(block => [block[0], block[1], block[2], block[3]]);
+                console.log(blocks)
+                this.queue.push(new SetBlocksAction(blocks));
                 break;
             case RemoveEntitiesAction.ID:
                 this.queue.push(new RemoveEntitiesAction(data['entities']));

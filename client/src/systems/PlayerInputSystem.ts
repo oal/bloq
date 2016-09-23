@@ -49,10 +49,11 @@ export default class PlayerInputSystem extends System {
 
             // Mouse clicks (and maybe also keypad in the future)
             let actionPrimary = MouseManager.isLeftButtonPressed();
-            let actionSecondary = MouseManager.isLeftButtonPressed();
+            let actionSecondary = MouseManager.isRightButtonPressed();
             if ((actionPrimary && !input.primaryAction) || (actionSecondary && !input.secondaryAction)) {
                 let selectionComponent = this.entityManager.getComponent(entity, ComponentId.PlayerSelection) as PlayerSelectionComponent;
-                input.actionTarget = selectionComponent.target;
+                input.target = selectionComponent.target;
+                input.targetSide = selectionComponent.targetSide;
             }
             if (actionPrimary !== input.primaryAction) {
                 input.primaryAction = actionPrimary;

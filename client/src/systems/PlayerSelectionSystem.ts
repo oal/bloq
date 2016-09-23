@@ -2,7 +2,7 @@ import {Scene, Mesh, Vector3, Raycaster, MeshBasicMaterial, BoxGeometry} from 't
 
 import {System} from "../../../shared/systems";
 import EntityManager from "../../../shared/EntityManager";
-import {ComponentId} from "../../../shared/constants";
+import {ComponentId, Side} from "../../../shared/constants";
 import {PlayerSelectionComponent, MeshComponent} from "../components";
 import {PositionComponent} from "../../../shared/components";
 import {globalToChunk, chunkKey} from "../../../shared/helpers";
@@ -64,6 +64,7 @@ export default class PlayerSelectionSystem extends System {
             for (let key of chunkKeys) {
                 let meshComponent = this.entityManager.getComponent(key, ComponentId.Mesh) as MeshComponent;
 
+                let hitSide: Side;
                 let hitPoint: Vector3 = null;
                 if (meshComponent && meshComponent.mesh) {
                     let hits = ray.intersectObject(meshComponent.mesh);
@@ -84,11 +85,21 @@ export default class PlayerSelectionSystem extends System {
                             Math.sign(point.z) / 2.0
                         );
 
+                        let normal = hit.face.normal;
+
+                        // Find which side of the cube the player has in focus.
+                        if(normal.x === 0 && normal.y === 1 && normal.z === 0) hitSide = Side.Top;
+                        else if(normal.x === 0 && normal.y === 0 && normal.z === 1) hitSide = Side.North;
+                        else if(normal.x === 1 && normal.y === 0 && normal.z === 0) hitSide = Side.East;
+                        else if(normal.x === 0 && normal.y === 0 && normal.z === -1) hitSide = Side.South;
+                        else if(normal.x === -1 && normal.y === 0 && normal.z === 0) hitSide = Side.West;
+                        else if(normal.x === 0 && normal.y === -1 && normal.z === 0) hitSide = Side.Bottom;
+
                         // Also subtract half of normal value to reach center of cube. Top face has normal
                         // of 1 pointing upwards, so subtracting half of that gets us precisely to the center of the
                         // cube, making the selector work correctly.
                         hitPoint = point.clone().add(cubeOffset).sub(
-                            hit.face.normal.clone().divideScalar(2)
+                            normal.clone().divideScalar(2)
                         ).roundToZero();
                     }
                 }
@@ -98,6 +109,7 @@ export default class PlayerSelectionSystem extends System {
                     this.debugSelector.visible = true;
                     targetValid = true;
                     selectionComponent.target = [hitPoint.x, hitPoint.y, hitPoint.z];
+                    selectionComponent.targetSide = hitSide;
                     selectionComponent.mesh.position.lerp(hitPoint, 0.75); // Lerp because it looks good. :-)
                     break;
                 } else {

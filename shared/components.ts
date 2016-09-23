@@ -1,5 +1,5 @@
 import EntityManager from "./EntityManager";
-import {TERRAIN_CHUNK_SIZE, ComponentId} from "./constants";
+import {TERRAIN_CHUNK_SIZE, ComponentId, Side} from "./constants";
 import {globalToChunk} from "./helpers";
 
 // Used when serializing component to avoid "dirty" flag being serialized. It is only needed locally at runtime.
@@ -99,7 +99,8 @@ export class InputComponent extends SerializableComponent {
 
     primaryAction: boolean = false; // Left mouse button
     secondaryAction: boolean = false; // Right mouse button
-    actionTarget: [number, number, number] = [0, 0, 0]; // Where in space the action is performed.
+    target: [number, number, number] = [0, 0, 0]; // Where in space the action is performed.
+    targetSide: Side = null;
 }
 
 

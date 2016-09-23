@@ -2,7 +2,7 @@ import {Object3D, Mesh} from 'three';
 
 import {Component} from '../../shared/components';
 import EntityManager from "../../shared/EntityManager";
-import {ComponentId} from "../../shared/constants";
+import {ComponentId, Side} from "../../shared/constants";
 import AnimatedMesh from "./AnimatedMesh";
 
 export class MeshComponent extends Component {
@@ -24,6 +24,7 @@ export class PlayerSelectionComponent extends MeshComponent {
     static ID = ComponentId.PlayerSelection;
 
     target: [number, number, number] = [0, 0, 0];
+    targetSide: Side;
     targetValid: boolean = false;
 }
 
