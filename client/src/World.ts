@@ -3,6 +3,7 @@ import {
     WebGLRenderer,
     PerspectiveCamera,
     ShaderMaterial,
+    VertexColors,
 } from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
@@ -47,7 +48,8 @@ export default class World extends BaseWorld {
                 }
             },
             vertexShader: document.getElementById('vertexShader').textContent,
-            fragmentShader: document.getElementById('fragmentShader').textContent
+            fragmentShader: document.getElementById('fragmentShader').textContent,
+            vertexColors: VertexColors
         });
 
         this.renderer = new WebGLRenderer();

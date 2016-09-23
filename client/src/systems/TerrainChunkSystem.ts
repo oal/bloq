@@ -48,6 +48,7 @@ export default class TerrainChunkSystem extends System {
         while (cumTime < 8 && this.queue.length > 0) {
             let [cx, cy, cz] = this.queue.pop();
             let entity = chunkKey(cx, cy, cz);
+            console.time(`create-${entity}`);
             let chunkComponent = this.entityManager.getComponent(entity, ComponentId.TerrainChunk) as TerrainChunkComponent;
 
             // If chunk was removed after it was queued.
@@ -67,8 +68,10 @@ export default class TerrainChunkSystem extends System {
                 })
             });
 
-            console.log('Build chunk', entity);
+            //console.log('Build chunk', entity);
+            console.time(`build-${entity}`);
             let chunkGeom = buildChunkGeometry(chunkComponent.data, neighborData);
+            console.timeEnd(`build-${entity}`);
             if (!chunkGeom) return;
 
             let meshComponent = (this.entityManager.getComponent(entity, ComponentId.Mesh) || this.entityManager.addComponent(entity, new MeshComponent())) as MeshComponent;
@@ -89,6 +92,8 @@ export default class TerrainChunkSystem extends System {
             mesh.position.x = chunkComponent.x * TERRAIN_CHUNK_SIZE;
             mesh.position.y = chunkComponent.y * TERRAIN_CHUNK_SIZE;
             mesh.position.z = chunkComponent.z * TERRAIN_CHUNK_SIZE;
+
+            console.timeEnd(`create-${entity}`);
 
             let endTime = performance.now();
             cumTime += (endTime - startTime);
