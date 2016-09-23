@@ -8,8 +8,8 @@ let buildChunkArrays = (data: Uint8Array, neighbors: Array<Array<Array<Uint8Arra
     let i = 0;
     let tri = 0;
 
-    let mats = new Float32Array(size*size*size*16);
-    let verts = new Float32Array(size*size*size*32);
+    let mats = new Float32Array(size*size*size*8);
+    let verts = new Float32Array(size*size*size*16);
 
     // Yes, it's massive. Could probably use hard coded indices like 1 and 15, as we will be doing 17-16 etc
     // a lot here. But I'm not sure if I'll need more flexibility later, so for now I'll keep it.
@@ -366,6 +366,7 @@ let buildChunkArrays = (data: Uint8Array, neighbors: Array<Array<Array<Uint8Arra
 function buildChunkGeometry(data: Uint8Array, neighbors: Array<Array<Array<Uint8Array>>>): BufferGeometry {
     let arrays = buildChunkArrays(data, neighbors);
     if(arrays.vertices.length === 0) return null;
+    console.log(`Vertex array length: ${arrays.vertices.length}`);
 
     var geometry = new BufferGeometry();
     geometry.addAttribute('material', new BufferAttribute(arrays.materials, 1));

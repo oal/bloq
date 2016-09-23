@@ -30,16 +30,18 @@ export default class TerrainCollisionSystem extends System {
 
             // Helper function for collision checks below.
             let checkCollisionAt = (nx, ny, nz) => {
-                let [gx, gy, gz] = [posComponent.x + nx / 2, posComponent.y + ny, posComponent.z + nz / 2].map(c => Math.round(Math.abs(c)) * Math.sign(c));
-                let [lx, ly, lz] = [
-                    mod(gx, TERRAIN_CHUNK_SIZE),
-                    mod(gy, TERRAIN_CHUNK_SIZE),
-                    mod(gz, TERRAIN_CHUNK_SIZE)
-                ];
+                // Add 0.5 because center of block in the world is half a unit off from underlying chunk data.
+                let [gx, gy, gz] = [posComponent.x + nx+0.5, posComponent.y + ny+0.5, posComponent.z + nz+0.5];
 
                 let cx = globalToChunk(gx);
                 let cy = globalToChunk(gy);
                 let cz = globalToChunk(gz);
+
+                let [lx, ly, lz] = [
+                    mod(Math.floor(gx), TERRAIN_CHUNK_SIZE),
+                    mod(Math.floor(gy), TERRAIN_CHUNK_SIZE),
+                    mod(Math.floor(gz), TERRAIN_CHUNK_SIZE)
+                ];
 
                 let key = chunkKey(cx, cy, cz);
                 let chunk = chunks[key];
@@ -49,10 +51,14 @@ export default class TerrainCollisionSystem extends System {
             };
 
             // Check and handle ground collisions.
-            if (checkCollisionAt(0, -0.25, 0)) {
+            if (checkCollisionAt(0, -0.1, 0)) {
+                // Clamp to ground, so player doesn't hover.
+                if (physComponent.velY < 0.0) {
+                    posComponent.y = (Math.round(Math.abs(posComponent.y) * 2) * Math.sign(posComponent.y)) / 2
+                }
                 physComponent.velY = 0.0;
                 let onGround = new OnGroundComponent();
-                onGround.canJump = !checkCollisionAt(0, 3, 0); // Only able to jump unless there is a block overhead
+                onGround.canJump = !checkCollisionAt(0, 3.1, 0); // Only able to jump unless there is a block overhead
                 this.entityManager.addComponent(entity, onGround);
             } else {
                 this.entityManager.removeComponentType(entity, ComponentId.OnGround);
@@ -65,10 +71,10 @@ export default class TerrainCollisionSystem extends System {
 
             // Check and update block collision component (wall collisions).
             let bcComponent = this.entityManager.getComponent(entity, ComponentId.WallCollision) as WallCollisionComponent;
-            bcComponent.px = !!(checkCollisionAt(1, 0.25, 0) || checkCollisionAt(1, 1.25, 0) || checkCollisionAt(1, 2.25, 0));
-            bcComponent.nx = !!(checkCollisionAt(-1, 0.25, 0) || checkCollisionAt(-1, 1.25, 0) || checkCollisionAt(-1, 2.25, 0));
-            bcComponent.pz = !!(checkCollisionAt(0, 0.25, 1) || checkCollisionAt(0, 1.25, 1) || checkCollisionAt(0, 2.25, 1));
-            bcComponent.nz = !!(checkCollisionAt(0, 0.25, -1) || checkCollisionAt(0, 1.25, -1) || checkCollisionAt(0, 2.25, -1));
+            bcComponent.px = !!(checkCollisionAt(0.5, 0.5, 0) || checkCollisionAt(0.5, 1.5, 0) || checkCollisionAt(0.5, 2.5, 0));
+            bcComponent.nx = !!(checkCollisionAt(-0.5, 0.5, 0) || checkCollisionAt(-0.5, 1.5, 0) || checkCollisionAt(-0.5, 2.5, 0));
+            bcComponent.pz = !!(checkCollisionAt(0, 0.5, 0.5) || checkCollisionAt(0, 1.5, 0.5) || checkCollisionAt(0, 2.5, 0.5));
+            bcComponent.nz = !!(checkCollisionAt(0, 0.5, -0.5) || checkCollisionAt(0, 1.5, -0.5) || checkCollisionAt(0, 2.5, -0.5));
         })
     }
 }
