@@ -76,8 +76,27 @@ export class RemoveBlocksAction extends Action {
             let [cx, cy, cz] = coord.map(globalToChunk);
             let [lx, ly, lz] = [mod(x, TERRAIN_CHUNK_SIZE), mod(y, TERRAIN_CHUNK_SIZE), mod(z, TERRAIN_CHUNK_SIZE)];
 
-            let chunk = entityManager.getComponent(chunkKey(cx, cy, cz), ComponentId.TerrainChunk) as TerrainChunkComponent;
-            if(!chunk) return;
+            let entityKey = chunkKey(cx, cy, cz);
+            let chunk = entityManager.getComponent(entityKey, ComponentId.TerrainChunk) as TerrainChunkComponent;
+            if (!chunk) return;
+
+            // Force refresh for neighboring chunks if player is digging at the edge of this chunk.
+            [-1, 0, 1].forEach(oz => {
+                [-1, 0, 1].forEach(oy => {
+                    [-1, 0, 1].forEach(ox => {
+                        if(Math.abs(ox) + Math.abs(oy) + Math.abs(oz) !== 1) return;
+                        let [nx, ny, nz] = [x + ox, y + oy, z + oz].map(globalToChunk);
+                        let neighborKey = chunkKey(nx, ny, nz);
+                        if (neighborKey === entityKey) return;
+
+                        let neighborChunk = entityManager.getComponent(neighborKey, ComponentId.TerrainChunk) as TerrainChunkComponent;
+                        if (neighborChunk) {
+                            console.log('Force neighbor dirty', neighborKey);
+                            neighborChunk.forceDirtyData(true);
+                        }
+                    });
+                });
+            });
 
             console.log('Dig at', lx, ly, lz, 'in', cx, cy, cz);
             chunk.setValue(lx, ly, lz, 0);

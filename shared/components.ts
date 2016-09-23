@@ -124,6 +124,11 @@ export class TerrainChunkComponent extends Component {
         this.z = z || 0;
     }
 
+    // Used when block just next to this chunk is changed, to force refresh of this chunk's mesh.
+    forceDirtyData(state: boolean) {
+        this.dirtyFields['data'] = state;
+    }
+
     getValue(x: number, y: number, z: number) {
         if (x < 0 || y < 0 || z < 0 || x >= TERRAIN_CHUNK_SIZE || y >= TERRAIN_CHUNK_SIZE || z >= TERRAIN_CHUNK_SIZE) return 0;
         return this.data[(y|0) * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE + (z|0) * TERRAIN_CHUNK_SIZE + (x|0)];

@@ -67,7 +67,7 @@ export default class TerrainChunkSystem extends System {
                 })
             });
 
-            console.log('Build chunk');
+            console.log('Build chunk', entity);
             let chunkGeom = buildChunkGeometry(chunkComponent.data, neighborData);
             if (!chunkGeom) return;
 
