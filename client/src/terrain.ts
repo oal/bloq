@@ -1,8 +1,7 @@
 import {BufferAttribute, BufferGeometry} from 'three';
 import {TERRAIN_CHUNK_SIZE} from "../../shared/constants";
 
-const size = TERRAIN_CHUNK_SIZE;
-
+// Relative offsets for cube faces. See more details further down.
 const faces = [
     // +z
     [
@@ -66,13 +65,18 @@ const faces = [
     ]
 ];
 
-let buildChunkArrays = (data: Uint8Array, neighbors: Array<Array<Array<Uint8Array>>>) => {
-    let i = 0;
-    let tri = 0;
-    let color = 0;
+const size = TERRAIN_CHUNK_SIZE; // Save some typing.
 
-    let mats = new Float32Array(size * size * size * 8);
-    let verts = new Float32Array(size * size * size * 16);
+
+let buildChunkArrays = (data: Uint8Array, neighbors: Array<Array<Array<Uint8Array>>>) => {
+    // Indexes to keep track of how full the buffers are / where to insert / slice.
+    let vertIdx = 0;
+    let triIdx = 0;
+    let colorIdx = 0;
+
+    // Buffers for geometry data. Should be enough room. Gets sliced before returning.
+    let materials = new Float32Array(size * size * size * 8);
+    let vertices = new Float32Array(size * size * size * 16);
     let colors = new Float32Array(size * size * size * 16);
 
     // Yes, it's massive. Could probably use hard coded indices like 1 and 15, as we will be doing 17-16 etc
@@ -211,23 +215,28 @@ let buildChunkArrays = (data: Uint8Array, neighbors: Array<Array<Array<Uint8Arra
         return data[y * size * size + z * size + x];
     };
 
+    // Helper used to increase indices, and set values for vertices, material and color (shadow).
     let addVertex = (x: number, y: number, z: number, val: number, shadow: boolean = false) => {
-        verts[i++] = x;
-        verts[i++] = y;
-        verts[i++] = z;
-        mats[tri++] = val;
+        vertices[vertIdx++] = x;
+        vertices[vertIdx++] = y;
+        vertices[vertIdx++] = z;
+        materials[triIdx++] = val;
 
         let shadowVal = shadow ? 0.75 : 1.0;
-        colors[color++] = shadowVal;
-        colors[color++] = shadowVal;
-        colors[color++] = shadowVal;
+        colors[colorIdx++] = shadowVal;
+        colors[colorIdx++] = shadowVal;
+        colors[colorIdx++] = shadowVal;
     };
 
+    // Low level, and kind of ugly, but it should not need to be changed very often.
     for (let z = 0; z < size; z++) {
         for (let y = 0; y < size; y++) {
             for (let x = 0; x < size; x++) {
                 let val = getPoint(x, y, z);
                 if (val) {
+                    // Insert faces where an actual value (like dirt) meets air/empty block.
+                    // Use relative indexes from "faces", and get nearby blocks to check if they
+                    // should be shadowed or not.
                     if (getPoint(x, y, z + 1) === 0) {
                         let face = faces[0];
                         for (let f = 0; f < 18; f += 3) {
@@ -288,9 +297,9 @@ let buildChunkArrays = (data: Uint8Array, neighbors: Array<Array<Array<Uint8Arra
     }
 
     return {
-        materials: mats.slice(0, tri),
-        vertices: verts.slice(0, i),
-        colors: colors.slice(0, color)
+        materials: materials.slice(0, triIdx),
+        vertices: vertices.slice(0, vertIdx),
+        colors: colors.slice(0, colorIdx)
     }
 };
 
