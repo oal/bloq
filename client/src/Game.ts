@@ -36,7 +36,9 @@ export default class Game {
     }
 
     init() {
-        this.renderer = new WebGLRenderer();
+        this.renderer = new WebGLRenderer({
+            antialias: true
+        });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setClearColor(0xBFF0FF);
 

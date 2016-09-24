@@ -1,19 +1,21 @@
 import MouseManager from '../../lib/MouseManager';
-import * as Keymaster from 'keymaster';
 
 import {System} from "../../../shared/systems";
 import {ComponentId} from "../../../shared/constants";
 import {InputComponent, RotationComponent} from "../../../shared/components";
 import {PlayerSelectionComponent} from "../components";
 import EntityManager from "../../../shared/EntityManager";
+import KeyboardManager from "../../lib/KeyboardManager";
 
 
 export default class PlayerInputSystem extends System {
     mouseManager: MouseManager;
+    keyboardManager: KeyboardManager;
 
-    constructor(em: EntityManager, mm: MouseManager) {
+    constructor(em: EntityManager, mm: MouseManager, km: KeyboardManager) {
         super(em);
         this.mouseManager = mm;
+        this.keyboardManager = km;
     }
 
     update(dt: number) {
@@ -21,11 +23,11 @@ export default class PlayerInputSystem extends System {
             // Keyboard
             let input = this.entityManager.getComponent(entity, ComponentId.Input) as InputComponent;
 
-            let moveForward = Keymaster.isPressed('W'.charCodeAt(0));
-            let moveLeft = Keymaster.isPressed('A'.charCodeAt(0));
-            let moveRight = Keymaster.isPressed('D'.charCodeAt(0));
-            let moveBackward = Keymaster.isPressed('S'.charCodeAt(0));
-            let jump = Keymaster.isPressed(' '.charCodeAt(0));
+            let moveForward = this.keyboardManager.isPressed('W');
+            let moveLeft = this.keyboardManager.isPressed('A');
+            let moveRight = this.keyboardManager.isPressed('D');
+            let moveBackward = this.keyboardManager.isPressed('S');
+            let jump = this.keyboardManager.isPressed(' ');
 
             if (moveForward !== input.moveForward) {
                 input.moveForward = moveForward;

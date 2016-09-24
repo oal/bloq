@@ -1,4 +1,4 @@
-class MouseManager {
+export default class MouseManager {
     x: number = 0;
     y: number = 0;
     private buttonsPressed: [boolean, boolean, boolean] =  [false, false, false];
@@ -30,5 +30,3 @@ class MouseManager {
     isMiddleButtonPressed() { return this.buttonsPressed[1]; }
     isRightButtonPressed() { return this.buttonsPressed[2]; }
 }
-
-export default MouseManager;

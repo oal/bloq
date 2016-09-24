@@ -21,6 +21,7 @@ import PlayerMeshSystem from "./systems/PlayerMeshSystem";
 import PlayerSelectionSystem from "./systems/PlayerSelectionSystem";
 import DebugTextSystem from "./systems/DebugTextSystem";
 import MouseManager from "../lib/MouseManager";
+import KeyboardManager from "../lib/KeyboardManager";
 
 
 export default class World extends BaseWorld {
@@ -61,8 +62,9 @@ export default class World extends BaseWorld {
         this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), -1000); // Always process first
         this.addSystem(new TerrainChunkSystem(this.entityManager, this.scene, this.terrainMaterial), -9);
 
+        let keyboardManager = new KeyboardManager(this.game.renderer.domElement);
         let mouseManager = new MouseManager(this.game.renderer.domElement);
-        this.addSystem(new PlayerInputSystem(this.entityManager, mouseManager), -8);
+        this.addSystem(new PlayerInputSystem(this.entityManager, mouseManager, keyboardManager), -8);
 
         this.addSystem(new PlayerInputSyncSystem(this.entityManager, this.game.server), 10);
         this.addSystem(new MeshSystem(this.entityManager, this.scene), 11);
