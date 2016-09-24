@@ -93,7 +93,9 @@ export default class Game {
         // Show darkened overlay when game is not in focus.
         let overlay = document.getElementById('overlay');
         overlay.onclick = () => {
-            this.renderer.domElement.requestPointerLock();
+            let canvas = this.renderer.domElement;
+            canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock;
+            canvas.requestPointerLock();
         };
 
         let registerEvent = (eventName, method, target?) => (target || document).addEventListener(eventName, method.bind(this), false);
@@ -103,7 +105,10 @@ export default class Game {
 
     private onPointerLockChange(event: Event) {
         let overlay = document.getElementById('overlay');
-        if (document.pointerLockElement === this.renderer.domElement) {
+
+        let canvas = this.renderer.domElement;
+        // FIXME: Still doesn't hide overlay in Firefox.
+        if (document.pointerLockElement === canvas || document.mozPointerLockElement === canvas) {
             this.state = GameState.Active;
             overlay.style.display = 'none';
         } else {
