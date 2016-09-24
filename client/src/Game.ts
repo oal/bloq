@@ -24,9 +24,9 @@ export default class Game {
 
     renderer: WebGLRenderer;
 
-    constructor() {
+    constructor(server: string) {
         this.loadAssets(() => {
-            this.server = new Server(this, () => {
+            this.server = new Server(this, server, () => {
                 this.init();
                 this.world = new World(this);
 

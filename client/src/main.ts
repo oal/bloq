@@ -1,3 +1,3 @@
-import Game from "./Game";
+import MainMenu from "./MainMenu";
 
-new Game();
+new MainMenu();

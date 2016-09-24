@@ -23,10 +23,10 @@ export default class Server {
     ws: WebSocket;
     game: Game;
 
-    constructor(game: Game, connCallback: Function) {
+    constructor(game: Game, server: string, connCallback: Function) {
         this.game = game;
 
-        this.url = `ws://${location.hostname}:${parseInt(location.port)+1}`;
+        this.url = `ws://${server}`;
 
         this.ws = new WebSocket(this.url);
         this.ws.binaryType = 'arraybuffer';

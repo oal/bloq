@@ -115,8 +115,6 @@ export default class PlayerSelectionSystem extends System {
                 } else {
                     this.debugSelector.visible = false;
                 }
-
-                if(hitPoint) console.log('CHECKED', hitPoint.x, hitPoint.y, hitPoint.z)
             }
 
             // Hide if target is not valid.
