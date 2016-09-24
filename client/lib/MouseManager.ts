@@ -3,17 +3,17 @@ class MouseManager {
     y: number = 0;
     private buttonsPressed: [boolean, boolean, boolean] =  [false, false, false];
 
-    constructor() {
-        document.addEventListener('mousemove', evt => {
+    constructor(target: Element) {
+        target.addEventListener('mousemove', evt => {
             this.x += evt.movementX;
             this.y += evt.movementY;
         }, false);
 
-        document.addEventListener('mousedown', evt => {
+        target.addEventListener('mousedown', evt => {
             this.buttonsPressed[evt.button] = true;
         }, false);
 
-        document.addEventListener('mouseup', evt => {
+        target.addEventListener('mouseup', evt => {
             this.buttonsPressed[evt.button] = false;
         }, false);
     }
@@ -31,6 +31,4 @@ class MouseManager {
     isRightButtonPressed() { return this.buttonsPressed[2]; }
 }
 
-let singleton = new MouseManager();
-
-export default singleton;
+export default MouseManager;

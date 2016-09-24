@@ -1,6 +1,7 @@
 import AssetManager from "./AssetManager";
 import Server from "./Server";
 import World from "./World";
+import {WebGLRenderer} from 'three';
 import Stats = require('stats.js');
 
 // Debug performance.
@@ -8,19 +9,55 @@ var stats = new Stats();
 stats.showPanel(1); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
 
+const enum GameState {
+    Active,
+    Inactive
+}
+
 export default class Game {
+    state: GameState = GameState.Inactive;
+
     assetManager: AssetManager;
 
     world: World;
     server: Server;
 
+    renderer: WebGLRenderer;
+
     constructor() {
         this.loadAssets(() => {
             this.server = new Server(this, () => {
+                this.init();
                 this.world = new World(this);
+
                 this.startGameLoop();
             });
         });
+    }
+
+    init() {
+        this.renderer = new WebGLRenderer();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setClearColor(0xBFF0FF);
+
+        document.body.appendChild(this.renderer.domElement);
+
+        // Show darkened overlay when game is not in focus. GameState is also used to
+        // disable mouse when game is inactive.
+        let overlay = document.getElementById('overlay');
+        document.addEventListener('pointerlockchange', () => {
+            if (document.pointerLockElement === this.renderer.domElement) {
+                this.state = GameState.Active;
+                overlay.style.display = 'none';
+            } else {
+                this.state = GameState.Inactive;
+                overlay.style.display = 'block';
+            }
+        }, false);
+
+        overlay.onclick = () => {
+            this.renderer.domElement.requestPointerLock();
+        };
     }
 
 
@@ -47,7 +84,11 @@ export default class Game {
             let newTime = performance.now();
             let dt = (newTime - currentTime) / 1000;
 
+            // Process frame
             this.tick(dt);
+
+            // Render
+            this.renderer.render(this.world.scene, this.world.camera);
 
             currentTime = newTime;
             requestAnimationFrame(update);

@@ -5,6 +5,7 @@ import {
     ShaderMaterial,
     VertexColors,
 } from 'three';
+import * as Keymaster from 'keymaster';
 
 import BaseWorld from "../../shared/BaseWorld";
 import Game from "./Game";
@@ -19,11 +20,11 @@ import MeshSystem from "./systems/MeshSystem";
 import PlayerMeshSystem from "./systems/PlayerMeshSystem";
 import PlayerSelectionSystem from "./systems/PlayerSelectionSystem";
 import DebugTextSystem from "./systems/DebugTextSystem";
+import MouseManager from "../lib/MouseManager";
 
 
 export default class World extends BaseWorld {
     scene: Scene;
-    renderer: WebGLRenderer;
     camera: PerspectiveCamera;
     terrainMaterial: ShaderMaterial;
 
@@ -52,18 +53,6 @@ export default class World extends BaseWorld {
             vertexColors: VertexColors
         });
 
-        this.renderer = new WebGLRenderer();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setClearColor(0xBFF0FF);
-
-        document.body.appendChild(this.renderer.domElement);
-
-        // TODO: Add a more robust version of this to capture lock if player presses escape and tries to re-lock.
-        this.renderer.domElement.onclick = () => {
-            this.renderer.domElement.requestPointerLock();
-            this.renderer.domElement.onclick = null;
-        };
-
         this.addSystems();
     }
 
@@ -71,7 +60,9 @@ export default class World extends BaseWorld {
         // TODO: Store system orders as constants in one place.
         this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), -1000); // Always process first
         this.addSystem(new TerrainChunkSystem(this.entityManager, this.scene, this.terrainMaterial), -9);
-        this.addSystem(new PlayerInputSystem(this.entityManager), -8);
+
+        let mouseManager = new MouseManager(this.game.renderer.domElement);
+        this.addSystem(new PlayerInputSystem(this.entityManager, mouseManager), -8);
 
         this.addSystem(new PlayerInputSyncSystem(this.entityManager, this.game.server), 10);
         this.addSystem(new MeshSystem(this.entityManager, this.scene), 11);
@@ -79,13 +70,9 @@ export default class World extends BaseWorld {
         this.addSystem(new PlayerSelectionSystem(this.entityManager, this.scene), 13);
 
         this.addSystem(new DebugTextSystem(this.entityManager), 1000);
-
-        console.log(this.systems);
-        console.log(this.systemsOrder)
     }
 
     tick(dt) {
         super.tick(dt);
-        this.renderer.render(this.scene, this.camera);
     }
 }

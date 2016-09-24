@@ -51,7 +51,7 @@ export default class PlayerActionSystem extends System {
                         break;
                 }
 
-                modifiedBlocks.push([target[0] + add[0], target[1] + add[1], target[2] + add[2], 3]);
+                modifiedBlocks.push([target[0] + add[0], target[1] + add[1], target[2] + add[2], 5]);
             }
 
 

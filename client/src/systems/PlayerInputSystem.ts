@@ -5,9 +5,17 @@ import {System} from "../../../shared/systems";
 import {ComponentId} from "../../../shared/constants";
 import {InputComponent, RotationComponent} from "../../../shared/components";
 import {PlayerSelectionComponent} from "../components";
+import EntityManager from "../../../shared/EntityManager";
 
 
 export default class PlayerInputSystem extends System {
+    mouseManager: MouseManager;
+
+    constructor(em: EntityManager, mm: MouseManager) {
+        super(em);
+        this.mouseManager = mm;
+    }
+
     update(dt: number) {
         this.entityManager.getEntities(ComponentId.CurrentPlayer).forEach((component, entity) => {
             // Keyboard
@@ -37,7 +45,7 @@ export default class PlayerInputSystem extends System {
 
             // Mouse movement
             let rot = this.entityManager.getComponent(entity, ComponentId.Rotation) as RotationComponent;
-            let [dx, dy] = MouseManager.delta();
+            let [dx, dy] = this.mouseManager.delta();
             if (dx !== 0) {
                 rot.y -= dx / 5.0 * dt;
             }
@@ -48,8 +56,8 @@ export default class PlayerInputSystem extends System {
             }
 
             // Mouse clicks (and maybe also keypad in the future)
-            let actionPrimary = MouseManager.isLeftButtonPressed();
-            let actionSecondary = MouseManager.isRightButtonPressed();
+            let actionPrimary = this.mouseManager.isLeftButtonPressed();
+            let actionSecondary = this.mouseManager.isRightButtonPressed();
             if ((actionPrimary && !input.primaryAction) || (actionSecondary && !input.secondaryAction)) {
                 let selectionComponent = this.entityManager.getComponent(entity, ComponentId.PlayerSelection) as PlayerSelectionComponent;
                 input.target = selectionComponent.target;
