@@ -15,6 +15,7 @@ export const enum ComponentId {
     Input,
     CurrentPlayer,
     TerrainChunk,
+    Inventory,
 
     // Client
     Mesh,

@@ -2,7 +2,7 @@ import {Server as WebSocketServer} from 'ws';
 import {TextEncoder} from 'text-encoding';
 import uuid = require('node-uuid');
 import World from "./World";
-import {initPlayerEntity, updatePlayerInput, updatePlayerRotation} from "./entities";
+import {initPlayerEntity, updatePlayerInput, updatePlayerRotation, updatePlayerInventory} from "./entities";
 import {objectHasKeys} from "../../shared/helpers";
 import {NetworkComponent} from "./components";
 import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION, ComponentId} from "../../shared/constants";
@@ -117,6 +117,9 @@ export default class Server {
                 }
                 if (objectHasKeys(obj.components, [ComponentId.Rotation])) {
                     updatePlayerRotation(this.world.entityManager, playerEntity, obj);
+                }
+                if (objectHasKeys(obj.components, [ComponentId.Inventory])) {
+                    updatePlayerInventory(this.world.entityManager, playerEntity, obj);
                 }
             }
         });

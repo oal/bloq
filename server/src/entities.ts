@@ -1,7 +1,7 @@
 import EntityManager from "../../shared/EntityManager";
 import {
     InputComponent, PositionComponent,
-    CurrentPlayerComponent, PhysicsComponent, RotationComponent, WallCollisionComponent
+    CurrentPlayerComponent, PhysicsComponent, RotationComponent, WallCollisionComponent, InventoryComponent
 } from "../../shared/components";
 import {NetworkComponent, NewPlayerComponent, PlayerComponent, ChunkSubscriptionComponent} from "./components";
 import {ComponentId} from "../../shared/constants";
@@ -23,8 +23,9 @@ export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocke
     pos.z = 5;
     em.addComponent(entity, pos); // Position tracking
 
-    em.addComponent(entity, new PhysicsComponent()); // Physics tracking
-    em.addComponent(entity, new RotationComponent()); // Rotation
+    em.addComponent(entity, new PhysicsComponent());
+    em.addComponent(entity, new RotationComponent());
+    em.addComponent(entity, new InventoryComponent());
 
     em.addComponent(entity, new PlayerComponent()); // Treat as player / render as player? WIP
     em.addComponent(entity, new CurrentPlayerComponent()); // Treat as current player. A temporary way to signalize that this is the player to control.
@@ -62,4 +63,13 @@ export function updatePlayerRotation(em: EntityManager, playerEntity, obj) {
     let rot = obj.components[ComponentId.Rotation];
     let existingRot = em.getComponent(playerEntity, ComponentId.Rotation) as RotationComponent;
     existingRot.update(rot);
+}
+
+export function updatePlayerInventory(em: EntityManager, playerEntity, obj) {
+    let inventoryData = obj.components[ComponentId.Inventory];
+    let inventory = em.getComponent(playerEntity, ComponentId.Inventory) as InventoryComponent;
+
+    // Should only trust activeSlot, so the player can't add arbitrary entities to their inventory, and have
+    // server accept it.
+    inventory.activeSlot = inventoryData.activeSlot;
 }

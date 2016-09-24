@@ -2,7 +2,7 @@ import {System} from "../../../shared/systems";
 import {ServerActionManager} from "../actions";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId, Side} from "../../../shared/constants";
-import {InputComponent} from "../../../shared/components";
+import {InputComponent, InventoryComponent} from "../../../shared/components";
 import {SetBlocksAction} from "../../../shared/actions";
 import {globalToChunk} from "../../../shared/helpers";
 import {broadcastAction} from "../helpers";
@@ -51,7 +51,9 @@ export default class PlayerActionSystem extends System {
                         break;
                 }
 
-                modifiedBlocks.push([target[0] + add[0], target[1] + add[1], target[2] + add[2], 5]);
+                // TODO: WIP. Should use entity in current slot instead of index as block type.
+                let inventory = this.entityManager.getComponent(entity, ComponentId.Inventory) as InventoryComponent;
+                modifiedBlocks.push([target[0] + add[0], target[1] + add[1], target[2] + add[2], inventory.activeSlot+1]);
             }
 
 

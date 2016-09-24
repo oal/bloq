@@ -159,6 +159,13 @@ export class TerrainChunkComponent extends Component {
     }
 }
 
+export class InventoryComponent extends SerializableComponent {
+    static ID = ComponentId.Inventory;
+
+    slots: Array<string> = [null, null, null, null, null, null, null, null, null, null];
+    activeSlot: number = 0;
+}
+
 
 export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new PositionComponent());
@@ -169,4 +176,5 @@ export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new CurrentPlayerComponent());
     manager.registerComponentType(new WallCollisionComponent());
     manager.registerComponentType(new TerrainChunkComponent());
+    manager.registerComponentType(new InventoryComponent());
 }

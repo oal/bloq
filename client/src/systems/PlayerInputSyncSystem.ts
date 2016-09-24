@@ -37,6 +37,17 @@ export default class PlayerInputSyncSystem extends System {
                     components: components
                 });
             }
+
+            let inventory = this.entityManager.getComponent(entity, ComponentId.Inventory);
+            if (inventory.isDirty()) {
+                console.log('send inventory');
+                let components = {};
+                components[ComponentId.Inventory] = inventory;
+                this.server.sendEntity({
+                    entity: entity,
+                    components: components
+                });
+            }
         })
     }
 }
