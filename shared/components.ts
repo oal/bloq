@@ -101,6 +101,8 @@ export class InputComponent extends SerializableComponent {
     secondaryAction: boolean = false; // Right mouse button
     target: [number, number, number] = [0, 0, 0]; // Where in space the action is performed.
     targetSide: Side = null;
+
+    scrollDirection: number = 0;
 }
 
 

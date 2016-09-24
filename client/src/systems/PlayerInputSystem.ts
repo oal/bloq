@@ -47,7 +47,7 @@ export default class PlayerInputSystem extends System {
 
             // Rotation
             let rot = this.entityManager.getComponent(entity, ComponentId.Rotation) as RotationComponent;
-            let [dx, dy] = this.mouseManager.delta();
+            let [dx, dy, scrollDirection] = this.mouseManager.delta();
             if (dx !== 0) {
                 rot.y -= dx / 5.0 * dt;
             }
@@ -56,6 +56,10 @@ export default class PlayerInputSystem extends System {
                 if (rot.x < -Math.PI / 2.0) rot.x = -Math.PI / 2.0;
                 else if (rot.x > Math.PI / 2.0) rot.x = Math.PI / 2.0;
             }
+
+            // Update scroll wheel direction.
+            input.scrollDirection = scrollDirection;
+
 
             // Mouse clicks (and maybe also keypad in the future)
             let actionPrimary = this.mouseManager.isLeftButtonPressed();
@@ -72,14 +76,22 @@ export default class PlayerInputSystem extends System {
                 input.secondaryAction = actionSecondary;
             }
 
+
             // Inventory
             let inventory = this.entityManager.getComponent(entity, ComponentId.Inventory) as InventoryComponent;
-            ['1','2','3','4','5','6','7','8','9','0'].forEach(numKey => {
-                if(this.keyboardManager.isPressed(numKey)) {
+
+            // Update slot based on number keys pressed.
+            ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].forEach(numKey => {
+                if (this.keyboardManager.isPressed(numKey)) {
                     // 0 is the rightmost slot, so we need to adjust by one.
-                    inventory.activeSlot = (parseInt(numKey)+9)%10;
+                    inventory.activeSlot = (parseInt(numKey) + 9) % 10;
                 }
-            })
+            });
+
+            // Same for scroll wheel.
+            if (scrollDirection !== 0) {
+                inventory.activeSlot = ((inventory.activeSlot + scrollDirection) + 10) % 10;
+            }
         })
     }
 }
