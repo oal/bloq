@@ -1,3 +1,5 @@
+import uuid = require('node-uuid');
+
 import {Component, SerializableComponent} from "./components";
 import {ComponentId} from "./constants";
 
@@ -36,6 +38,10 @@ export default class EntityManager {
 
     getRegisteredComponentTypes(): Iterator<ComponentId> {
         return this.componentConstructors.keys();
+    }
+
+    createEntity() {
+        return uuid.v4();
     }
 
     serializeEntity(entity: string, withComponents: Array<ComponentId> = null) {

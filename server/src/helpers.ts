@@ -18,3 +18,16 @@ export function broadcastAction(em: EntityManager, chunk: [number, number, numbe
         }
     });
 }
+
+export function broadcastEntity(em: EntityManager, chunk: [number, number, number], blockEntity: string) {
+    let key = chunkKey(chunk[0], chunk[1], chunk[2]);
+
+    em.getEntities(ComponentId.ChunkSubscription).forEach((component, entity) => {
+        let subComponent = component as ChunkSubscriptionComponent;
+
+        if(subComponent.chunks.has(key)) {
+            let netComponent = em.getComponent(entity, ComponentId.Network) as NetworkComponent;
+            Server.sendEntity(netComponent.websocket, em.serializeEntity(blockEntity));
+        }
+    });
+}

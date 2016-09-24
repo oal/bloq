@@ -12,7 +12,6 @@ import {
     LineBasicMaterial,
     Object3D
 } from 'three';
-import {WallCollisionComponent} from "../../shared/components";
 import {ComponentId} from "../../shared/constants";
 import AnimatedMesh from "./AnimatedMesh";
 
@@ -36,6 +35,7 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
 
     // Only show selection box for current player.
     if (ComponentId.CurrentPlayer in initialData) {
+        console.log('Spawning current player');
         let selectionComponent = new PlayerSelectionComponent();
 
         // Need an underlying box for the Box helper to work.
@@ -59,7 +59,4 @@ export function initPlayerEntity(em: EntityManager, entity: string, initialData:
     let playerComponent = new PlayerComponent();
     playerComponent.mesh = playerMesh;
     em.addComponent(entity, playerComponent);
-
-    // Add local component to track wall / block collisions.
-    em.addComponent(entity, new WallCollisionComponent());
 }

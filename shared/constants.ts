@@ -16,6 +16,7 @@ export const enum ComponentId {
     CurrentPlayer,
     TerrainChunk,
     Inventory,
+    Block,
 
     // Client
     Mesh,
@@ -35,4 +36,13 @@ export const enum Side {
     South,
     West,
     Bottom
+}
+
+export const enum Block {
+    Air = 0,
+    Dirt,
+    Grass,
+    Stone,
+    Sand,
+    Wood
 }

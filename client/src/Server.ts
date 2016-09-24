@@ -1,10 +1,11 @@
-import {SkinnedMesh} from 'three';
+import {SkinnedMesh, Mesh, BoxGeometry, MeshNormalMaterial} from 'three';
 import Game from "./Game";
 import {objectHasKeys} from "../../shared/helpers";
 import {initPlayerEntity} from "./entities";
 import {TerrainChunkComponent} from "../../shared/components";
 import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION, ComponentId} from "../../shared/constants";
 import AnimatedMesh from "./AnimatedMesh";
+import {MeshComponent} from "./components";
 
 let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponent] => {
     let view = new DataView(data);
@@ -60,6 +61,12 @@ export default class Server {
             // Player component needs special care. For all others, just deserialize and update the entity manager.
             if (objectHasKeys(obj.components, [ComponentId.Player])) {
                 initPlayerEntity(this.game.world.entityManager, obj.entity, obj.components, this.game.assetManager.getMesh('player') as AnimatedMesh, this.game.world.camera);
+            } else if (objectHasKeys(obj.components, [ComponentId.Block])) {
+                // TODO: Need a cleaner way for transferring and updating entities from / to server.
+                this.game.world.entityManager.deserializeAndSetEntity(jsonStr);
+                let meshComponent = new MeshComponent();
+                meshComponent.mesh = new Mesh(new BoxGeometry(0.25, 0.25, 0.25), new MeshNormalMaterial());
+                this.game.world.entityManager.addComponent(obj.entity, meshComponent);
             } else {
                 this.game.world.entityManager.deserializeAndSetEntity(jsonStr);
             }

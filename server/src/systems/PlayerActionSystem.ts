@@ -2,10 +2,13 @@ import {System} from "../../../shared/systems";
 import {ServerActionManager} from "../actions";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId, Side} from "../../../shared/constants";
-import {InputComponent, InventoryComponent} from "../../../shared/components";
+import {
+    InputComponent, InventoryComponent, PositionComponent, PhysicsComponent,
+    BlockComponent, WallCollisionComponent, RotationComponent
+} from "../../../shared/components";
 import {SetBlocksAction} from "../../../shared/actions";
 import {globalToChunk} from "../../../shared/helpers";
-import {broadcastAction} from "../helpers";
+import {broadcastAction, broadcastEntity} from "../helpers";
 
 
 export default class PlayerActionSystem extends System {
@@ -24,6 +27,25 @@ export default class PlayerActionSystem extends System {
             if (inputComponent.isDirty('primaryAction') && inputComponent.primaryAction) {
                 let target = inputComponent.target;
                 modifiedBlocks.push([target[0], target[1], target[2], 0]);
+
+                let blockEntity = this.entityManager.createEntity();
+                let pos = new PositionComponent();
+                pos.x = target[0];
+                pos.y = target[1];
+                pos.z = target[2];
+
+                this.entityManager.addComponent(blockEntity, pos);
+                // TODO: Physics component needs to be added on server for it to be simulated correctly.
+                this.entityManager.addComponent(blockEntity, new RotationComponent());
+                let phys = new PhysicsComponent();
+                phys.velY = 0.15;
+                this.entityManager.addComponent(blockEntity, phys);
+                this.entityManager.addComponent(blockEntity, new WallCollisionComponent());
+
+                let block = new BlockComponent();
+                block.kind = 1;
+                this.entityManager.addComponent(blockEntity, block);
+                broadcastEntity(this.entityManager, target.map(globalToChunk), blockEntity);
             }
 
             if (inputComponent.isDirty('secondaryAction') && inputComponent.secondaryAction) {

@@ -103,7 +103,7 @@ export default class Server {
 
 
     onConnect(ws) {
-        let playerEntity = uuid.v4();
+        let playerEntity = this.world.entityManager.createEntity();
         initPlayerEntity(this.world.entityManager, playerEntity, ws);
 
         let netComponent = this.world.entityManager.getComponent(playerEntity, ComponentId.Network) as NetworkComponent;

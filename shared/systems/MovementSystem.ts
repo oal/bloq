@@ -9,6 +9,8 @@ import {
 export default class MovementSystem extends System {
     update(dt: number): any {
         this.entityManager.getEntities(ComponentId.Physics).forEach((component, entity) => {
+            if(!this.entityManager.getComponent(entity, ComponentId.Player)) return;
+
             let input = this.entityManager.getComponent(entity, ComponentId.Input) as InputComponent;
 
             let rotation = this.entityManager.getComponent(entity, ComponentId.Rotation) as RotationComponent;

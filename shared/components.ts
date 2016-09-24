@@ -79,7 +79,7 @@ export class OnGroundComponent extends Component {
 }
 
 // TODO: Use setters or something for these values, and use on server as well.
-export class WallCollisionComponent extends Component {
+export class WallCollisionComponent extends SerializableComponent {
     static ID = ComponentId.WallCollision;
 
     public px: boolean = false;
@@ -168,6 +168,13 @@ export class InventoryComponent extends SerializableComponent {
     activeSlot: number = 0;
 }
 
+// Extended on client and server (client adds mesh). Therefore, not registered as shared component.
+export class BlockComponent extends SerializableComponent {
+    static ID = ComponentId.Block;
+
+    kind: number;
+}
+
 
 export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new PositionComponent());
@@ -179,4 +186,5 @@ export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new WallCollisionComponent());
     manager.registerComponentType(new TerrainChunkComponent());
     manager.registerComponentType(new InventoryComponent());
+    manager.registerComponentType(new BlockComponent());
 }

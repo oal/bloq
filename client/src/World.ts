@@ -23,6 +23,7 @@ import DebugTextSystem from "./systems/DebugTextSystem";
 import MouseManager from "../lib/MouseManager";
 import KeyboardManager from "../lib/KeyboardManager";
 import InventoryUISystem from "./systems/InventoryUISystem";
+import BlockSystem from "./systems/BlockSystem";
 
 
 export default class World extends BaseWorld {
@@ -71,6 +72,8 @@ export default class World extends BaseWorld {
         this.addSystem(new MeshSystem(this.entityManager, this.scene), 11);
         this.addSystem(new PlayerMeshSystem(this.entityManager, this.scene), 12);
         this.addSystem(new PlayerSelectionSystem(this.entityManager, this.scene), 13);
+        this.addSystem(new BlockSystem(this.entityManager), 14);
+
 
         this.addSystem(new InventoryUISystem(this.entityManager), 999);
         //this.addSystem(new DebugTextSystem(this.entityManager), 1000);
