@@ -43,23 +43,7 @@ export default class Game {
         this.renderer.setClearColor(0xBFF0FF);
 
         document.body.appendChild(this.renderer.domElement);
-
-        // Show darkened overlay when game is not in focus. GameState is also used to
-        // disable mouse when game is inactive.
-        let overlay = document.getElementById('overlay');
-        document.addEventListener('pointerlockchange', () => {
-            if (document.pointerLockElement === this.renderer.domElement) {
-                this.state = GameState.Active;
-                overlay.style.display = 'none';
-            } else {
-                this.state = GameState.Inactive;
-                overlay.style.display = 'block';
-            }
-        }, false);
-
-        overlay.onclick = () => {
-            this.renderer.domElement.requestPointerLock();
-        };
+        this.registerEvents();
     }
 
 
@@ -104,4 +88,37 @@ export default class Game {
         stats.end();
     }
 
+    // Events
+    private registerEvents() {
+        // Show darkened overlay when game is not in focus.
+        let overlay = document.getElementById('overlay');
+        overlay.onclick = () => {
+            this.renderer.domElement.requestPointerLock();
+        };
+
+        let registerEvent = (eventName, method, target?) => (target || document).addEventListener(eventName, method.bind(this), false);
+        registerEvent('resize', this.onResize, window);
+        registerEvent('pointerlockchange', this.onPointerLockChange);
+    }
+
+    private onPointerLockChange(event: Event) {
+        let overlay = document.getElementById('overlay');
+        if (document.pointerLockElement === this.renderer.domElement) {
+            this.state = GameState.Active;
+            overlay.style.display = 'none';
+        } else {
+            this.state = GameState.Inactive;
+            overlay.style.display = 'block';
+        }
+    }
+
+    private onResize(event: Event) {
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+
+        this.world.camera.aspect = width / height;
+        this.world.camera.updateProjectionMatrix();
+
+        this.renderer.setSize(width, height, true);
+    }
 }
