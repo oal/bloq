@@ -12,7 +12,8 @@ export default class InformNewPlayersSystem extends System {
             ComponentId.Rotation,
             ComponentId.Physics,
             ComponentId.Input,
-            ComponentId.Player
+            ComponentId.Player,
+            ComponentId.WallCollision
         ];
 
         this.entityManager.getEntities(ComponentId.NewPlayer).forEach((component, newEntity) => {

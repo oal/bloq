@@ -12,6 +12,7 @@ export default class PickUpSystem extends System {
 
             pickableEntities.set(entity, posComponent);
         });
+
         this.entityManager.getEntities(ComponentId.Player).forEach((component, entity) => {
             let posComponent = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Position);
 

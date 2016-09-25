@@ -127,7 +127,6 @@ export default class Server {
         ws.on('close', () => {
             console.log('Removing player', playerEntity);
             this.world.entityManager.removeEntity(playerEntity);
-            broadcastAction(this.world.entityManager, [0, 0, 0], new RemoveEntitiesAction([playerEntity]));
         })
 
     }

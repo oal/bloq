@@ -38,7 +38,6 @@ export default class PlayerActionSystem extends System {
                 let block = new BlockComponent();
                 block.kind = 1;
                 this.entityManager.addComponent(blockEntity, block);
-                broadcastEntity(this.entityManager, target.map(globalToChunk), blockEntity);
             }
 
             if (inputComponent.isDirty('secondaryAction') && inputComponent.secondaryAction) {

@@ -1,6 +1,6 @@
 import uuid = require('node-uuid');
 
-import {Component, SerializableComponent} from "./components";
+import {Component, SerializableComponent, PositionComponent} from "./components";
 import {ComponentId} from "./constants";
 
 let componentProxyHandler = {
@@ -21,6 +21,7 @@ export const enum EntityManagerEvent {
     EntityCreated,
     EntityRemoved,
     ComponentAdded,
+    ComponentReplaced,
     ComponentRemoved,
 
     NumEvents, // Used to initialize event handler array. Not a real event.
@@ -30,12 +31,15 @@ export default class EntityManager {
     private components: Map<ComponentId, Map<string, Component>>;
     private componentConstructors: Map<ComponentId, Function>;
 
-    private eventHandlers: Array<Array<Function>>;
+    private eventHandlers: Array<Array<Function>> = [];
 
     constructor() {
         this.components = new Map<ComponentId, Map<string, Component>>();
         this.componentConstructors = new Map<ComponentId, Function>();
-        this.eventHandlers = new Array(EntityManagerEvent.NumEvents).fill([]);
+
+        for(let i = 0; i < EntityManagerEvent.NumEvents; i++) {
+            this.eventHandlers.push([]);
+        }
     }
 
     registerComponentType(instance: Component) {
@@ -54,7 +58,7 @@ export default class EntityManager {
 
     createEntity() {
         let entity = uuid.v4();
-        this.emit(EntityManagerEvent.EntityCreated, {entity: entity});
+        this.emit(EntityManagerEvent.EntityCreated, entity);
         return entity;
     }
 
@@ -107,13 +111,34 @@ export default class EntityManager {
     }
 
     removeEntity(entity: string) {
+        let entityExisted = false;
+        let inChunk = null;
         this.components.forEach((entities, type) => {
-            if (entities.has(entity)) this.removeComponentType(entity, type);
+            if (entities.has(entity)) {
+                // I don't like having to reference a specific component inside the EntityManager,
+                // but the event handlers need to know from what chunk the entity was removed,
+                // to broadcast the info to clients efficiently.
+                // An alternative solution would be to not remove the entity in removeEntity, but only
+                // schedule for removal.
+                if(type === ComponentId.Position) {
+                    inChunk = this.getComponent<PositionComponent>(entity, ComponentId.Position).toChunk();
+                }
+                this.removeComponentType(entity, type);
+                entityExisted = true;
+            }
         });
+
+        if (entityExisted && inChunk) {
+            this.emit(EntityManagerEvent.EntityRemoved, entity, inChunk);
+        }
     }
 
     getEntities(componentType: ComponentId): Map<string, Component> {
         return this.components.get(componentType);
+    }
+
+    hasComponent(entity: string, componentType: ComponentId): boolean {
+        return this.components.get(componentType).has(entity);
     }
 
     getComponent<T>(entity: string, componentType: ComponentId): T {
@@ -121,7 +146,13 @@ export default class EntityManager {
     }
 
     addComponent(entity: string, component: Component): Component {
+        let event;
+        if (this.components.get(component.ID).has(entity)) event = EntityManagerEvent.ComponentReplaced;
+        else event = EntityManagerEvent.ComponentAdded;
+
         this.components.get(component.ID).set(entity, new Proxy(component, componentProxyHandler));
+
+        this.emit(event, entity, component.ID);
         return component;
     }
 
@@ -131,6 +162,7 @@ export default class EntityManager {
         if (component) {
             component.dispose(); // Hook into component in case it needs to do some cleanup.
             componentEntities.delete(entity);
+            this.emit(EntityManagerEvent.ComponentRemoved, entity, type);
         }
     }
 
@@ -153,9 +185,9 @@ export default class EntityManager {
         this.eventHandlers[eventType].push(callback);
     }
 
-    private emit(eventType: EntityManagerEvent, data: Object) {
+    private emit(eventType: EntityManagerEvent, entity: string, data?: any) {
         this.eventHandlers[eventType].forEach((callback) => {
-            callback(data);
+            callback(entity, data);
         })
     }
 }

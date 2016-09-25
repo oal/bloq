@@ -10,6 +10,7 @@ import ChunkSubscriptionSystem from "./systems/ChunkSubscriptionSystem";
 import PlayerActionSystem from "./systems/PlayerActionSystem";
 import PickUpSystem from "./systems/PickUpSystem";
 import {EntityManagerEvent} from "../../shared/EntityManager";
+import BroadcastEntitySystem from "./systems/BroadcastEntitySystem";
 
 
 export default class World extends BaseWorld {
@@ -27,13 +28,10 @@ export default class World extends BaseWorld {
         this.addSystem(new ChunkSubscriptionSystem(this.entityManager, this.terrain), 100);
         this.addSystem(new PlayerActionSystem(this.entityManager, this.actionManager), 101);
         this.addSystem(new PickUpSystem(this.entityManager), 102);
+        this.addSystem(new BroadcastEntitySystem(this.entityManager), 103);
 
         console.log(this.systems);
         console.log(this.systemsOrder)
-
-        this.entityManager.addEventListener(EntityManagerEvent.EntityCreated, (data) => {
-            console.log('Oh, look, an entity!', data);
-        })
     }
 
 
