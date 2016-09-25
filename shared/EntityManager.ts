@@ -30,7 +30,7 @@ export const enum EntityManagerEvent {
 export default class EntityManager {
     private components: Map<ComponentId, Map<string, Component>>;
     private componentConstructors: Map<ComponentId, Function>;
-    private removedEntities: Set<string> = new Set<>();
+    private removedEntities: Set<string> = new Set<string>();
 
     private eventHandlers: Array<Array<Function>> = [];
 

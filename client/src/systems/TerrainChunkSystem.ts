@@ -74,7 +74,8 @@ export default class TerrainChunkSystem extends System {
             console.timeEnd(`build-${entity}`);
             if (!chunkGeom) return;
 
-            let meshComponent = (this.entityManager.getComponent(entity, ComponentId.Mesh) || this.entityManager.addComponent(entity, new MeshComponent())) as MeshComponent;
+            let meshComponent = this.entityManager.getComponent<MeshComponent>(entity, ComponentId.Mesh);
+            if(!meshComponent) meshComponent = this.entityManager.addComponent(entity, new MeshComponent()) as MeshComponent;
             let mesh = meshComponent.mesh;
             if (meshComponent.mesh) {
                 mesh.geometry.dispose();

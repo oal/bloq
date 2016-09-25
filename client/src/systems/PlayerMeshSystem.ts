@@ -4,7 +4,10 @@ import {System} from "../../../shared/systems";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId} from "../../../shared/constants";
 import {PlayerComponent} from "../components";
-import {PositionComponent, RotationComponent, PhysicsComponent} from "../../../shared/components";
+import {
+    PositionComponent, RotationComponent, PhysicsComponent,
+    CurrentPlayerComponent
+} from "../../../shared/components";
 
 
 export default class PlayerMeshSystem extends System {
@@ -32,7 +35,7 @@ export default class PlayerMeshSystem extends System {
             let rot = this.entityManager.getComponent<RotationComponent>(entity, ComponentId.Rotation);
             mesh.rotation.y = rot.y;
 
-            if (this.entityManager.getComponent(entity, ComponentId.CurrentPlayer)) {
+            if (this.entityManager.getComponent<CurrentPlayerComponent>(entity, ComponentId.CurrentPlayer)) {
                 mesh.getObjectByName('camera').rotation.x = rot.x;
             } else {
                 // Animation is only relevant for other players, as current player has no mesh.

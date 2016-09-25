@@ -5,7 +5,7 @@ import {PositionComponent, InventoryComponent} from "../../../shared/components"
 
 export default class PickUpSystem extends System {
     update(dt: number) {
-        let pickableEntities: Map<string, PositionComponent> = new Map<>();
+        let pickableEntities: Map<string, PositionComponent> = new Map<string, PositionComponent>();
         this.entityManager.getEntities(ComponentId.Block).forEach((component, entity) => {
             let posComponent = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Position);
             if(!posComponent) return;

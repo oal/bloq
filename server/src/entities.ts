@@ -37,7 +37,7 @@ export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocke
 
 export function updatePlayerInput(em: EntityManager, am: ServerActionManager, playerEntity: string, obj) {
     let input = obj.components[ComponentId.Input];
-    let existingInput = em.getComponent(playerEntity, ComponentId.Input);
+    let existingInput = em.getComponent<InputComponent>(playerEntity, ComponentId.Input);
     existingInput.update(input);
 
     let position = obj.components[ComponentId.Position];

@@ -2,7 +2,7 @@ import {System} from "../../../shared/systems";
 import Server from "../Server";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId} from "../../../shared/constants";
-import {RotationComponent} from "../../../shared/components";
+import {RotationComponent, PositionComponent, InputComponent, InventoryComponent} from "../../../shared/components";
 
 
 export default class PlayerInputSyncSystem extends System {
@@ -15,8 +15,8 @@ export default class PlayerInputSyncSystem extends System {
 
     update(dt: number) {
         this.entityManager.getEntities(ComponentId.CurrentPlayer).forEach((component, entity) => {
-            let position = this.entityManager.getComponent(entity, ComponentId.Position);
-            let input = this.entityManager.getComponent(entity, ComponentId.Input);
+            let position = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Position);
+            let input = this.entityManager.getComponent<InputComponent>(entity, ComponentId.Input);
 
             if (input.isDirty()) {
                 let components = {};
@@ -38,7 +38,7 @@ export default class PlayerInputSyncSystem extends System {
                 });
             }
 
-            let inventory = this.entityManager.getComponent(entity, ComponentId.Inventory);
+            let inventory = this.entityManager.getComponent<InventoryComponent>(entity, ComponentId.Inventory);
             if (inventory.isDirty()) {
                 console.log('send inventory');
                 let components = {};
