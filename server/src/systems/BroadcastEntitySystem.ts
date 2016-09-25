@@ -9,7 +9,7 @@ import {RemoveEntitiesAction} from "../../../shared/actions";
 
 export default class BroadcastEntitySystem extends System {
     addedEntities: Array<string> = [];
-    removedEntities: Array<[string, number, number, number]> = [];
+    removedEntities: Array<string> = [];
 
     constructor(em: EntityManager) {
         super(em);
@@ -23,7 +23,7 @@ export default class BroadcastEntitySystem extends System {
     }
 
     onEntityRemoved(entity: string, chunk: [number, number, number]) {
-        this.removedEntities.push([entity, chunk[0], chunk[1], chunk[2]]);
+        this.removedEntities.push(entity);
     }
 
     update(dt: number): any {
@@ -36,9 +36,16 @@ export default class BroadcastEntitySystem extends System {
             }
         });
 
-        this.removedEntities.forEach(data => {
-            let [entity, cx, cy, cz] = data;
-            broadcastAction(this.entityManager, [cx, cy, cz], ActionId.RemoveEntities, new RemoveEntitiesAction([entity]));
+        this.removedEntities.forEach(entity => {
+            let posComponent = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Position);
+            if(!posComponent) return;
+
+            broadcastAction(
+                this.entityManager,
+                posComponent.toChunk(),
+                ActionId.RemoveEntities,
+                new RemoveEntitiesAction([entity])
+            );
         });
 
         // Reset entity list for next tick.

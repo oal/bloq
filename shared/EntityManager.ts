@@ -1,6 +1,6 @@
 import uuid = require('node-uuid');
 
-import {Component, SerializableComponent, PositionComponent} from "./components";
+import {Component, SerializableComponent} from "./components";
 import {ComponentId} from "./constants";
 
 let componentProxyHandler = {
@@ -30,6 +30,7 @@ export const enum EntityManagerEvent {
 export default class EntityManager {
     private components: Map<ComponentId, Map<string, Component>>;
     private componentConstructors: Map<ComponentId, Function>;
+    private removedEntities: Set<string> = new Set<>();
 
     private eventHandlers: Array<Array<Function>> = [];
 
@@ -110,27 +111,11 @@ export default class EntityManager {
         }
     }
 
+    // Only schedules for removal.
+    // Entities (and their components) are fully removed once cleanComponents() is called.
     removeEntity(entity: string) {
-        let entityExisted = false;
-        let inChunk = null;
-        this.components.forEach((entities, type) => {
-            if (entities.has(entity)) {
-                // I don't like having to reference a specific component inside the EntityManager,
-                // but the event handlers need to know from what chunk the entity was removed,
-                // to broadcast the info to clients efficiently.
-                // An alternative solution would be to not remove the entity in removeEntity, but only
-                // schedule for removal.
-                if(type === ComponentId.Position) {
-                    inChunk = this.getComponent<PositionComponent>(entity, ComponentId.Position).toChunk();
-                }
-                this.removeComponentType(entity, type);
-                entityExisted = true;
-            }
-        });
-
-        if (entityExisted && inChunk) {
-            this.emit(EntityManagerEvent.EntityRemoved, entity, inChunk);
-        }
+        this.removedEntities.add(entity);
+        this.emit(EntityManagerEvent.EntityRemoved, entity);
     }
 
     getEntities(componentType: ComponentId): Map<string, Component> {
@@ -171,13 +156,22 @@ export default class EntityManager {
     }
 
     cleanComponents() {
-        this.components.forEach((entityComponent) => {
+        // Remove entities marked for removal.
+        this.removedEntities.forEach(entity => {
+            this.components.forEach((entities, type) => {
+                if (entities.has(entity)) this.removeComponentType(entity, type);
+            });
+        });
+        this.removedEntities.clear();
+
+        // Reset dirty state for all components.
+        this.components.forEach(entityComponent => {
             entityComponent.forEach((component) => {
                 Object.keys(component.dirtyFields).forEach(key => {
                     if (component.dirtyFields[key]) component.dirtyFields[key] = false;
                 });
-            })
-        })
+            });
+        });
     }
 
     // Event related
