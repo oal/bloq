@@ -4,7 +4,7 @@ import {
     CurrentPlayerComponent, PhysicsComponent, RotationComponent, WallCollisionComponent, InventoryComponent
 } from "../../shared/components";
 import {NetworkComponent, NewPlayerComponent, PlayerComponent, ChunkSubscriptionComponent} from "./components";
-import {ComponentId} from "../../shared/constants";
+import {ComponentId, ActionId} from "../../shared/constants";
 import {MoveEntityAction} from "../../shared/actions";
 import {globalToChunk} from "../../shared/helpers";
 import {broadcastAction} from "./helpers";
@@ -55,7 +55,7 @@ export function updatePlayerInput(em: EntityManager, am: ServerActionManager, pl
 
         // Broad cast so it's queued on clients.
         let [cx, cy, cz] = prevPos.map(globalToChunk);
-        broadcastAction(em, [cx, cy, cz], action);
+        broadcastAction(em, [cx, cy, cz], ActionId.MoveEntity, action);
     }
 }
 

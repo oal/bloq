@@ -26,7 +26,7 @@ export const enum ComponentId {
     // Server
     Network,
     ChunkSubscription,
-    NewPlayer,
+    NewPlayer
 }
 
 export const enum Side {
@@ -38,11 +38,18 @@ export const enum Side {
     Bottom
 }
 
-export const enum Block {
+export const enum BlockId {
     Air = 0,
     Dirt,
     Grass,
     Stone,
     Sand,
     Wood
+}
+
+export const enum ActionId {
+    UnsubscribeTerrainChunks = 1,
+    SetBlocks,
+    RemoveEntities,
+    MoveEntity
 }

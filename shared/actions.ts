@@ -1,7 +1,7 @@
 import {TextEncoder} from 'text-encoding';
 import EntityManager from "./EntityManager";
 import {globalToChunk, mod, chunkKey} from "./helpers";
-import {TERRAIN_CHUNK_SIZE, ComponentId} from "./constants";
+import {TERRAIN_CHUNK_SIZE, ComponentId, ActionId} from "./constants";
 import {TerrainChunkComponent, PositionComponent} from "./components";
 import {MeshComponent} from "../client/src/components";
 
@@ -28,12 +28,6 @@ export class ActionManager {
 }
 
 export class Action {
-    static ID: number = 0;
-
-    get ID(): number {
-        return this.constructor['ID'];
-    }
-
     serialize(): Uint8Array {
         let str = JSON.stringify(this);
         let encoder = new TextEncoder();
@@ -46,7 +40,6 @@ export class Action {
 
 
 export class UnsubscribeTerrainChunksAction extends Action {
-    static ID: number = 1;
     chunkKeys: Array<string> = [];
 
     constructor(chunkKeys: Array<string>) {
@@ -62,7 +55,6 @@ export class UnsubscribeTerrainChunksAction extends Action {
 }
 
 export class SetBlocksAction extends Action {
-    static ID: number = 2;
     blocks: Array<[number, number, number, number]>;
 
     constructor(blocks: Array<[number, number, number, number]>) {
@@ -108,7 +100,6 @@ export class SetBlocksAction extends Action {
 }
 
 export class RemoveEntitiesAction extends Action {
-    static ID: number = 3;
     entities: Array<string>;
 
     constructor(entities: Array<string>) {
@@ -123,10 +114,7 @@ export class RemoveEntitiesAction extends Action {
     }
 }
 
-
 export class MoveEntityAction extends Action {
-    static ID: number = 4;
-
     entity: string;
     position: [number, number, number];
 

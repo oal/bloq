@@ -1,7 +1,7 @@
 import {System} from "../../../shared/systems";
 import {Terrain} from "../terrain";
 import EntityManager from "../../../shared/EntityManager";
-import {ComponentId} from "../../../shared/constants";
+import {ComponentId, ActionId} from "../../../shared/constants";
 import {ChunkSubscriptionComponent, NetworkComponent} from "../components";
 import {PositionComponent, TerrainChunkComponent} from "../../../shared/components";
 import {arraysEqual, chunkKey} from "../../../shared/helpers";
@@ -58,7 +58,7 @@ export default class ChunkSubscriptionSystem extends System {
                     if (!newChunkSubs.has(chunkKey)) unsubChunks.push(chunkKey)
                 });
                 if (unsubChunks.length) {
-                    Server.sendAction(netComponent.websocket, new UnsubscribeTerrainChunksAction(unsubChunks));
+                    Server.sendAction(netComponent.websocket, ActionId.UnsubscribeTerrainChunks, new UnsubscribeTerrainChunksAction(unsubChunks));
                 }
 
                 // Update chunk subscription.

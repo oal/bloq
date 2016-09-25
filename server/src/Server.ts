@@ -5,7 +5,7 @@ import World from "./World";
 import {initPlayerEntity, updatePlayerInput, updatePlayerRotation, updatePlayerInventory} from "./entities";
 import {objectHasKeys} from "../../shared/helpers";
 import {NetworkComponent} from "./components";
-import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION, ComponentId} from "../../shared/constants";
+import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION, ComponentId, ActionId} from "../../shared/constants";
 import {Action, RemoveEntitiesAction} from "../../shared/actions";
 import {broadcastAction} from "./helpers";
 
@@ -81,7 +81,7 @@ export default class Server {
         ws.send(packet);
     }
 
-    static sendAction(ws: WebSocket, action: Action) {
+    static sendAction(ws: WebSocket, actionId: ActionId, action: Action) {
         let bytes = action.serialize();
 
         // Give room for message type and action ID.
@@ -91,7 +91,7 @@ export default class Server {
 
         // Set header data
         packetView.setUint16(0, MSG_ACTION);
-        packetView.setUint16(Uint16Array.BYTES_PER_ELEMENT, action.ID);
+        packetView.setUint16(Uint16Array.BYTES_PER_ELEMENT, actionId);
 
         // Copy over message data.
         for (let i = 0; i < bytes.length; i++) {

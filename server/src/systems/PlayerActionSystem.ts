@@ -1,7 +1,7 @@
 import {System} from "../../../shared/systems";
 import {ServerActionManager} from "../actions";
 import EntityManager from "../../../shared/EntityManager";
-import {ComponentId, Side} from "../../../shared/constants";
+import {ComponentId, Side, ActionId} from "../../../shared/constants";
 import {
     InputComponent, InventoryComponent, PositionComponent, PhysicsComponent,
     BlockComponent, WallCollisionComponent, RotationComponent
@@ -76,7 +76,7 @@ export default class PlayerActionSystem extends System {
             if (modifiedBlocks.length > 0) {
                 let action = new SetBlocksAction(modifiedBlocks);
                 let [cx, cy, cz] = inputComponent.target.map(globalToChunk);
-                broadcastAction(this.entityManager, [cx, cy, cz], action);
+                broadcastAction(this.entityManager, [cx, cy, cz], ActionId.SetBlocks, action);
                 this.actionManager.queueAction(action); // Queue on server as well.
             }
         });

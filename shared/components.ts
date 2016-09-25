@@ -1,5 +1,5 @@
 import EntityManager from "./EntityManager";
-import {TERRAIN_CHUNK_SIZE, ComponentId, Side} from "./constants";
+import {TERRAIN_CHUNK_SIZE, ComponentId, Side, BlockId} from "./constants";
 import {globalToChunk} from "./helpers";
 
 // Used when serializing component to avoid "dirty" flag being serialized. It is only needed locally at runtime.
@@ -180,7 +180,7 @@ export class InventoryComponent extends SerializableComponent {
 export class BlockComponent extends SerializableComponent {
     static ID = ComponentId.Block;
 
-    kind: number;
+    kind: BlockId;
 }
 
 
