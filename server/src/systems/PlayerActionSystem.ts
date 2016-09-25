@@ -35,13 +35,6 @@ export default class PlayerActionSystem extends System {
                 pos.z = target[2];
 
                 this.entityManager.addComponent(blockEntity, pos);
-                // TODO: Physics component needs to be added on server for it to be simulated correctly.
-                this.entityManager.addComponent(blockEntity, new RotationComponent());
-                let phys = new PhysicsComponent();
-                phys.velY = 0.15;
-                this.entityManager.addComponent(blockEntity, phys);
-                this.entityManager.addComponent(blockEntity, new WallCollisionComponent());
-
                 let block = new BlockComponent();
                 block.kind = 1;
                 this.entityManager.addComponent(blockEntity, block);

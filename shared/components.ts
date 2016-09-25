@@ -166,6 +166,14 @@ export class InventoryComponent extends SerializableComponent {
 
     slots: Array<string> = [null, null, null, null, null, null, null, null, null, null];
     activeSlot: number = 0;
+
+    addEntity(entity: string): boolean {
+        let availableIndex = this.slots.indexOf(null);
+        if(availableIndex === -1) return false;
+
+        this.slots[availableIndex] = entity;
+        return true;
+    }
 }
 
 // Extended on client and server (client adds mesh). Therefore, not registered as shared component.

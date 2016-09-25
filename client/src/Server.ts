@@ -2,7 +2,7 @@ import {SkinnedMesh, Mesh, BoxGeometry, MeshNormalMaterial} from 'three';
 import Game from "./Game";
 import {objectHasKeys} from "../../shared/helpers";
 import {initPlayerEntity} from "./entities";
-import {TerrainChunkComponent} from "../../shared/components";
+import {TerrainChunkComponent, RotationComponent} from "../../shared/components";
 import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION, ComponentId} from "../../shared/constants";
 import AnimatedMesh from "./AnimatedMesh";
 import {MeshComponent} from "./components";
@@ -67,6 +67,7 @@ export default class Server {
                 let meshComponent = new MeshComponent();
                 meshComponent.mesh = new Mesh(new BoxGeometry(0.25, 0.25, 0.25), new MeshNormalMaterial());
                 this.game.world.entityManager.addComponent(obj.entity, meshComponent);
+                this.game.world.entityManager.addComponent(obj.entity, new RotationComponent());
             } else {
                 this.game.world.entityManager.deserializeAndSetEntity(jsonStr);
             }

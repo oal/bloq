@@ -8,6 +8,7 @@ import InformNewPlayersSystem from "./systems/InformNewPlayersSystem";
 import BroadcastPlayerInputSystem from "./systems/BroadcastPlayerInputSystem";
 import ChunkSubscriptionSystem from "./systems/ChunkSubscriptionSystem";
 import PlayerActionSystem from "./systems/PlayerActionSystem";
+import PickUpSystem from "./systems/PickUpSystem";
 
 
 export default class World extends BaseWorld {
@@ -24,6 +25,7 @@ export default class World extends BaseWorld {
         this.addSystem(new BroadcastPlayerInputSystem(this.entityManager), -8);
         this.addSystem(new ChunkSubscriptionSystem(this.entityManager, this.terrain), 100);
         this.addSystem(new PlayerActionSystem(this.entityManager, this.actionManager), 101);
+        this.addSystem(new PickUpSystem(this.entityManager), 102);
 
         console.log(this.systems);
         console.log(this.systemsOrder)
