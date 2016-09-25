@@ -1,8 +1,8 @@
 export default class KeyboardManager {
     private targetInFocus: boolean = false;
-    private pressedKeys: Set<number> = new Set<>();
+    private pressedKeys: Set<number> = new Set<number>();
 
-    constructor(target: Element) {
+    constructor(target: HTMLElement) {
         // Because keydown/keyup can only be registered on "document" and inputs (?).
         // Keep track of whether or not the game canvas is in focus, and only allow
         // key presses to get stored if that is the case.

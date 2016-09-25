@@ -6,7 +6,15 @@
     "outDir": "dist",
     "sourceMap": false,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "types": [
+      "es6-collections",
+      "node",
+      "node-uuid",
+      "fast-simplex-noise",
+      "text-encoding",
+      "ws"
+    ]
   },
   "exclude": [
     "node_modules",

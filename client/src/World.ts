@@ -1,11 +1,9 @@
 import {
     Scene,
-    WebGLRenderer,
     PerspectiveCamera,
     ShaderMaterial,
     VertexColors,
 } from 'three';
-import * as Keymaster from 'keymaster';
 
 import BaseWorld from "../../shared/BaseWorld";
 import Game from "./Game";

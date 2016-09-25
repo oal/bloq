@@ -17,8 +17,8 @@ export default class MainMenu {
         let serverAddress = (document.querySelector('#server') as HTMLInputElement).value;
         if (serverAddress.length === 0) return;
 
-        document.querySelector('#mainmenu').style.display = 'none';
-        document.querySelector('#gui').style.display = 'block';
+        (document.querySelector('#mainmenu') as HTMLDivElement).style.display = 'none';
+        (document.querySelector('#gui') as HTMLDivElement).style.display = 'block';
         new Game(serverAddress);
     }
 }
