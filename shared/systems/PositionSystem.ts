@@ -10,7 +10,7 @@ export default class PositionSystem extends System {
             let physComponent = component as PhysicsComponent;
 
             // Update positions.
-            let posComponent = this.entityManager.getComponent(entity, ComponentId.Position) as PositionComponent;
+            let posComponent = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Position);
             posComponent.x += physComponent.velX;
             posComponent.y += physComponent.velY;
             posComponent.z += physComponent.velZ;

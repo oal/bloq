@@ -22,14 +22,14 @@ export default class InformNewPlayersSystem extends System {
             // Send info about new player to existing players.
             this.entityManager.getEntities(ComponentId.Player).forEach((component, existingEntity) => {
                 if (existingEntity == newEntity) return; // Never send info about the new player to themselves.
-                let ws = this.entityManager.getComponent(existingEntity, ComponentId.Network) as NetworkComponent;
+                let ws = this.entityManager.getComponent<NetworkComponent>(existingEntity, ComponentId.Network);
                 Server.sendEntity(ws.websocket, newPlayerData);
 
                 existingPlayerDatas.push(this.entityManager.serializeEntity(existingEntity, syncComponents));
             });
 
             // Inform new player about existing players.
-            let ws = this.entityManager.getComponent(newEntity, ComponentId.Network) as NetworkComponent;
+            let ws = this.entityManager.getComponent<NetworkComponent>(newEntity, ComponentId.Network);
             existingPlayerDatas.forEach(data => {
                 Server.sendEntity(ws.websocket, data);
             });

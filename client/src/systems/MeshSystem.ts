@@ -24,14 +24,14 @@ export default class MeshSystem extends System {
                 this.scene.add(meshComponent.mesh);
             }
 
-            let position = this.entityManager.getComponent(entity, ComponentId.Position) as PositionComponent;
+            let position = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Position);
             if (position) {
                 meshComponent.mesh.position.x = position.x;
                 meshComponent.mesh.position.y = position.y;
                 meshComponent.mesh.position.z = position.z;
             }
 
-            let rot = this.entityManager.getComponent(entity, ComponentId.Rotation) as RotationComponent;
+            let rot = this.entityManager.getComponent<RotationComponent>(entity, ComponentId.Rotation);
             if (rot) {
                 meshComponent.mesh.rotation.x = rot.x;
                 meshComponent.mesh.rotation.y = rot.y;

@@ -24,13 +24,13 @@ export default class DebugTextSystem extends System {
         }
 
         let playerEntity = this.entityManager.getEntities(ComponentId.CurrentPlayer).keys().next().value;
-        let positionComponent = this.entityManager.getComponent(playerEntity, ComponentId.Position) as PositionComponent;
+        let positionComponent = this.entityManager.getComponent<PositionComponent>(playerEntity, ComponentId.Position);
         if (!positionComponent) return;
 
-        let rotationComponent = this.entityManager.getComponent(playerEntity, ComponentId.Rotation) as RotationComponent;
-        let selectionComponent = this.entityManager.getComponent(playerEntity, ComponentId.PlayerSelection) as PlayerSelectionComponent;
+        let rotationComponent = this.entityManager.getComponent<RotationComponent>(playerEntity, ComponentId.Rotation);
+        let selectionComponent = this.entityManager.getComponent<PlayerSelectionComponent>(playerEntity, ComponentId.PlayerSelection);
 
-        let onGroundComponent = this.entityManager.getComponent(playerEntity, ComponentId.OnGround) as OnGroundComponent;
+        let onGroundComponent = this.entityManager.getComponent<OnGroundComponent>(playerEntity, ComponentId.OnGround);
 
 
         let [cx, cy, cz] = positionComponent.toChunk();

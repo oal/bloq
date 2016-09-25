@@ -10,7 +10,7 @@ import {chunkKey, mod, globalToChunk} from "../helpers";
 export default class TerrainCollisionSystem extends System {
     update(dt: number): any {
         this.entityManager.getEntities(ComponentId.Physics).forEach((component, entity) => {
-            let posComponent = this.entityManager.getComponent(entity, ComponentId.Position) as PositionComponent;
+            let posComponent = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Position);
             let physComponent = component as PhysicsComponent;
 
             // Find the chunk coordinates based on current global position (16 -> 0 etc.)
@@ -22,7 +22,7 @@ export default class TerrainCollisionSystem extends System {
                 for (let ny = -1; ny <= 1; ny++) {
                     for (let nx = -1; nx <= 1; nx++) {
                         let key = chunkKey(cx + nx, cy + ny, cz + nz);
-                        let chunkComponent = this.entityManager.getComponent(key, ComponentId.TerrainChunk) as TerrainChunkComponent;
+                        let chunkComponent = this.entityManager.getComponent<TerrainChunkComponent>(key, ComponentId.TerrainChunk);
                         if (chunkComponent) chunks[key] = chunkComponent;
                     }
                 }
@@ -69,7 +69,7 @@ export default class TerrainCollisionSystem extends System {
             }
 
             // Check and update block collision component (wall collisions).
-            let bcComponent = this.entityManager.getComponent(entity, ComponentId.WallCollision) as WallCollisionComponent;
+            let bcComponent = this.entityManager.getComponent<WallCollisionComponent>(entity, ComponentId.WallCollision);
             bcComponent.px = !!(checkCollisionAt(0.5, 0.5, 0) || checkCollisionAt(0.5, 1.5, 0) || checkCollisionAt(0.5, 2.5, 0));
             bcComponent.nx = !!(checkCollisionAt(-0.5, 0.5, 0) || checkCollisionAt(-0.5, 1.5, 0) || checkCollisionAt(-0.5, 2.5, 0));
             bcComponent.pz = !!(checkCollisionAt(0, 0.5, 0.5) || checkCollisionAt(0, 1.5, 0.5) || checkCollisionAt(0, 2.5, 0.5));

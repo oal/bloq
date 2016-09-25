@@ -13,7 +13,7 @@ export function broadcastAction(em: EntityManager, chunk: [number, number, numbe
         let subComponent = component as ChunkSubscriptionComponent;
 
         if(subComponent.chunks.has(key)) {
-            let netComponent = em.getComponent(entity, ComponentId.Network) as NetworkComponent;
+            let netComponent = em.getComponent<NetworkComponent>(entity, ComponentId.Network);
             Server.sendAction(netComponent.websocket, actionId, action);
         }
     });
@@ -26,7 +26,7 @@ export function broadcastEntity(em: EntityManager, chunk: [number, number, numbe
         let subComponent = component as ChunkSubscriptionComponent;
 
         if(subComponent.chunks.has(key)) {
-            let netComponent = em.getComponent(entity, ComponentId.Network) as NetworkComponent;
+            let netComponent = em.getComponent<NetworkComponent>(entity, ComponentId.Network);
             Server.sendEntity(netComponent.websocket, em.serializeEntity(blockEntity));
         }
     });

@@ -106,7 +106,7 @@ export default class Server {
         let playerEntity = this.world.entityManager.createEntity();
         initPlayerEntity(this.world.entityManager, playerEntity, ws);
 
-        let netComponent = this.world.entityManager.getComponent(playerEntity, ComponentId.Network) as NetworkComponent;
+        let netComponent = this.world.entityManager.getComponent<NetworkComponent>(playerEntity, ComponentId.Network);
         Server.sendEntity(netComponent.websocket, this.world.entityManager.serializeEntity(playerEntity));
 
         ws.on('message', (data, flags) => {

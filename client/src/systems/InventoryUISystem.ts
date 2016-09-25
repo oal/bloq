@@ -6,7 +6,7 @@ import {InventoryComponent} from "../../../shared/components";
 export default class InventoryUISystem extends System {
     update(dt: number) {
         this.entityManager.getEntities(ComponentId.Inventory).forEach((component, entity) => {
-            let inventory = this.entityManager.getComponent(entity, ComponentId.Inventory) as InventoryComponent;
+            let inventory = this.entityManager.getComponent<InventoryComponent>(entity, ComponentId.Inventory);
             if(inventory.isDirty('activeSlot')) {
                 let currentSlot = document.querySelector('#inventory .active');
                 let newSlot = document.querySelectorAll('#inventory .inventory-row:first-child li')[inventory.activeSlot];

@@ -24,19 +24,19 @@ export default class PlayerMeshSystem extends System {
                 this.scene.add(mesh);
             }
 
-            let position = this.entityManager.getComponent(entity, ComponentId.Position) as PositionComponent;
+            let position = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Position);
             mesh.position.x = position.x;
             mesh.position.y = position.y;
             mesh.position.z = position.z;
 
-            let rot = this.entityManager.getComponent(entity, ComponentId.Rotation) as RotationComponent;
+            let rot = this.entityManager.getComponent<RotationComponent>(entity, ComponentId.Rotation);
             mesh.rotation.y = rot.y;
 
             if (this.entityManager.getComponent(entity, ComponentId.CurrentPlayer)) {
                 mesh.getObjectByName('camera').rotation.x = rot.x;
             } else {
                 // Animation is only relevant for other players, as current player has no mesh.
-                let physComponent = this.entityManager.getComponent(entity, ComponentId.Physics) as PhysicsComponent;
+                let physComponent = this.entityManager.getComponent<PhysicsComponent>(entity, ComponentId.Physics);
                 if (Math.abs(physComponent.velX) > 0.01 || Math.abs(physComponent.velZ) > 0.01) {
                     if (mesh.getCurrentAnimation() != 'walk') {
                         mesh.playAnimation('walk');

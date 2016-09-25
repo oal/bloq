@@ -20,8 +20,8 @@ export default class ChunkSubscriptionSystem extends System {
     update(dt: number) {
         this.entityManager.getEntities(ComponentId.ChunkSubscription).forEach((component, entity) => {
             let chunkSubComponent = component as ChunkSubscriptionComponent;
-            let posComponent = this.entityManager.getComponent(entity, ComponentId.Position) as PositionComponent;
-            let netComponent = this.entityManager.getComponent(entity, ComponentId.Network) as NetworkComponent;
+            let posComponent = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Position);
+            let netComponent = this.entityManager.getComponent<NetworkComponent>(entity, ComponentId.Network);
 
             // Do we need to update chunk subscriptions?
             let currChunk = posComponent.toChunk();
@@ -40,7 +40,7 @@ export default class ChunkSubscriptionSystem extends System {
 
                             // If this chunk key wasn't already subscribed to, player needs to receive chunk data:
                             if (!chunkSubComponent.chunks.has(key)) {
-                                let chunkComponent = this.entityManager.getComponent(key, ComponentId.TerrainChunk) as TerrainChunkComponent;
+                                let chunkComponent = this.entityManager.getComponent<TerrainChunkComponent>(key, ComponentId.TerrainChunk);
                                 if (!chunkComponent) {
                                     chunkComponent = this.terrain.generateChunk(cx, cy, cz);
                                     this.entityManager.addComponent(key, chunkComponent);

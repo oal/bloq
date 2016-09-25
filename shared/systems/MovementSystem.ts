@@ -11,9 +11,9 @@ export default class MovementSystem extends System {
         this.entityManager.getEntities(ComponentId.Physics).forEach((component, entity) => {
             if(!this.entityManager.getComponent(entity, ComponentId.Player)) return;
 
-            let input = this.entityManager.getComponent(entity, ComponentId.Input) as InputComponent;
+            let input = this.entityManager.getComponent<InputComponent>(entity, ComponentId.Input);
 
-            let rotation = this.entityManager.getComponent(entity, ComponentId.Rotation) as RotationComponent;
+            let rotation = this.entityManager.getComponent<RotationComponent>(entity, ComponentId.Rotation);
 
             let physComponent = component as PhysicsComponent;
 
@@ -37,7 +37,7 @@ export default class MovementSystem extends System {
                 physComponent.velZ += cosSpeed;
             }
             if (input.jump) {
-                let onGround = this.entityManager.getComponent(entity, ComponentId.OnGround) as OnGroundComponent;
+                let onGround = this.entityManager.getComponent<OnGroundComponent>(entity, ComponentId.OnGround);
                 if (onGround && onGround.canJump) {
                     physComponent.velY = 0.25;
                     this.entityManager.removeComponentType(entity, ComponentId.OnGround);
@@ -45,7 +45,7 @@ export default class MovementSystem extends System {
             }
 
             // Are we colliding with a block in the world? If so, allow no more movement in that direction.
-            let blockCollision = this.entityManager.getComponent(entity, ComponentId.WallCollision) as WallCollisionComponent;
+            let blockCollision = this.entityManager.getComponent<WallCollisionComponent>(entity, ComponentId.WallCollision);
             if (blockCollision.px && physComponent.velX > 0) physComponent.velX = 0;
             if (blockCollision.nx && physComponent.velX < 0) physComponent.velX = 0;
             if (blockCollision.pz && physComponent.velZ > 0) physComponent.velZ = 0;

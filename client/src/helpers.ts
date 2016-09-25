@@ -9,7 +9,7 @@ export function findBlockMaterial(em: EntityManager, x: number, y: number, z: nu
 
     let key = chunkKey(cx, cy, cz);
 
-    let chunkComponent = em.getComponent(key, ComponentId.TerrainChunk) as TerrainChunkComponent;
+    let chunkComponent = em.getComponent<TerrainChunkComponent>(key, ComponentId.TerrainChunk);
     if(!chunkComponent) return 0;
 
     let [lx, ly, lz] = [mod(x, TERRAIN_CHUNK_SIZE), mod(y, TERRAIN_CHUNK_SIZE), mod(z, TERRAIN_CHUNK_SIZE)];

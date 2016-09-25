@@ -21,7 +21,7 @@ export default class PlayerInputSystem extends System {
     update(dt: number) {
         this.entityManager.getEntities(ComponentId.CurrentPlayer).forEach((component, entity) => {
             // Movement related
-            let input = this.entityManager.getComponent(entity, ComponentId.Input) as InputComponent;
+            let input = this.entityManager.getComponent<InputComponent>(entity, ComponentId.Input);
 
             let moveForward = this.keyboardManager.isPressed('W');
             let moveLeft = this.keyboardManager.isPressed('A');
@@ -46,7 +46,7 @@ export default class PlayerInputSystem extends System {
             }
 
             // Rotation
-            let rot = this.entityManager.getComponent(entity, ComponentId.Rotation) as RotationComponent;
+            let rot = this.entityManager.getComponent<RotationComponent>(entity, ComponentId.Rotation);
             let [dx, dy, scrollDirection] = this.mouseManager.delta();
             if (dx !== 0) {
                 rot.y -= dx / 5.0 * dt;
@@ -65,7 +65,7 @@ export default class PlayerInputSystem extends System {
             let actionPrimary = this.mouseManager.isLeftButtonPressed();
             let actionSecondary = this.mouseManager.isRightButtonPressed();
             if ((actionPrimary && !input.primaryAction) || (actionSecondary && !input.secondaryAction)) {
-                let selectionComponent = this.entityManager.getComponent(entity, ComponentId.PlayerSelection) as PlayerSelectionComponent;
+                let selectionComponent = this.entityManager.getComponent<PlayerSelectionComponent>(entity, ComponentId.PlayerSelection);
                 input.target = selectionComponent.target;
                 input.targetSide = selectionComponent.targetSide;
             }
@@ -78,7 +78,7 @@ export default class PlayerInputSystem extends System {
 
 
             // Inventory
-            let inventory = this.entityManager.getComponent(entity, ComponentId.Inventory) as InventoryComponent;
+            let inventory = this.entityManager.getComponent<InventoryComponent>(entity, ComponentId.Inventory);
 
             // Update slot based on number keys pressed.
             ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].forEach(numKey => {

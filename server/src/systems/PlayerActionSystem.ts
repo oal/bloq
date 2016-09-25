@@ -67,7 +67,7 @@ export default class PlayerActionSystem extends System {
                 }
 
                 // TODO: WIP. Should use entity in current slot instead of index as block type.
-                let inventory = this.entityManager.getComponent(entity, ComponentId.Inventory) as InventoryComponent;
+                let inventory = this.entityManager.getComponent<InventoryComponent>(entity, ComponentId.Inventory);
                 modifiedBlocks.push([target[0] + add[0], target[1] + add[1], target[2] + add[2], inventory.activeSlot+1]);
             }
 

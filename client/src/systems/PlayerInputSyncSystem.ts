@@ -28,7 +28,7 @@ export default class PlayerInputSyncSystem extends System {
                 });
             }
 
-            let rot = this.entityManager.getComponent(entity, ComponentId.Rotation) as RotationComponent;
+            let rot = this.entityManager.getComponent<RotationComponent>(entity, ComponentId.Rotation);
             if (rot.isDirty()) {
                 let components = {};
                 components[ComponentId.Rotation] = rot;

@@ -41,7 +41,7 @@ export function updatePlayerInput(em: EntityManager, am: ServerActionManager, pl
     existingInput.update(input);
 
     let position = obj.components[ComponentId.Position];
-    let existingPosition = em.getComponent(playerEntity, ComponentId.Position) as PositionComponent;
+    let existingPosition = em.getComponent<PositionComponent>(playerEntity, ComponentId.Position);
     let prevPos: [number, number, number] = [existingPosition.x, existingPosition.y, existingPosition.z];
     let dist = Math.sqrt(Math.pow(position.x - existingPosition.x, 2) + Math.pow(position.y - existingPosition.y, 2) + Math.pow(position.z - existingPosition.z, 2));
 
@@ -61,13 +61,13 @@ export function updatePlayerInput(em: EntityManager, am: ServerActionManager, pl
 
 export function updatePlayerRotation(em: EntityManager, playerEntity, obj) {
     let rot = obj.components[ComponentId.Rotation];
-    let existingRot = em.getComponent(playerEntity, ComponentId.Rotation) as RotationComponent;
+    let existingRot = em.getComponent<RotationComponent>(playerEntity, ComponentId.Rotation);
     existingRot.update(rot);
 }
 
 export function updatePlayerInventory(em: EntityManager, playerEntity, obj) {
     let inventoryData = obj.components[ComponentId.Inventory];
-    let inventory = em.getComponent(playerEntity, ComponentId.Inventory) as InventoryComponent;
+    let inventory = em.getComponent<InventoryComponent>(playerEntity, ComponentId.Inventory);
 
     // Should only trust activeSlot, so the player can't add arbitrary entities to their inventory, and have
     // server accept it.

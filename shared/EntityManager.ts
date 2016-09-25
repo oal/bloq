@@ -9,7 +9,7 @@ let componentProxyHandler = {
     // },
     set: (obj, prop, value) => {
         if (prop != 'dirtyFields' && obj[prop] !== value) {
-            if(prop === 'primaryAction') console.log('New: ', value, "Old: ", obj[prop]);
+            if (prop === 'primaryAction') console.log('New: ', value, "Old: ", obj[prop]);
             (obj as Component).dirtyFields[prop] = true;
             obj[prop] = value;
         }
@@ -17,13 +17,25 @@ let componentProxyHandler = {
     }
 };
 
+export const enum EntityManagerEvent {
+    EntityCreated,
+    EntityRemoved,
+    ComponentAdded,
+    ComponentRemoved,
+
+    NumEvents, // Used to initialize event handler array. Not a real event.
+}
+
 export default class EntityManager {
     private components: Map<ComponentId, Map<string, Component>>;
     private componentConstructors: Map<ComponentId, Function>;
 
+    private eventHandlers: Array<Array<Function>>;
+
     constructor() {
         this.components = new Map<ComponentId, Map<string, Component>>();
         this.componentConstructors = new Map<ComponentId, Function>();
+        this.eventHandlers = new Array(EntityManagerEvent.NumEvents).fill([]);
     }
 
     registerComponentType(instance: Component) {
@@ -41,7 +53,9 @@ export default class EntityManager {
     }
 
     createEntity() {
-        return uuid.v4();
+        let entity = uuid.v4();
+        this.emit(EntityManagerEvent.EntityCreated, {entity: entity});
+        return entity;
     }
 
     serializeEntity(entity: string, withComponents: Array<ComponentId> = null) {
@@ -102,8 +116,8 @@ export default class EntityManager {
         return this.components.get(componentType);
     }
 
-    getComponent(entity: string, componentType: ComponentId): Component {
-        return this.components.get(componentType).get(entity);
+    getComponent<T>(entity: string, componentType: ComponentId): T {
+        return this.components.get(componentType).get(entity) as T;
     }
 
     addComponent(entity: string, component: Component): Component {
@@ -128,9 +142,20 @@ export default class EntityManager {
         this.components.forEach((entityComponent) => {
             entityComponent.forEach((component) => {
                 Object.keys(component.dirtyFields).forEach(key => {
-                    if(component.dirtyFields[key]) component.dirtyFields[key] = false;
+                    if (component.dirtyFields[key]) component.dirtyFields[key] = false;
                 });
             })
+        })
+    }
+
+    // Event related
+    addEventListener(eventType: EntityManagerEvent, callback: Function) {
+        this.eventHandlers[eventType].push(callback);
+    }
+
+    private emit(eventType: EntityManagerEvent, data: Object) {
+        this.eventHandlers[eventType].forEach((callback) => {
+            callback(data);
         })
     }
 }

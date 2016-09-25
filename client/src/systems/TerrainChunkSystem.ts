@@ -36,7 +36,7 @@ export default class TerrainChunkSystem extends System {
         if(this.queue.length > preLength) {
             // Get current player (First key of iterator. There will always only be one CurrentPlayer)
             let playerEntity = this.entityManager.getEntities(ComponentId.CurrentPlayer).keys().next().value;
-            let positionComponent = this.entityManager.getComponent(playerEntity, ComponentId.Position) as PositionComponent;
+            let positionComponent = this.entityManager.getComponent<PositionComponent>(playerEntity, ComponentId.Position);
             let [cx, cy, cz] = positionComponent.toChunk();
             let vec = new Vector3(cx, cy, cz);
             this.queue.sort((a, b) => vec.distanceTo(new Vector3(b[0], b[1], b[2])));
@@ -49,7 +49,7 @@ export default class TerrainChunkSystem extends System {
             let [cx, cy, cz] = this.queue.pop();
             let entity = chunkKey(cx, cy, cz);
             console.time(`create-${entity}`);
-            let chunkComponent = this.entityManager.getComponent(entity, ComponentId.TerrainChunk) as TerrainChunkComponent;
+            let chunkComponent = this.entityManager.getComponent<TerrainChunkComponent>(entity, ComponentId.TerrainChunk);
 
             // If chunk was removed after it was queued.
             if(!chunkComponent) continue;
@@ -61,7 +61,7 @@ export default class TerrainChunkSystem extends System {
                         if(x === 0 && y === 0 && z === 0) return null;
 
                         let entity = chunkKey(cx+x, cy+y, cz+z);
-                        let chunk = this.entityManager.getComponent(entity, ComponentId.TerrainChunk) as TerrainChunkComponent;
+                        let chunk = this.entityManager.getComponent<TerrainChunkComponent>(entity, ComponentId.TerrainChunk);
                         if(chunk) return chunk.data;
                         else return null;
                     })

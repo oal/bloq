@@ -70,7 +70,7 @@ export class SetBlocksAction extends Action {
             let [lx, ly, lz] = [mod(x, TERRAIN_CHUNK_SIZE), mod(y, TERRAIN_CHUNK_SIZE), mod(z, TERRAIN_CHUNK_SIZE)];
 
             let entityKey = chunkKey(cx, cy, cz);
-            let chunk = entityManager.getComponent(entityKey, ComponentId.TerrainChunk) as TerrainChunkComponent;
+            let chunk = entityManager.getComponent<TerrainChunkComponent>(entityKey, ComponentId.TerrainChunk);
             if (!chunk) return;
 
             // Force refresh for neighboring chunks if player is digging at the edge of this chunk.
@@ -82,7 +82,7 @@ export class SetBlocksAction extends Action {
                         let neighborKey = chunkKey(nx, ny, nz);
                         if (neighborKey === entityKey) return;
 
-                        let neighborChunk = entityManager.getComponent(neighborKey, ComponentId.TerrainChunk) as TerrainChunkComponent;
+                        let neighborChunk = entityManager.getComponent<TerrainChunkComponent>(neighborKey, ComponentId.TerrainChunk);
                         if (neighborChunk) {
                             console.log('Force neighbor dirty', neighborKey);
                             neighborChunk.forceDirtyData(true);
@@ -125,7 +125,7 @@ export class MoveEntityAction extends Action {
     }
 
     execute(entityManager: EntityManager) {
-        let posComponent = entityManager.getComponent(this.entity, ComponentId.Position) as PositionComponent;
+        let posComponent = entityManager.getComponent<PositionComponent>(this.entity, ComponentId.Position);
         posComponent.x = this.position[0];
         posComponent.y = this.position[1];
         posComponent.z = this.position[2];

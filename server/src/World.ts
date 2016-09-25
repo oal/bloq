@@ -9,6 +9,7 @@ import BroadcastPlayerInputSystem from "./systems/BroadcastPlayerInputSystem";
 import ChunkSubscriptionSystem from "./systems/ChunkSubscriptionSystem";
 import PlayerActionSystem from "./systems/PlayerActionSystem";
 import PickUpSystem from "./systems/PickUpSystem";
+import {EntityManagerEvent} from "../../shared/EntityManager";
 
 
 export default class World extends BaseWorld {
@@ -29,6 +30,10 @@ export default class World extends BaseWorld {
 
         console.log(this.systems);
         console.log(this.systemsOrder)
+
+        this.entityManager.addEventListener(EntityManagerEvent.EntityCreated, (data) => {
+            console.log('Oh, look, an entity!', data);
+        })
     }
 
 

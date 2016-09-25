@@ -29,8 +29,8 @@ export default class PlayerSelectionSystem extends System {
         this.entityManager.getEntities(ComponentId.PlayerSelection).forEach((component, entity) => {
             // Load relevant components.
             let selectionComponent = component as PlayerSelectionComponent;
-            let positionComponent = this.entityManager.getComponent(entity, ComponentId.Position) as PositionComponent;
-            let rotComponent = this.entityManager.getComponent(entity, ComponentId.Rotation) as PositionComponent;
+            let positionComponent = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Position);
+            let rotComponent = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Rotation);
 
             // Get player's eye position, which we use for ray caster / collision detection origin.
             let [x, y, z] = [positionComponent.x, positionComponent.y + 2.5, positionComponent.z];
@@ -62,7 +62,7 @@ export default class PlayerSelectionSystem extends System {
             let ray = new Raycaster(pos, rotVec, 0.01, 5);
             let targetValid = false;
             for (let key of chunkKeys) {
-                let meshComponent = this.entityManager.getComponent(key, ComponentId.Mesh) as MeshComponent;
+                let meshComponent = this.entityManager.getComponent<MeshComponent>(key, ComponentId.Mesh);
 
                 let hitSide: Side;
                 let hitPoint: Vector3 = null;
