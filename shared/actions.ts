@@ -131,3 +131,15 @@ export class MoveEntityAction extends Action {
         posComponent.z = this.position[2];
     }
 }
+
+export class PickUpEntityAction extends Action {
+    player: string; // entity
+    inventorySlot: number; // inventory slot to place entity in.
+    pickable: string; // entity
+
+    constructor(playerEntity: string, inventorySlot: number, pickableEntity: string) {
+        this.player = playerEntity;
+        this.inventorySlot = inventorySlot;
+        this.pickable = pickableEntity;
+    }
+}

@@ -24,9 +24,14 @@ export class PlayerComponent extends SerializableComponent {
     static ID = ComponentId.Player;
 }
 
+export class PickableComponent extends Component {
+    static ID = ComponentId.Pickable;
+}
+
 export function registerServerComponents(manager: EntityManager) {
     manager.registerComponentType(new NetworkComponent());
     manager.registerComponentType(new ChunkSubscriptionComponent());
     manager.registerComponentType(new NewPlayerComponent());
     manager.registerComponentType(new PlayerComponent());
+    manager.registerComponentType(new PickableComponent());
 }

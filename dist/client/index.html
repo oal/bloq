@@ -88,10 +88,20 @@
             background-color: rgba(0, 0, 0, 0.2);
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) inset;
             border-radius: 2px;
+            display: flex;
         }
 
         .inventory-row li.active {
             background-color: #fff;
+        }
+
+        .inventory-row li span {
+            display: none;
+            background-color: #000;
+            width: 2vw;
+            height: 2vw;
+            margin: auto;
+            border-radius: 25%;
         }
 
     </style>
@@ -109,16 +119,16 @@
 
     <div id="inventory">
         <ol class="inventory-row">
-            <li class="active"></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
+            <li class="active"><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
         </ol>
     </div>
 </div>

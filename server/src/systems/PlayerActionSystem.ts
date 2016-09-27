@@ -9,6 +9,7 @@ import {
 import {SetBlocksAction} from "../../../shared/actions";
 import {globalToChunk} from "../../../shared/helpers";
 import {broadcastAction, broadcastEntity} from "../helpers";
+import {PickableComponent} from "../components";
 
 
 export default class PlayerActionSystem extends System {
@@ -28,16 +29,17 @@ export default class PlayerActionSystem extends System {
                 let target = inputComponent.target;
                 modifiedBlocks.push([target[0], target[1], target[2], 0]);
 
+                // TODO: Move all of this into a "createBlockEntity" function or something similar:
                 let blockEntity = this.entityManager.createEntity();
                 let pos = new PositionComponent();
                 pos.x = target[0];
                 pos.y = target[1];
                 pos.z = target[2];
-
-                this.entityManager.addComponent(blockEntity, pos);
                 let block = new BlockComponent();
                 block.kind = 1;
+                this.entityManager.addComponent(blockEntity, pos);
                 this.entityManager.addComponent(blockEntity, block);
+                this.entityManager.addComponent(blockEntity, new PickableComponent());
             }
 
             if (inputComponent.isDirty('secondaryAction') && inputComponent.secondaryAction) {
@@ -69,7 +71,6 @@ export default class PlayerActionSystem extends System {
                 let inventory = this.entityManager.getComponent<InventoryComponent>(entity, ComponentId.Inventory);
                 modifiedBlocks.push([target[0] + add[0], target[1] + add[1], target[2] + add[2], inventory.activeSlot+1]);
             }
-
 
             // Broadcast so it's queued on clients.
             if (modifiedBlocks.length > 0) {

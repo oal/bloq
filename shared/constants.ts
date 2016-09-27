@@ -22,11 +22,13 @@ export const enum ComponentId {
     Mesh,
     PlayerSelection,
     Player,
+    LerpPosition,
 
     // Server
     Network,
     ChunkSubscription,
-    NewPlayer
+    NewPlayer,
+    Pickable,
 }
 
 export const enum Side {
@@ -51,5 +53,6 @@ export const enum ActionId {
     UnsubscribeTerrainChunks = 1,
     SetBlocks,
     RemoveEntities,
-    MoveEntity
+    MoveEntity,
+    PickUpEntity
 }

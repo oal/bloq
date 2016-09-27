@@ -167,12 +167,14 @@ export class InventoryComponent extends SerializableComponent {
     slots: Array<string> = [null, null, null, null, null, null, null, null, null, null];
     activeSlot: number = 0;
 
-    addEntity(entity: string): boolean {
-        let availableIndex = this.slots.indexOf(null);
-        if(availableIndex === -1) return false;
+    addEntity(entity: string, position?: number): number {
+        // No position specified, so find first available.
+        if(!position) position = this.slots.indexOf(null);
+        if(position === -1) return -1; // inventory is full.
 
-        this.slots[availableIndex] = entity;
-        return true;
+        this.slots[position] = entity;
+        this.dirtyFields['slots'] = true; // Force dirty because we're mutating an array.
+        return position;
     }
 }
 
@@ -181,6 +183,7 @@ export class BlockComponent extends SerializableComponent {
     static ID = ComponentId.Block;
 
     kind: BlockId;
+    // TODO: Support stacking / count attribute.
 }
 
 

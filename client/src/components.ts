@@ -36,9 +36,18 @@ export class PlayerComponent extends MeshComponent {
     mesh: AnimatedMesh;
 }
 
+export class LerpPositionComponent extends Component {
+    static ID = ComponentId.LerpPosition;
+
+    x: number;
+    y: number;
+    z: number;
+}
+
 export function registerClientComponents(manager: EntityManager) {
     manager.registerComponentType(new MeshComponent());
     manager.registerComponentType(new PlayerComponent());
     manager.registerComponentType(new PlayerSelectionComponent());
+    manager.registerComponentType(new LerpPositionComponent());
 }
 
