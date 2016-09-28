@@ -1,6 +1,8 @@
 import FastSimplexNoise = require('fast-simplex-noise');
 import {TerrainChunkComponent} from "../../shared/components";
-import {TERRAIN_CHUNK_SIZE} from "../../shared/constants";
+import {TERRAIN_CHUNK_SIZE, ComponentId} from "../../shared/constants";
+import EntityManager from "../../shared/EntityManager";
+import {globalToChunk, chunkKey, mod} from "../../shared/helpers";
 
 export class Terrain {
     groundSampler = new FastSimplexNoise({
@@ -54,4 +56,11 @@ export class Terrain {
         }
         return chunk;
     }
+}
+
+export function getValueGlobal(em: EntityManager, x: number, y: number, z: number) {
+    let key = chunkKey(globalToChunk(x), globalToChunk(y), globalToChunk(z));
+    let chunkComponent = em.getComponent<TerrainChunkComponent>(key, ComponentId.TerrainChunk);
+
+    return chunkComponent.getValue(mod(x, TERRAIN_CHUNK_SIZE), mod(y, TERRAIN_CHUNK_SIZE), mod(z, TERRAIN_CHUNK_SIZE));
 }

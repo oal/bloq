@@ -1,10 +1,14 @@
 import EntityManager from "../../shared/EntityManager";
 import {
     InputComponent, PositionComponent,
-    CurrentPlayerComponent, PhysicsComponent, RotationComponent, WallCollisionComponent, InventoryComponent
+    CurrentPlayerComponent, PhysicsComponent, RotationComponent, WallCollisionComponent, InventoryComponent,
+    BlockComponent
 } from "../../shared/components";
-import {NetworkComponent, NewPlayerComponent, PlayerComponent, ChunkSubscriptionComponent} from "./components";
-import {ComponentId, ActionId} from "../../shared/constants";
+import {
+    NetworkComponent, NewPlayerComponent, PlayerComponent, ChunkSubscriptionComponent,
+    PickableComponent
+} from "./components";
+import {ComponentId, ActionId, BlockId} from "../../shared/constants";
 import {MoveEntityAction} from "../../shared/actions";
 import {globalToChunk} from "../../shared/helpers";
 import {broadcastAction} from "./helpers";
@@ -72,4 +76,20 @@ export function updatePlayerInventory(em: EntityManager, playerEntity, obj) {
     // Should only trust activeSlot, so the player can't add arbitrary entities to their inventory, and have
     // server accept it.
     inventory.activeSlot = inventoryData.activeSlot;
+}
+
+export function initBlockEntity(em: EntityManager, x: number, y: number, z: number, kind: BlockId): string {
+    let blockEntity = em.createEntity();
+    let pos = new PositionComponent();
+    pos.x = x;
+    pos.y = y;
+    pos.z = z;
+
+    let block = new BlockComponent();
+    block.kind = kind;
+    em.addComponent(blockEntity, pos);
+    em.addComponent(blockEntity, block);
+    em.addComponent(blockEntity, new PickableComponent());
+
+    return blockEntity;
 }
