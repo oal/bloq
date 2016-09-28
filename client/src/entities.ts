@@ -1,5 +1,5 @@
 import EntityManager from "../../shared/EntityManager";
-import {PlayerComponent, PlayerSelectionComponent} from "./components";
+import {PlayerComponent, PlayerSelectionComponent, MeshComponent} from "./components";
 import {
     Mesh,
     BoxGeometry,
@@ -14,6 +14,25 @@ import {
 } from 'three';
 import {ComponentId} from "../../shared/constants";
 import AnimatedMesh from "./AnimatedMesh";
+import {objectHasKeys} from "../../shared/helpers";
+import {RotationComponent} from "../../shared/components";
+import AssetManager from "./AssetManager";
+
+
+export function initEntity(em: EntityManager, entity: string, components: Object, assetManager: AssetManager, jsonStr: string, camera) {
+    // Player component needs special care. For all others, just deserialize and update the entity manager.
+    if (objectHasKeys(components, [ComponentId.Player])) {
+        initPlayerEntity(em, entity, components, assetManager.getMesh('player') as AnimatedMesh, camera);
+    } else if (objectHasKeys(components, [ComponentId.Block])) {
+        em.deserializeAndSetEntity(jsonStr);
+        let meshComponent = new MeshComponent();
+        meshComponent.mesh = new Mesh(new BoxGeometry(0.25, 0.25, 0.25), new MeshBasicMaterial());
+        em.addComponent(entity, meshComponent);
+        em.addComponent(entity, new RotationComponent());
+    } else {
+        em.deserializeAndSetEntity(jsonStr);
+    }
+}
 
 export function initPlayerEntity(em: EntityManager, entity: string, initialData: Object, mesh: AnimatedMesh, camera: PerspectiveCamera) {
     console.log(entity, initialData);

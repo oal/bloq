@@ -5,9 +5,8 @@ import World from "./World";
 import {initPlayerEntity, updatePlayerInput, updatePlayerRotation, updatePlayerInventory} from "./entities";
 import {objectHasKeys} from "../../shared/helpers";
 import {NetworkComponent} from "./components";
-import {MSG_ENTITY, MSG_TERRAIN, MSG_ACTION, ComponentId, ActionId} from "../../shared/constants";
-import {Action, RemoveEntitiesAction} from "../../shared/actions";
-import {broadcastAction} from "./helpers";
+import {ComponentId, ActionId, MessageType} from "../../shared/constants";
+import {Action} from "../../shared/actions";
 
 let hrtimeToSeconds = (hrtime: number[]) => hrtime[0] + hrtime[1] / 1000000000;
 
@@ -61,7 +60,7 @@ export default class Server {
         for (let i = 0; i < bytes.length; i++) {
             packetView.setUint8(i + Uint16Array.BYTES_PER_ELEMENT, bytes[i]);
         }
-        packetView.setUint16(0, MSG_ENTITY);
+        packetView.setUint16(0, MessageType.Entity);
 
         ws.send(packet);
     }
@@ -77,7 +76,7 @@ export default class Server {
             packetView.setUint8(i + Uint16Array.BYTES_PER_ELEMENT, data[i]);
         }
 
-        packetView.setUint16(0, MSG_TERRAIN);
+        packetView.setUint16(0, MessageType.Terrain);
         ws.send(packet);
     }
 
@@ -90,7 +89,7 @@ export default class Server {
         let packetView = new DataView(packet);
 
         // Set header data
-        packetView.setUint16(0, MSG_ACTION);
+        packetView.setUint16(0, MessageType.Action);
         packetView.setUint16(Uint16Array.BYTES_PER_ELEMENT, actionId);
 
         // Copy over message data.
