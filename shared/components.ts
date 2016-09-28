@@ -167,7 +167,7 @@ export class InventoryComponent extends SerializableComponent {
     slots: Array<string> = [null, null, null, null, null, null, null, null, null, null];
     activeSlot: number = 0;
 
-    addEntity(entity: string, position?: number): number {
+    setEntity(entity: string, position?: number): number {
         // No position specified, so find first available.
         if(!position) position = this.slots.indexOf(null);
         if(position === -1) return -1; // inventory is full.
@@ -176,6 +176,10 @@ export class InventoryComponent extends SerializableComponent {
         this.dirtyFields['slots'] = true; // Force dirty because we're mutating an array.
         return position;
     }
+
+    getEntity(slot: number): string {
+        return this.slots[slot];
+    }
 }
 
 // Extended on client and server (client adds mesh). Therefore, not registered as shared component.
@@ -183,7 +187,7 @@ export class BlockComponent extends SerializableComponent {
     static ID = ComponentId.Block;
 
     kind: BlockId;
-    // TODO: Support stacking / count attribute.
+    count: number = 1;
 }
 
 

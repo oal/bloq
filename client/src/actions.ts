@@ -1,13 +1,12 @@
 import * as shared from "../../shared/actions";
 import {ActionId, ComponentId} from "../../shared/constants";
 import EntityManager from "../../shared/EntityManager";
-import {LerpPositionComponent} from "./components";
-import {InventoryComponent} from "../../shared/components";
+import {InventoryComponent, BlockComponent} from "../../shared/components";
 
 
 export class ClientActionManager extends shared.ActionManager {
     queueRawAction(id: number, data: Object) {
-        switch(id) {
+        switch (id) {
             case ActionId.UnsubscribeTerrainChunks:
                 this.queue.push(new shared.UnsubscribeTerrainChunksAction(data['chunkKeys']));
                 break;
@@ -37,16 +36,17 @@ class PickUpEntityAction extends shared.PickUpEntityAction {
     }
 
     execute(entityManager: EntityManager) {
-        let playerPos = entityManager.getComponent(this.player, ComponentId.Position);
-
-        let lerpComponent = new LerpPositionComponent();
-        lerpComponent.x = playerPos.x;
-        lerpComponent.y = playerPos.y;
-        lerpComponent.z = playerPos.z;
-
-        entityManager.addComponent(this.pickable, lerpComponent);
-
         let inventoryComponent = entityManager.getComponent<InventoryComponent>(this.player, ComponentId.Inventory);
-        inventoryComponent.addEntity(this.pickable, this.inventorySlot);
+        let existingEntity = inventoryComponent.getEntity(this.inventorySlot);
+        if (existingEntity) {
+            let pickableBlock = entityManager.getComponent<BlockComponent>(this.pickable, ComponentId.Block);
+            let existingBlock = entityManager.getComponent<BlockComponent>(existingEntity, ComponentId.Block);
+            if(existingBlock.kind === pickableBlock.kind) {
+                existingBlock.count++;
+            }
+        } else {
+            inventoryComponent.setEntity(this.pickable, this.inventorySlot);
+            entityManager.removeComponentType(this.pickable, ComponentId.Mesh);
+        }
     }
 }

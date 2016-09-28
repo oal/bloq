@@ -1,14 +1,13 @@
 import {System} from "../../../shared/systems";
 import {ServerActionManager} from "../actions";
 import EntityManager from "../../../shared/EntityManager";
-import {ComponentId, Side, ActionId} from "../../../shared/constants";
+import {ComponentId, Side, ActionId, TERRAIN_CHUNK_SIZE} from "../../../shared/constants";
 import {
-    InputComponent, InventoryComponent, PositionComponent, PhysicsComponent,
-    BlockComponent, WallCollisionComponent, RotationComponent
+    InputComponent, InventoryComponent, PositionComponent, BlockComponent, TerrainChunkComponent
 } from "../../../shared/components";
 import {SetBlocksAction} from "../../../shared/actions";
-import {globalToChunk} from "../../../shared/helpers";
-import {broadcastAction, broadcastEntity} from "../helpers";
+import {globalToChunk, chunkKey, mod} from "../../../shared/helpers";
+import {broadcastAction} from "../helpers";
 import {PickableComponent} from "../components";
 
 
@@ -30,16 +29,22 @@ export default class PlayerActionSystem extends System {
                 modifiedBlocks.push([target[0], target[1], target[2], 0]);
 
                 // TODO: Move all of this into a "createBlockEntity" function or something similar:
-                let blockEntity = this.entityManager.createEntity();
-                let pos = new PositionComponent();
-                pos.x = target[0];
-                pos.y = target[1];
-                pos.z = target[2];
-                let block = new BlockComponent();
-                block.kind = 1;
-                this.entityManager.addComponent(blockEntity, pos);
-                this.entityManager.addComponent(blockEntity, block);
-                this.entityManager.addComponent(blockEntity, new PickableComponent());
+                let key = chunkKey(globalToChunk(target[0]), globalToChunk(target[1]), globalToChunk(target[2]));
+                let chunkComponent = this.entityManager.getComponent<TerrainChunkComponent>(key, ComponentId.TerrainChunk);
+                let currentKind = chunkComponent.getValue(mod(target[0], TERRAIN_CHUNK_SIZE), mod(target[1], TERRAIN_CHUNK_SIZE), mod(target[2], TERRAIN_CHUNK_SIZE));
+                if (currentKind !== 0) {
+                    let blockEntity = this.entityManager.createEntity();
+                    let pos = new PositionComponent();
+                    pos.x = target[0];
+                    pos.y = target[1];
+                    pos.z = target[2];
+
+                    let block = new BlockComponent();
+                    block.kind = currentKind;
+                    this.entityManager.addComponent(blockEntity, pos);
+                    this.entityManager.addComponent(blockEntity, block);
+                    this.entityManager.addComponent(blockEntity, new PickableComponent());
+                }
             }
 
             if (inputComponent.isDirty('secondaryAction') && inputComponent.secondaryAction) {
@@ -69,7 +74,7 @@ export default class PlayerActionSystem extends System {
 
                 // TODO: WIP. Should use entity in current slot instead of index as block type.
                 let inventory = this.entityManager.getComponent<InventoryComponent>(entity, ComponentId.Inventory);
-                modifiedBlocks.push([target[0] + add[0], target[1] + add[1], target[2] + add[2], inventory.activeSlot+1]);
+                modifiedBlocks.push([target[0] + add[0], target[1] + add[1], target[2] + add[2], inventory.activeSlot + 1]);
             }
 
             // Broadcast so it's queued on clients.

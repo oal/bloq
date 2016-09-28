@@ -22,7 +22,6 @@ export const enum ComponentId {
     Mesh,
     PlayerSelection,
     Player,
-    LerpPosition,
 
     // Server
     Network,

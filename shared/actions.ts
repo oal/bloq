@@ -1,9 +1,8 @@
 import {TextEncoder} from 'text-encoding';
 import EntityManager from "./EntityManager";
 import {globalToChunk, mod, chunkKey} from "./helpers";
-import {TERRAIN_CHUNK_SIZE, ComponentId, ActionId} from "./constants";
+import {TERRAIN_CHUNK_SIZE, ComponentId} from "./constants";
 import {TerrainChunkComponent, PositionComponent} from "./components";
-import {MeshComponent} from "../client/src/components";
 
 
 export class ActionManager {
@@ -77,7 +76,7 @@ export class SetBlocksAction extends Action {
             [-1, 0, 1].forEach(oz => {
                 [-1, 0, 1].forEach(oy => {
                     [-1, 0, 1].forEach(ox => {
-                        if(Math.abs(ox) + Math.abs(oy) + Math.abs(oz) !== 1) return;
+                        if (Math.abs(ox) + Math.abs(oy) + Math.abs(oz) !== 1) return;
                         let [nx, ny, nz] = [x + ox, y + oy, z + oz].map(globalToChunk);
                         let neighborKey = chunkKey(nx, ny, nz);
                         if (neighborKey === entityKey) return;
@@ -138,6 +137,7 @@ export class PickUpEntityAction extends Action {
     pickable: string; // entity
 
     constructor(playerEntity: string, inventorySlot: number, pickableEntity: string) {
+        super();
         this.player = playerEntity;
         this.inventorySlot = inventorySlot;
         this.pickable = pickableEntity;
