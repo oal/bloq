@@ -17,6 +17,7 @@ import AnimatedMesh from "./AnimatedMesh";
 import {objectHasKeys} from "../../shared/helpers";
 import {RotationComponent} from "../../shared/components";
 import AssetManager from "./AssetManager";
+import {buildBlockGeometry} from "./geometry/block";
 
 
 export function initEntity(em: EntityManager, entity: string, components: Object, assetManager: AssetManager, jsonStr: string, camera) {
@@ -25,8 +26,13 @@ export function initEntity(em: EntityManager, entity: string, components: Object
         initPlayerEntity(em, entity, components, assetManager.getMesh('player') as AnimatedMesh, camera);
     } else if (objectHasKeys(components, [ComponentId.Block])) {
         em.deserializeAndSetEntity(jsonStr);
+
+        let geom = buildBlockGeometry(components[ComponentId.Block]['kind']|0);
+
         let meshComponent = new MeshComponent();
-        meshComponent.mesh = new Mesh(new BoxGeometry(0.25, 0.25, 0.25), new MeshBasicMaterial());
+        meshComponent.mesh = new Mesh(geom, new MeshBasicMaterial());
+        meshComponent.mesh.scale.set(0.25, 0.25, 0.25);
+
         em.addComponent(entity, meshComponent);
         em.addComponent(entity, new RotationComponent());
     } else {

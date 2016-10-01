@@ -1,5 +1,7 @@
 import {BufferAttribute, BufferGeometry} from 'three';
-import {TERRAIN_CHUNK_SIZE} from "../../shared/constants";
+
+import {TERRAIN_CHUNK_SIZE} from "../../../shared/constants";
+
 
 // Relative offsets for cube faces. See more details further down.
 const faces = [

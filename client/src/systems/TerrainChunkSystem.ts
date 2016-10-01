@@ -5,7 +5,7 @@ import EntityManager from "../../../shared/EntityManager";
 import {ComponentId, TERRAIN_CHUNK_SIZE} from "../../../shared/constants";
 import {TerrainChunkComponent, PositionComponent} from "../../../shared/components";
 import {chunkKey} from "../../../shared/helpers";
-import {buildChunkGeometry} from "../terrain";
+import {buildChunkGeometry} from "../geometry/terrain";
 import {MeshComponent} from "../components";
 
 

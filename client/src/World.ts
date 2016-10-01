@@ -28,6 +28,7 @@ export default class World extends BaseWorld {
     scene: Scene;
     camera: PerspectiveCamera;
     terrainMaterial: ShaderMaterial;
+    blockMaterial: ShaderMaterial;
 
     game: Game;
 
@@ -49,8 +50,19 @@ export default class World extends BaseWorld {
                     value: this.game.assetManager.getTexture('terrain')
                 }
             },
-            vertexShader: document.getElementById('vertexShader').textContent,
-            fragmentShader: document.getElementById('fragmentShader').textContent,
+            vertexShader: require('../shaders/terrain_vert.glsl'),
+            fragmentShader: require('../shaders/terrain_frag.glsl'),
+            vertexColors: VertexColors
+        });
+
+        this.blockMaterial = new ShaderMaterial({
+            uniforms: {
+                texture: {
+                    value: this.game.assetManager.getTexture('terrain')
+                }
+            },
+            vertexShader: require('../shaders/block_vert.glsl'),
+            fragmentShader: require('../shaders/block_frag.glsl'),
             vertexColors: VertexColors
         });
 
@@ -70,7 +82,7 @@ export default class World extends BaseWorld {
         this.addSystem(new MeshSystem(this.entityManager, this.scene), 11);
         this.addSystem(new PlayerMeshSystem(this.entityManager, this.scene), 12);
         this.addSystem(new PlayerSelectionSystem(this.entityManager, this.scene), 13);
-        this.addSystem(new BlockSystem(this.entityManager), 14);
+        this.addSystem(new BlockSystem(this.entityManager, this.blockMaterial), 14);
 
 
         this.addSystem(new InventoryUISystem(this.entityManager), 999);

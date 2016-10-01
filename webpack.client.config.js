@@ -26,7 +26,8 @@ module.exports = {
                 test: /\.ts$/,
                 exclude: /node_modules/,
                 loader: 'ts-loader?configFileName=tsconfig.client.json'
-            }
+            },
+            { test: /\.glsl$/, loader: 'raw' },
         ]
     },
 
