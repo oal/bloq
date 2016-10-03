@@ -1,5 +1,5 @@
 import AssetManager from "./AssetManager";
-import Server from "./Server";
+import {Server} from "./Server";
 import World from "./World";
 import {WebGLRenderer} from 'three';
 import Stats = require('stats.js');

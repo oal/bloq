@@ -20,7 +20,9 @@ import AssetManager from "./AssetManager";
 import {buildBlockGeometry} from "./geometry/block";
 
 
-export function initEntity(em: EntityManager, entity: string, components: Object, assetManager: AssetManager, jsonStr: string, camera) {
+export function initEntity(em: EntityManager, entity: string, components: Object, assetManager: AssetManager, camera) {
+    let jsonStr = JSON.stringify({entity: entity, components: components}); // WIP.
+
     // Player component needs special care. For all others, just deserialize and update the entity manager.
     if (objectHasKeys(components, [ComponentId.Player])) {
         initPlayerEntity(em, entity, components, assetManager.getMesh('player') as AnimatedMesh, camera);

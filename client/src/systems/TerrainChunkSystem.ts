@@ -7,46 +7,61 @@ import {TerrainChunkComponent, PositionComponent} from "../../../shared/componen
 import {chunkKey} from "../../../shared/helpers";
 import {buildChunkGeometry} from "../geometry/terrain";
 import {MeshComponent} from "../components";
+import {ServerEvent, Server} from "../Server";
 
 
 export default class TerrainChunkSystem extends System {
     scene: Scene;
     material: ShaderMaterial;
 
-    queue = []; // Pseudo queue. Gets reordered.
+    initQueue = [];
+    renderQueue = []; // Pseudo queue. Gets reordered.
 
-    constructor(em: EntityManager, scene: Scene, material: ShaderMaterial) {
+    constructor(em: EntityManager, server: Server,  scene: Scene, material: ShaderMaterial) {
         super(em);
         this.scene = scene;
         this.material = material;
+
+        server.addEventListener(ServerEvent.Terrain, this.onTerrain.bind(this));
+    }
+
+    onTerrain(terrainObj: Object) {
+        this.initQueue.push(terrainObj);
     }
 
     update(dt: number) {
+        this.initQueue.forEach(terrainObj => {
+            let [entity, component] = [terrainObj['entity'], terrainObj['component']];
+            let chunkComponent = this.entityManager.addComponent(entity, component) as TerrainChunkComponent;
+            chunkComponent.dirtyFields['data'] = true;
+        });
+        this.initQueue = [];
+
         // Add dirty chunks to System queue.
-        let preLength = this.queue.length;
+        let preLength = this.renderQueue.length;
         this.entityManager.getEntities(ComponentId.TerrainChunk).forEach((component, entity) => {
             let chunkComponent = component as TerrainChunkComponent;
             if (chunkComponent.isDirty()) {
-                this.queue.push([chunkComponent.x, chunkComponent.y, chunkComponent.z]);
+                this.renderQueue.push([chunkComponent.x, chunkComponent.y, chunkComponent.z]);
             }
         });
 
         // If any chunks were added to dirty queue, sort by distance from player, so closest
         // chunks render first.
-        if(this.queue.length > preLength) {
+        if(this.renderQueue.length > preLength) {
             // Get current player (First key of iterator. There will always only be one CurrentPlayer)
             let playerEntity = this.entityManager.getEntities(ComponentId.CurrentPlayer).keys().next().value;
             let positionComponent = this.entityManager.getComponent<PositionComponent>(playerEntity, ComponentId.Position);
             let [cx, cy, cz] = positionComponent.toChunk();
             let vec = new Vector3(cx, cy, cz);
-            this.queue.sort((a, b) => vec.distanceTo(new Vector3(b[0], b[1], b[2])));
+            this.renderQueue.sort((a, b) => vec.distanceTo(new Vector3(b[0], b[1], b[2])));
         }
 
         // Shift off queue until we have used 8 ms (half of available frame time) or no chunks are left in queue.
         let cumTime = 0.0;
         let startTime = performance.now();
-        while (cumTime < 8 && this.queue.length > 0) {
-            let [cx, cy, cz] = this.queue.pop();
+        while (cumTime < 8 && this.renderQueue.length > 0) {
+            let [cx, cy, cz] = this.renderQueue.pop();
             let entity = chunkKey(cx, cy, cz);
             console.time(`create-${entity}`);
             let chunkComponent = this.entityManager.getComponent<TerrainChunkComponent>(entity, ComponentId.TerrainChunk);

@@ -22,6 +22,7 @@ import MouseManager from "../lib/MouseManager";
 import KeyboardManager from "../lib/KeyboardManager";
 import InventoryUISystem from "./systems/InventoryUISystem";
 import BlockSystem from "./systems/BlockSystem";
+import {ServerEvent} from "./Server";
 
 
 export default class World extends BaseWorld {
@@ -72,7 +73,8 @@ export default class World extends BaseWorld {
     addSystems() {
         // TODO: Store system orders as constants in one place.
         this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), -1000); // Always process first
-        this.addSystem(new TerrainChunkSystem(this.entityManager, this.scene, this.terrainMaterial), -9);
+
+        this.addSystem(new TerrainChunkSystem(this.entityManager, this.game.server, this.scene, this.terrainMaterial), -9);
 
         let keyboardManager = new KeyboardManager(this.game.renderer.domElement);
         let mouseManager = new MouseManager(this.game.renderer.domElement);

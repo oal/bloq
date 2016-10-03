@@ -1,7 +1,8 @@
 import Game from "./Game";
-import {initPlayerEntity, initEntity} from "./entities";
+import {initEntity} from "./entities";
 import {TerrainChunkComponent} from "../../shared/components";
-import {ComponentId, MessageType} from "../../shared/constants";
+import {MessageType} from "../../shared/constants";
+import {bufferToObject} from "./helpers";
 
 let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponent] => {
     let view = new DataView(data);
@@ -15,10 +16,18 @@ let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponen
     return [`${x}x${y}x${z}`, chunkComponent]
 };
 
-export default class Server {
+export const enum ServerEvent {
+    Entity = 1,
+    Terrain,
+
+    NumEvents
+}
+
+export class Server {
     url: string;
     ws: WebSocket;
     game: Game;
+    private eventHandlers: Array<Array<Function>> = [];
 
     constructor(game: Game, server: string, connCallback: Function) {
         this.game = game;
@@ -31,6 +40,10 @@ export default class Server {
         this.ws.onclose = this.onClose.bind(this);
         this.ws.onmessage = this.onMessage.bind(this);
         this.ws.onerror = this.onError.bind(this);
+
+        for(let i = 0; i < ServerEvent.NumEvents; i++) {
+            this.eventHandlers.push([]);
+        }
     }
 
     onClose(evt: MessageEvent) {
@@ -49,30 +62,29 @@ export default class Server {
         if (msgType === MessageType.Entity) { // Entity as text
             let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
 
-            // Bytes -> JSON string -> Object.
-            let decoder = new TextDecoder();
-            let jsonStr = decoder.decode(data);
-            let obj = JSON.parse(jsonStr);
+            let obj = bufferToObject(data);
+
+            this.emit(ServerEvent.Entity, obj);
 
             // TODO: Pass fewer arguments here. Should not be necessary with the last three.
-            initEntity(this.game.world.entityManager, obj.entity, obj.components, this.game.assetManager, jsonStr, this.game.world.camera);
+            initEntity(this.game.world.entityManager, obj.entity, obj.components, this.game.assetManager, this.game.world.camera);
 
         } else if (msgType === MessageType.Action) { // Action message
             let actionId = bufView.getUint16(Uint16Array.BYTES_PER_ELEMENT);
             let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT * 2);
 
-            // Bytes -> JSON string -> Object.
-            let decoder = new TextDecoder();
-            let jsonStr = decoder.decode(data);
-            let obj = JSON.parse(jsonStr);
+            let obj = bufferToObject(data);
 
-            // Queue action.
+            // Queue action directly. No "event" to be emitted.
             this.game.world.actionManager.queueRawAction(actionId, obj);
         } else if (msgType === MessageType.Terrain) { // Binary terrain message
             let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
             let [entity, component] = deserializeTerrainChunk(data);
-            let chunkComponent = this.game.world.entityManager.addComponent(entity, component) as TerrainChunkComponent;
-            chunkComponent.dirtyFields['data'] = true;
+
+            this.emit(ServerEvent.Terrain, {
+                entity: entity,
+                component: component
+            });
         } else {
             console.warn('Unknown message type: ', msgType)
         }
@@ -80,6 +92,16 @@ export default class Server {
 
     onError(evt: MessageEvent) {
         console.log('error');
+    }
+
+    addEventListener(eventType: ServerEvent, listener) {
+        this.eventHandlers[eventType].push(listener);
+    }
+
+    private emit(eventType: ServerEvent, data: Object) {
+        this.eventHandlers[eventType].forEach((callback) => {
+            callback(data);
+        })
     }
 
     sendEntity(data: Object) {
