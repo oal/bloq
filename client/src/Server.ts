@@ -1,5 +1,4 @@
 import Game from "./Game";
-import {initEntity} from "./entities";
 import {TerrainChunkComponent} from "../../shared/components";
 import {MessageType, ComponentId} from "../../shared/constants";
 import {bufferToObject} from "./helpers";
@@ -56,36 +55,40 @@ export class Server {
         let bufView = new DataView(evt.data);
         let msgType = bufView.getUint16(0);
 
-        if (msgType === MessageType.Entity) { // Entity as text
-            let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
+        let data;
+        let obj;
+        switch(msgType) {
+            case MessageType.Entity:
+                data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
+                obj = bufferToObject(data) as EntityMessage;
 
-            let obj = bufferToObject(data) as EntityMessage;
+                Object.keys(obj.components).forEach(componentId => {
+                    let key = parseInt(componentId);
+                    this.emit(key as ComponentId, obj.entity, obj.components);
+                });
+                break;
 
-            Object.keys(obj.components).forEach(componentId => {
-                let key = parseInt(componentId);
-                this.emit(key as ComponentId, obj.entity, obj.components);
-            });
+            case MessageType.Terrain:
+                data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
+                let [entity, component] = deserializeTerrainChunk(data);
 
-            // TODO: Pass fewer arguments here. Should not be necessary with the last three.
-            initEntity(this.game.world.entityManager, obj.entity, obj.components, this.game.assetManager, this.game.world.camera);
+                let componentsObj = {};
+                componentsObj[ComponentId.TerrainChunk] = component;
+                this.emit(ComponentId.TerrainChunk, entity, componentsObj);
+                break;
 
-        } else if (msgType === MessageType.Action) { // Action message
-            let actionId = bufView.getUint16(Uint16Array.BYTES_PER_ELEMENT);
-            let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT * 2);
+            case MessageType.Action:
+                let actionId = bufView.getUint16(Uint16Array.BYTES_PER_ELEMENT);
+                data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT * 2);
 
-            let obj = bufferToObject(data);
+                obj = bufferToObject(data);
 
-            // Queue action directly. No "event" to be emitted.
-            this.game.world.actionManager.queueRawAction(actionId, obj);
-        } else if (msgType === MessageType.Terrain) { // Binary terrain message
-            let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
-            let [entity, component] = deserializeTerrainChunk(data);
+                // Queue action directly. No "event" to be emitted.
+                this.game.world.actionManager.queueRawAction(actionId, obj);
+                break;
 
-            let componentsObj = {};
-            componentsObj[ComponentId.TerrainChunk] = component;
-            this.emit(ComponentId.TerrainChunk, entity, componentsObj);
-        } else {
-            console.warn('Unknown message type: ', msgType)
+            default:
+                console.warn('Unknown message type: ', msgType)
         }
     }
 

@@ -3,7 +3,7 @@ import {ShaderMaterial, Mesh} from 'three';
 import Initializer from "./Initializer";
 import {ComponentId} from "../../../shared/constants";
 import {MeshComponent} from "../components";
-import {RotationComponent, PositionComponent, BlockComponent} from "../../../shared/components";
+import {RotationComponent, BlockComponent} from "../../../shared/components";
 import {buildBlockGeometry} from "../geometry/block";
 import EntityManager from "../../../shared/EntityManager";
 
@@ -17,19 +17,17 @@ export default class BlockInitializer extends Initializer {
     }
 
     initialize(entity: string, components: Object) {
-        let pos = components[ComponentId.Position];
-        let posComponent = new PositionComponent();
-        posComponent.x = pos.x;
-        posComponent.y = pos.y;
-        posComponent.z = pos.z;
-        this.entityManager.addComponent(entity, posComponent);
+        this.entityManager.addComponentFromObject(
+            entity,
+            ComponentId.Position,
+            components[ComponentId.Position]
+        );
 
-
-        let block = components[ComponentId.Block];
-        let blockComponent = new BlockComponent();
-        blockComponent.kind = block.kind|0;
-        blockComponent.count = block.count;
-        this.entityManager.addComponent(entity, blockComponent);
+        let blockComponent = this.entityManager.addComponentFromObject(
+            entity,
+            ComponentId.Block,
+            components[ComponentId.Block]
+        ) as BlockComponent;
 
         let geom = buildBlockGeometry(blockComponent.kind);
 

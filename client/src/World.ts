@@ -26,6 +26,8 @@ import ServerEntitySystem from "./systems/ServerEntitySystem";
 import {ComponentId} from "../../shared/constants";
 import BlockInitializer from "./initializers/BlockInitializer";
 import TerrainChunkInitializer from "./initializers/TerrainChunkInitializer";
+import PlayerInitializer from "./initializers/PlayerInitializer";
+import AnimatedMesh from "./AnimatedMesh";
 
 
 export default class World extends BaseWorld {
@@ -81,6 +83,7 @@ export default class World extends BaseWorld {
 
         let entitySystem = new ServerEntitySystem(this.entityManager, this.game.server);
         entitySystem.addInitializer(ComponentId.TerrainChunk, new TerrainChunkInitializer(this.entityManager));
+        entitySystem.addInitializer(ComponentId.Player, new PlayerInitializer(this.entityManager, this.camera, this.game.assetManager.getMesh('player') as AnimatedMesh));
         entitySystem.addInitializer(ComponentId.Block, new BlockInitializer(this.entityManager, this.blockMaterial));
         this.addSystem(entitySystem, -9);
 

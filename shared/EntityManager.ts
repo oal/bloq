@@ -84,33 +84,6 @@ export default class EntityManager {
         return `{"entity":"${entity}","components":{${components.join(',')}}}`;
     }
 
-    deserializeAndSetEntity(json: string) {
-        let obj = JSON.parse(json);
-
-        // Extract entity UUID and component data.
-        let entity = obj['entity'];
-        let components = obj['components'];
-
-        // Loop over and construct new instances of components.
-        for (let type in components) {
-            if (!components.hasOwnProperty(type)) continue;
-            let typeI = parseInt(type);
-
-            let data = components[type];
-            let constructor = this.componentConstructors.get(typeI as ComponentId);
-            if (!constructor) {
-                console.error('Tried to deserialize unknown component:', type);
-                continue;
-            }
-
-            let instance = new (constructor as any)();
-            instance.update(data);
-
-            // Finally, add / set component in entity manager.
-            this.addComponent(entity, instance);
-        }
-    }
-
     // Only schedules for removal.
     // Entities (and their components) are fully removed once cleanComponents() is called.
     removeEntity(entity: string) {
@@ -139,6 +112,19 @@ export default class EntityManager {
 
         this.emit(event, entity, component.ID);
         return component;
+    }
+
+    addComponentFromObject(entity:string, componentType: ComponentId, componentData: Object): Component {
+        let componentConstructor = this.componentConstructors.get(componentType);
+        if(!componentConstructor) {
+            console.warn('Tried to add non-registered component type from object:', componentType);
+            return;
+        }
+
+        let component = new (componentConstructor as any)();
+        component.update(componentData);
+
+        return this.addComponent(entity, component);
     }
 
     removeComponentType(entity: string, type: ComponentId) {
