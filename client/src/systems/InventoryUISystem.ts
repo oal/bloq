@@ -24,6 +24,7 @@ export default class InventoryUISystem extends System {
                 domBlock.style.display = entity ? 'block' : 'none';
                 if (entity) {
                     let block = this.entityManager.getComponent<BlockComponent>(entity, ComponentId.Block);
+                    if(!block) return;
                     domBlock.innerText = `${block.kind} (${block.count})`;
                 }
             })

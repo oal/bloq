@@ -1,8 +1,9 @@
 import Game from "./Game";
 import {initEntity} from "./entities";
 import {TerrainChunkComponent} from "../../shared/components";
-import {MessageType} from "../../shared/constants";
+import {MessageType, ComponentId} from "../../shared/constants";
 import {bufferToObject} from "./helpers";
+
 
 let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponent] => {
     let view = new DataView(data);
@@ -16,18 +17,18 @@ let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponen
     return [`${x}x${y}x${z}`, chunkComponent]
 };
 
-export const enum ServerEvent {
-    Entity = 1,
-    Terrain,
-
-    NumEvents
+export interface EntityMessage {
+    entity: string,
+    components: {
+        [propName: number]: Object
+    }
 }
 
 export class Server {
     url: string;
     ws: WebSocket;
     game: Game;
-    private eventHandlers: Array<Array<Function>> = [];
+    private componentHandlers: Map<ComponentId, Array<Function>> = new Map<ComponentId, Array<Function>>();
 
     constructor(game: Game, server: string, connCallback: Function) {
         this.game = game;
@@ -40,10 +41,6 @@ export class Server {
         this.ws.onclose = this.onClose.bind(this);
         this.ws.onmessage = this.onMessage.bind(this);
         this.ws.onerror = this.onError.bind(this);
-
-        for(let i = 0; i < ServerEvent.NumEvents; i++) {
-            this.eventHandlers.push([]);
-        }
     }
 
     onClose(evt: MessageEvent) {
@@ -62,9 +59,12 @@ export class Server {
         if (msgType === MessageType.Entity) { // Entity as text
             let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
 
-            let obj = bufferToObject(data);
+            let obj = bufferToObject(data) as EntityMessage;
 
-            this.emit(ServerEvent.Entity, obj);
+            Object.keys(obj.components).forEach(componentId => {
+                let key = parseInt(componentId);
+                this.emit(key as ComponentId, obj.entity, obj.components);
+            });
 
             // TODO: Pass fewer arguments here. Should not be necessary with the last three.
             initEntity(this.game.world.entityManager, obj.entity, obj.components, this.game.assetManager, this.game.world.camera);
@@ -81,10 +81,9 @@ export class Server {
             let data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
             let [entity, component] = deserializeTerrainChunk(data);
 
-            this.emit(ServerEvent.Terrain, {
-                entity: entity,
-                component: component
-            });
+            let componentsObj = {};
+            componentsObj[ComponentId.TerrainChunk] = component;
+            this.emit(ComponentId.TerrainChunk, entity, componentsObj);
         } else {
             console.warn('Unknown message type: ', msgType)
         }
@@ -94,13 +93,21 @@ export class Server {
         console.log('error');
     }
 
-    addEventListener(eventType: ServerEvent, listener) {
-        this.eventHandlers[eventType].push(listener);
+    addEventListener(componentId: ComponentId, listener) {
+        let handlers = this.componentHandlers.get(componentId);
+        if(!handlers) {
+            handlers = [];
+            this.componentHandlers.set(componentId, handlers);
+        }
+        handlers.push(listener);
     }
 
-    private emit(eventType: ServerEvent, data: Object) {
-        this.eventHandlers[eventType].forEach((callback) => {
-            callback(data);
+    private emit(componentId: ComponentId, entity: string, components: Object) {
+        let handlers = this.componentHandlers.get(componentId);
+        if(!handlers) return;
+
+        handlers.forEach((callback) => {
+            callback(entity, components);
         })
     }
 

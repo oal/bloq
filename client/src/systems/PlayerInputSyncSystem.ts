@@ -1,5 +1,5 @@
 import {System} from "../../../shared/systems";
-import Server from "../Server";
+import {Server} from "../Server";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId} from "../../../shared/constants";
 import {RotationComponent, PositionComponent, InputComponent, InventoryComponent} from "../../../shared/components";

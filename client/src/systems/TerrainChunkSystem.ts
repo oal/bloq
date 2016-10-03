@@ -7,36 +7,22 @@ import {TerrainChunkComponent, PositionComponent} from "../../../shared/componen
 import {chunkKey} from "../../../shared/helpers";
 import {buildChunkGeometry} from "../geometry/terrain";
 import {MeshComponent} from "../components";
-import {ServerEvent, Server} from "../Server";
+import {Server} from "../Server";
 
 
 export default class TerrainChunkSystem extends System {
     scene: Scene;
     material: ShaderMaterial;
 
-    initQueue = [];
     renderQueue = []; // Pseudo queue. Gets reordered.
 
-    constructor(em: EntityManager, server: Server,  scene: Scene, material: ShaderMaterial) {
+    constructor(em: EntityManager, scene: Scene, material: ShaderMaterial) {
         super(em);
         this.scene = scene;
         this.material = material;
-
-        server.addEventListener(ServerEvent.Terrain, this.onTerrain.bind(this));
-    }
-
-    onTerrain(terrainObj: Object) {
-        this.initQueue.push(terrainObj);
     }
 
     update(dt: number) {
-        this.initQueue.forEach(terrainObj => {
-            let [entity, component] = [terrainObj['entity'], terrainObj['component']];
-            let chunkComponent = this.entityManager.addComponent(entity, component) as TerrainChunkComponent;
-            chunkComponent.dirtyFields['data'] = true;
-        });
-        this.initQueue = [];
-
         // Add dirty chunks to System queue.
         let preLength = this.renderQueue.length;
         this.entityManager.getEntities(ComponentId.TerrainChunk).forEach((component, entity) => {

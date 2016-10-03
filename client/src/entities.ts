@@ -27,7 +27,7 @@ export function initEntity(em: EntityManager, entity: string, components: Object
     if (objectHasKeys(components, [ComponentId.Player])) {
         initPlayerEntity(em, entity, components, assetManager.getMesh('player') as AnimatedMesh, camera);
     } else if (objectHasKeys(components, [ComponentId.Block])) {
-        em.deserializeAndSetEntity(jsonStr);
+        /*em.deserializeAndSetEntity(jsonStr);
 
         let geom = buildBlockGeometry(components[ComponentId.Block]['kind']|0);
 
@@ -37,6 +37,7 @@ export function initEntity(em: EntityManager, entity: string, components: Object
 
         em.addComponent(entity, meshComponent);
         em.addComponent(entity, new RotationComponent());
+         */
     } else {
         em.deserializeAndSetEntity(jsonStr);
     }
