@@ -41,7 +41,7 @@ class PickUpEntityAction extends shared.PickUpEntityAction {
         if (existingEntity) {
             let pickableBlock = entityManager.getComponent<BlockComponent>(this.pickable, ComponentId.Block);
             let existingBlock = entityManager.getComponent<BlockComponent>(existingEntity, ComponentId.Block);
-            if(existingBlock.kind === pickableBlock.kind) {
+            if(existingBlock && pickableBlock && existingBlock.kind === pickableBlock.kind) {
                 existingBlock.count++;
             }
         } else {

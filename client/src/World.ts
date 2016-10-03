@@ -79,13 +79,14 @@ export default class World extends BaseWorld {
         // TODO: Store system orders as constants in one place.
         this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), -1000); // Always process first
 
-        this.addSystem(new TerrainChunkSystem(this.entityManager, this.scene, this.terrainMaterial), -10);
-
         let entitySystem = new ServerEntitySystem(this.entityManager, this.game.server);
         entitySystem.addInitializer(ComponentId.TerrainChunk, new TerrainChunkInitializer(this.entityManager));
         entitySystem.addInitializer(ComponentId.Player, new PlayerInitializer(this.entityManager, this.camera, this.game.assetManager.getMesh('player') as AnimatedMesh));
         entitySystem.addInitializer(ComponentId.Block, new BlockInitializer(this.entityManager, this.blockMaterial));
-        this.addSystem(entitySystem, -9);
+        this.addSystem(entitySystem, -11);
+
+        this.addSystem(new TerrainChunkSystem(this.entityManager, this.scene, this.terrainMaterial), -10);
+
 
         let keyboardManager = new KeyboardManager(this.game.renderer.domElement);
         let mouseManager = new MouseManager(this.game.renderer.domElement);
