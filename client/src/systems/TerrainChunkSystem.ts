@@ -51,7 +51,7 @@ export default class TerrainChunkSystem extends System {
             this.renderQueue.sort((a, b) => vec.distanceTo(new Vector3(b[0], b[1], b[2])));
         }
 
-        // Shift off queue until we have used 8 ms (half of available frame time) or no chunks are left in queue.
+        // Shift off queue until we have used 4 ms (half of available frame time) or no chunks are left in queue.
         let cumTime = 0.0;
         let startTime = performance.now();
         while (cumTime < 4 && this.readyQueue.length > 0) {

@@ -100,7 +100,6 @@ export default class Server {
         ws.send(packet);
     }
 
-
     onConnect(ws) {
         let playerEntity = this.world.entityManager.createEntity();
         initPlayerEntity(this.world.entityManager, playerEntity, ws);

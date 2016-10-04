@@ -55,7 +55,7 @@ export class Terrain {
                 }
             }
         }
-        console.timeEnd(`genchunk-${x}-${y}-${z}`);
+        console.time(`genchunk-${x}-${y}-${z}`);
         return chunk;
     }
 }

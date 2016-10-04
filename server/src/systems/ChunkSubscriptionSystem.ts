@@ -11,10 +11,15 @@ import {UnsubscribeTerrainChunksAction} from "../../../shared/actions";
 
 export default class ChunkSubscriptionSystem extends System {
     terrain: Terrain;
+    chunkQueue: Array<[[number, number, number], string]> = [];
 
     constructor(em: EntityManager, terrain: Terrain) {
         super(em);
         this.terrain = terrain;
+    }
+
+    private queueChunkFor(x: number, y: number, z: number, entity: string) {
+        this.chunkQueue.push([[x, y, z], entity]);
     }
 
     update(dt: number) {
@@ -40,13 +45,7 @@ export default class ChunkSubscriptionSystem extends System {
 
                             // If this chunk key wasn't already subscribed to, player needs to receive chunk data:
                             if (!chunkSubComponent.chunks.has(key)) {
-                                let chunkComponent = this.entityManager.getComponent<TerrainChunkComponent>(key, ComponentId.TerrainChunk);
-                                if (!chunkComponent) {
-                                    chunkComponent = this.terrain.generateChunk(cx, cy, cz);
-                                    this.entityManager.addComponent(key, chunkComponent);
-                                }
-
-                                Server.sendTerrainChunk(netComponent.websocket, chunkComponent.serialize().buffer);
+                                this.queueChunkFor(cx, cy, cz, entity);
                             }
                         }
                     }
@@ -64,6 +63,33 @@ export default class ChunkSubscriptionSystem extends System {
                 // Update chunk subscription.
                 chunkSubComponent.chunks = newChunkSubs;
             }
-        })
+        });
+
+        let clock = (start) => {
+            if ( !start ) return process.hrtime();
+            let end = process.hrtime(start);
+            return Math.round((end[0]*1000) + (end[1]/1000000));
+        };
+
+        let cumTime = 0.0;
+        let startTime = clock(0);
+        if(this.chunkQueue.length) console.log(`${this.chunkQueue.length} chunks left to send / generate.`);
+        while (cumTime < 2 && this.chunkQueue.length > 0) {
+            let [pos, playerEntity] = this.chunkQueue.shift();
+            let [cx, cy, cz] = pos;
+            let key = chunkKey(cx, cy, cz);
+
+            let chunkComponent = this.entityManager.getComponent<TerrainChunkComponent>(key, ComponentId.TerrainChunk);
+            if (!chunkComponent) {
+                chunkComponent = this.terrain.generateChunk(cx, cy, cz);
+                this.entityManager.addComponent(key, chunkComponent);
+            }
+
+            let netComponent = this.entityManager.getComponent<NetworkComponent>(playerEntity, ComponentId.Network);
+            Server.sendTerrainChunk(netComponent.websocket, chunkComponent.serialize().buffer);
+
+            cumTime += clock(startTime);
+            startTime = clock(0);
+        }
     }
 }

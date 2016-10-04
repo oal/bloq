@@ -27,6 +27,7 @@
     "stats.js": "^0.16.0",
     "text-encoding": "^0.6.0",
     "three": "^0.80.1",
+    "tiny-worker": "^1.1.7",
     "ts-loader": "^0.8.2",
     "typescript": "^2.0.3",
     "webpack": "^1.13.2",
