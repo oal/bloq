@@ -13,7 +13,7 @@ export class ActionManager {
             action.execute(entityManager);
         });
         // For debugging:
-        if (this.queue.length) console.log(`Processed ${this.queue.length} actions.`);
+        //if (this.queue.length) console.log(`Processed ${this.queue.length} actions.`);
 
         this.queue = [];
     }
@@ -82,17 +82,11 @@ export class SetBlocksAction extends Action {
                         if (neighborKey === entityKey) return;
 
                         let neighborChunk = entityManager.getComponent<TerrainChunkComponent>(neighborKey, ComponentId.TerrainChunk);
-                        if (neighborChunk) {
-                            console.log('Force neighbor dirty', neighborKey);
-                            neighborChunk.forceDirtyData(true);
-                        }
+                        if (neighborChunk) neighborChunk.forceDirtyData(true);
                     });
                 });
             });
 
-
-            console.log('SET GLOBAL', x, y, z, 'to', value);
-            console.log('SET LOCAL', lx, ly, lz, 'in', cx, cy, cz);
             chunk.setValue(lx, ly, lz, value);
         })
     }

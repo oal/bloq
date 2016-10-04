@@ -13,7 +13,7 @@ export class MeshComponent extends Component {
     dispose(): void {
         super.dispose();
         if(this.mesh && this.mesh.parent) {
-            console.log('Disposing mesh.');
+            //console.log('Disposing mesh.');
             this.mesh.geometry.dispose();
             this.mesh.parent.remove(this.mesh);
         }

@@ -47,7 +47,7 @@ export class Server {
     }
 
     onMessage(evt: MessageEvent) {
-        console.log('Got message');
+        //console.log('Got message');
         if (!(evt.data instanceof ArrayBuffer)) {
             console.error('Not array buffer!', evt.data);
         }
