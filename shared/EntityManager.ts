@@ -8,9 +8,9 @@ let componentProxyHandler = {
     //     return target[name];
     // },
     set: (obj, prop, value) => {
-        if (prop != 'dirtyFields' && obj[prop] !== value) {
+        if (prop !== 'dirtyFields' && obj[prop] !== value) {
             if (prop === 'primaryAction') console.log('New: ', value, "Old: ", obj[prop]);
-            (obj as Component).dirtyFields[prop] = true;
+            (obj as Component).dirtyFields.add(prop);
             obj[prop] = value;
         }
         return true;
@@ -153,9 +153,11 @@ export default class EntityManager {
         // Reset dirty state for all components.
         this.components.forEach(entityComponent => {
             entityComponent.forEach((component) => {
-                Object.keys(component.dirtyFields).forEach(key => {
+                component.dirtyFields.clear();
+                /*Object.keys(component.dirtyFields).forEach(key => {
                     if (component.dirtyFields[key]) component.dirtyFields[key] = false;
                 });
+                */
             });
         });
     }

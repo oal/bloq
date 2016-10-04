@@ -77,6 +77,10 @@ export default class TerrainChunkSystem extends System {
             // Set chunk position. Add offsets so displayed mesh corresponds with collision detection and
             // lookups on the underlying data for the terrain chunk.
             let chunkComponent = this.entityManager.getComponent<TerrainChunkComponent>(entity, ComponentId.TerrainChunk);
+            if(!chunkComponent) {
+                console.log('Tried to set mesh for component that does not exist', entity);
+                continue;
+            }
             mesh.position.x = chunkComponent.x * TERRAIN_CHUNK_SIZE;
             mesh.position.y = chunkComponent.y * TERRAIN_CHUNK_SIZE;
             mesh.position.z = chunkComponent.z * TERRAIN_CHUNK_SIZE;
@@ -109,7 +113,11 @@ export default class TerrainChunkSystem extends System {
                 })
             });
 
-            this.worker.postMessage({entity: entity, data: chunkComponent.data, neighborData: neighborData});
+            this.worker.postMessage({
+                entity: entity,
+                data: chunkComponent.data,
+                neighborData: neighborData
+            });
 
             let endTime = performance.now();
             cumTime += (endTime - startTime);

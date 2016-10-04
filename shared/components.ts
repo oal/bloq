@@ -10,15 +10,15 @@ let componentReplacer = (key, value) => {
 
 export class Component {
     static ID = 0;
-    dirtyFields: {} = {}; // TODO: Use Set if we can compile without it being transpiled to an Object.
+    dirtyFields: Set<string> = new Set<string>();
 
     get ID(): number {
         return this.constructor['ID'];
     }
 
     isDirty(field?: string): boolean {
-        if(field) return !!this.dirtyFields[field];
-        else return Object.keys(this.dirtyFields).some(key => this.dirtyFields[key]);
+        if(field) return this.dirtyFields.has(field);
+        else return this.dirtyFields.size > 0;
     }
 
     typeName(): ComponentId {
@@ -129,7 +129,8 @@ export class TerrainChunkComponent extends Component {
 
     // Used when block just next to this chunk is changed, to force refresh of this chunk's mesh.
     forceDirtyData(state: boolean) {
-        this.dirtyFields['data'] = state;
+        if(state) this.dirtyFields.add('data');
+        else this.dirtyFields.delete('data');
     }
 
     getValue(x: number, y: number, z: number) {
@@ -142,7 +143,7 @@ export class TerrainChunkComponent extends Component {
         this.data[(y|0) * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE + (z|0) * TERRAIN_CHUNK_SIZE + (x|0)] = mat;
 
         // Implicit dirty detection only works when setting attributes, not mutating child structures like an array.
-        this.dirtyFields['data'] = true;
+        this.dirtyFields.add('data');
     }
 
     serialize(): Uint8Array {
@@ -173,7 +174,7 @@ export class InventoryComponent extends SerializableComponent {
         if(position === -1) return -1; // inventory is full.
 
         this.slots[position] = entity;
-        this.dirtyFields['slots'] = true; // Force dirty because we're mutating an array.
+        this.dirtyFields.add('slots'); // Force dirty because we're mutating an array.
         return position;
     }
 
