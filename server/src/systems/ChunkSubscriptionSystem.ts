@@ -36,20 +36,26 @@ export default class ChunkSubscriptionSystem extends System {
 
                 // Look through the view area for the player and notify of new chunks in view.
                 const viewDist = 4;
-                for (let z = -viewDist; z <= viewDist; z++) {
-                    for (let y = -viewDist/2; y <= viewDist/2; y++) {
-                        for (let x = -viewDist; x <= viewDist; x++) {
-                            let [cx, cy, cz] = [currChunk[0] + x, currChunk[1] + y, currChunk[2] + z];
-                            let key = chunkKey(cx, cy, cz);
-                            newChunkSubs.set(key, true);
+                for (let dist = 0; dist <= viewDist; dist++) {
+                    for (let z = -viewDist; z <= viewDist; z++) {
+                        for (let y = -viewDist/2; y <= viewDist/2; y++) {
+                            for (let x = -viewDist; x <= viewDist; x++) {
+                                let realDist = Math.sqrt(x*x+y*y+z*z);
+                                if(realDist < dist || realDist > dist+1) continue;
 
-                            // If this chunk key wasn't already subscribed to, player needs to receive chunk data:
-                            if (!chunkSubComponent.chunks.has(key)) {
-                                this.queueChunkFor(cx, cy, cz, entity);
+                                let [cx, cy, cz] = [currChunk[0] + x, currChunk[1] + y, currChunk[2] + z];
+                                let key = chunkKey(cx, cy, cz);
+                                newChunkSubs.set(key, true);
+
+                                // If this chunk key wasn't already subscribed to, player needs to receive chunk data:
+                                if (!chunkSubComponent.chunks.has(key)) {
+                                    this.queueChunkFor(cx, cy, cz, entity);
+                                }
                             }
                         }
                     }
                 }
+
 
                 // Signal that the chunks too far away be removed.
                 let unsubChunks = [];

@@ -12,8 +12,6 @@ export default class PhysicsSystem extends System {
             physComponent.velY -= dt * 2;
             if (physComponent.velY < -1) physComponent.velY = -1;
 
-            physComponent.velY = 0;
-
             // TODO: Should use delta time here somewhere.
             physComponent.velX *= 30 * dt;
             physComponent.velZ *= 30 * dt;

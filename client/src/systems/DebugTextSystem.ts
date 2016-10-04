@@ -1,13 +1,22 @@
+import {WebGLRenderer} from 'three';
+
 import {System} from "../../../shared/systems";
 import {PositionComponent, RotationComponent, OnGroundComponent} from "../../../shared/components";
 import {ComponentId, TERRAIN_CHUNK_SIZE} from "../../../shared/constants";
 import {mod} from "../../../shared/helpers";
 import {PlayerSelectionComponent} from "../components";
+import EntityManager from "../../../shared/EntityManager";
 
 
 // This is ugly, but it changes a lot, and is only for debugging.
 export default class DebugTextSystem extends System {
     domEl = null;
+    renderer: WebGLRenderer;
+
+    constructor(em: EntityManager, renderer: WebGLRenderer) {
+        super(em);
+        this.renderer = renderer;
+    }
 
     update(dt: number): any {
         if (!this.domEl) {
@@ -20,6 +29,7 @@ export default class DebugTextSystem extends System {
             this.domEl.style.padding = '10px';
             this.domEl.style.minWidth = '250px';
             this.domEl.style.fontWeight = 'bold';
+            this.domEl.style.fontSize = '9px';
             document.body.appendChild(this.domEl);
         }
 
@@ -46,6 +56,9 @@ On ground: ${!!onGroundComponent} | can jump: ${!!onGroundComponent && onGroundC
 Target: x: ${selectionComponent.target[0]} | y: ${selectionComponent.target[1]} | z: ${selectionComponent.target[2]} (${selectionComponent.targetValid ? 'valid' : 'invalid'})
 
 Rotation: x: ${rotationComponent.x.toFixed(2)} | y: ${rotationComponent.y.toFixed(2)} | z: ${rotationComponent.z.toFixed(2)}
+
+Renderer: ${JSON.stringify(this.renderer.info.memory, null, '  ')}
+${this.renderer.info.render.calls} render calls / ${this.renderer.info.render.vertices} vertices
 `;
     }
 }

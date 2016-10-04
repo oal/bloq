@@ -100,7 +100,7 @@ export default class World extends BaseWorld {
 
 
         this.addSystem(new InventoryUISystem(this.entityManager), 999);
-        this.addSystem(new DebugTextSystem(this.entityManager), 1000);
+        this.addSystem(new DebugTextSystem(this.entityManager, this.game.renderer), 1000);
     }
 
     tick(dt) {
