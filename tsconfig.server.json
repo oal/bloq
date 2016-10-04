@@ -8,13 +8,13 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "types": [
-      "es6-collections",
       "node",
       "node-uuid",
       "fast-simplex-noise",
       "text-encoding",
       "ws"
-    ]
+    ],
+    "lib": ["es2015", "webworker"]
   },
   "exclude": [
     "node_modules",

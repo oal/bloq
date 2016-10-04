@@ -8,12 +8,12 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "types": [
-      "es6-collections",
       "three",
       "stats",
       "node-uuid",
       "text-encoding"
-    ]
+    ],
+    "lib": ["es2015", "dom"]
   },
   "exclude": [
     "node_modules",

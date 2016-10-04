@@ -1,6 +1,6 @@
 var LiveReloadPlugin = require('webpack-livereload-plugin');
 var webpack = require('webpack');
-console.log(__dirname)
+console.log(__dirname);
 module.exports = {
     resolve: {
         extensions: ['', '.ts', '.js']
