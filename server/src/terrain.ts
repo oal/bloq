@@ -46,6 +46,7 @@ export class Terrain {
     }
 
     generateChunk(x: number, y: number, z: number): TerrainChunkComponent {
+        console.time(`genchunk-${x}-${y}-${z}`);
         let chunk = new TerrainChunkComponent(x, y, z);
         for (let lz = 0; lz < TERRAIN_CHUNK_SIZE; lz++) {
             for (let ly = 0; ly < TERRAIN_CHUNK_SIZE; ly++) {
@@ -54,6 +55,7 @@ export class Terrain {
                 }
             }
         }
+        console.timeEnd(`genchunk-${x}-${y}-${z}`);
         return chunk;
     }
 }

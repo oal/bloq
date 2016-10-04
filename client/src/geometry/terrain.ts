@@ -70,7 +70,7 @@ const faces = [
 const size = TERRAIN_CHUNK_SIZE; // Save some typing.
 
 
-let buildChunkArrays = (data: Uint8Array, neighbors: Array<Array<Array<Uint8Array>>>) => {
+export function buildChunkArrays(data: Uint8Array, neighbors: Array<Array<Array<Uint8Array>>>) {
     // Indexes to keep track of how full the buffers are / where to insert / slice.
     let vertIdx = 0;
     let triIdx = 0;
@@ -303,22 +303,22 @@ let buildChunkArrays = (data: Uint8Array, neighbors: Array<Array<Array<Uint8Arra
         vertices: vertices.slice(0, vertIdx),
         colors: colors.slice(0, colorIdx)
     }
-};
+}
 
-function buildChunkGeometry(data: Uint8Array, neighbors: Array<Array<Array<Uint8Array>>>): BufferGeometry {
-    let arrays = buildChunkArrays(data, neighbors);
-    if (arrays.vertices.length === 0) return null;
-    //console.log(`Vertex array length: ${arrays.vertices.length}`);
-
+export function geometryFromArrays(arrays): BufferGeometry {
     var geometry = new BufferGeometry();
     geometry.addAttribute('material', new BufferAttribute(arrays.materials, 1));
     geometry.addAttribute('position', new BufferAttribute(arrays.vertices, 3));
     geometry.addAttribute('color', new BufferAttribute(arrays.colors, 3));
-    geometry.computeVertexNormals();
+    //geometry.computeVertexNormals(); // Not needed unless lighting is added.
 
     return geometry;
 }
 
-export {
-    buildChunkGeometry
+
+export function buildChunkGeometry(data: Uint8Array, neighbors: Array<Array<Array<Uint8Array>>>): BufferGeometry {
+    let arrays = buildChunkArrays(data, neighbors);
+    if (arrays.vertices.length === 0) return null;
+
+    return geometryFromArrays(arrays);
 }
