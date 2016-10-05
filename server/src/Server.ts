@@ -1,18 +1,19 @@
 import {Server as WebSocketServer} from 'ws';
 import {TextEncoder} from 'text-encoding';
-import uuid = require('node-uuid');
 import World from "./World";
 import {initPlayerEntity, updatePlayerInput, updatePlayerRotation, updatePlayerInventory} from "./entities";
 import {objectHasKeys} from "../../shared/helpers";
 import {NetworkComponent} from "./components";
 import {ComponentId, ActionId, MessageType} from "../../shared/constants";
 import {Action} from "../../shared/actions";
+import DatabaseManager from "./DatabaseManager";
 
 let hrtimeToSeconds = (hrtime: number[]) => hrtime[0] + hrtime[1] / 1000000000;
 
 export default class Server {
     wss: WebSocketServer;
     world: World;
+    databaseManager: DatabaseManager = new DatabaseManager();
 
     constructor() {
         this.world = new World();
@@ -23,6 +24,7 @@ export default class Server {
         });
         this.wss.on('connection', this.onConnect.bind(this));
 
+        this.databaseManager.registerEntityEvents(this.world.entityManager);
         this.startGameLoop();
     }
 
@@ -51,7 +53,7 @@ export default class Server {
     }
 
     static sendEntity(ws: WebSocket, str: string) {
-        console.log('Sending:', str);
+        console.log('Sending entity:', str);
         let encoder = new TextEncoder();
         let bytes = encoder.encode(str);
 

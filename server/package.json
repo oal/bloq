@@ -1,0 +1,28 @@
+{
+  "name": "bloq-server",
+  "version": "0.0.2",
+  "description": "Server for Bloq",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "serve": "nodemon dist/server/src/main.js"
+  },
+  "author": "Olav Andreas Lindekleiv",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@types/fast-simplex-noise": "^2.1.4",
+    "@types/node": "^6.0.42",
+    "@types/node-uuid": "0.0.28",
+    "@types/sqlite3": "^2.2.31",
+    "@types/text-encoding": "0.0.30",
+    "@types/ws": "0.0.33",
+    "fast-simplex-noise": "^2.2.0",
+    "node-uuid": "^1.4.7",
+    "text-encoding": "^0.6.1"
+  },
+  "dependencies": {
+    "sqlite3": "^3.1.5",
+    "ws": "^1.1.1"
+  }
+}

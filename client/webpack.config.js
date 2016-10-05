@@ -1,17 +1,22 @@
-var LiveReloadPlugin = require('webpack-livereload-plugin');
+var path = require('path');
 var webpack = require('webpack');
-console.log(__dirname);
+
 module.exports = {
     resolve: {
-        extensions: ['', '.ts', '.js']
+        extensions: ['', '.ts', '.js'],
+		// alias: { src: path.resolve(__dirname, '../shared/'), common: path.resolve(__dirname, 'src/shared/') },
+		// modules: [
+		// 	path.resolve(__dirname, 'node_modules'),
+		// ],
+		root: [path.resolve(__dirname, 'node_modules')]
     },
 
-    plugins: [
-        new LiveReloadPlugin(),
-        new webpack.HotModuleReplacementPlugin()
-    ],
+	resolveLoader: {
+		root: [path.resolve(__dirname, 'node_modules')]
+	},
 
-    entry: './client/src/main.ts',
+
+    entry: './src/main.ts',
     output: {
         path: __dirname + "/dist/client/",
         publicPath: "dist/client/",
@@ -25,7 +30,7 @@ module.exports = {
             {
                 test: /\.ts$/,
                 exclude: /node_modules/,
-                loader: 'ts-loader?configFileName=tsconfig.client.json'
+                loader: 'ts-loader'
             },
             { test: /\.glsl$/, loader: 'raw' },
         ]

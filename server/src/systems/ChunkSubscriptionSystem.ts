@@ -9,6 +9,12 @@ import Server from "../Server";
 import {UnsubscribeTerrainChunksAction} from "../../../shared/actions";
 
 
+let clock = (start) : (number | number[]) => {
+    if ( !start ) return process.hrtime();
+    let end = process.hrtime(start);
+    return Math.round((end[0]*1000) + (end[1]/1000000));
+};
+
 export default class ChunkSubscriptionSystem extends System {
     terrain: Terrain;
     chunkQueue: Array<[[number, number, number], string]> = [];
@@ -71,12 +77,6 @@ export default class ChunkSubscriptionSystem extends System {
             }
         });
 
-        let clock = (start) => {
-            if ( !start ) return process.hrtime();
-            let end = process.hrtime(start);
-            return Math.round((end[0]*1000) + (end[1]/1000000));
-        };
-
         let cumTime = 0.0;
         let startTime = clock(0);
         if(this.chunkQueue.length) console.log(`${this.chunkQueue.length} chunks left to send / generate.`);
@@ -94,7 +94,7 @@ export default class ChunkSubscriptionSystem extends System {
             let netComponent = this.entityManager.getComponent<NetworkComponent>(playerEntity, ComponentId.Network);
             Server.sendTerrainChunk(netComponent.websocket, chunkComponent.serialize().buffer);
 
-            cumTime += clock(startTime);
+            cumTime += clock(startTime) as number;
             startTime = clock(0);
         }
     }

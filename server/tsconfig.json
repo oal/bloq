@@ -3,20 +3,20 @@
     "module": "commonjs",
     "target": "es5",
     "noImplicitAny": false,
-    "outDir": "dist",
+    "outDir": "dist/",
     "sourceMap": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "types": [
-      "three",
-      "stats",
+      "node",
       "node-uuid",
-      "text-encoding"
+      "fast-simplex-noise",
+      "text-encoding",
+      "ws"
     ],
-    "lib": ["es2015", "dom"]
+    "lib": ["es2015", "webworker"]
   },
   "exclude": [
-    "node_modules",
-    "server"
+    "node_modules"
   ]
 }
