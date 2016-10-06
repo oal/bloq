@@ -11,6 +11,7 @@ import PlayerActionSystem from "./systems/PlayerActionSystem";
 import PickUpSystem from "./systems/PickUpSystem";
 import {EntityManagerEvent} from "../../shared/EntityManager";
 import BroadcastEntitySystem from "./systems/BroadcastEntitySystem";
+import DatabaseSystem from "./systems/DatabaseSystem";
 
 
 export default class World extends BaseWorld {
@@ -29,6 +30,7 @@ export default class World extends BaseWorld {
         this.addSystem(new PlayerActionSystem(this.entityManager, this.actionManager), 101);
         this.addSystem(new PickUpSystem(this.entityManager), 102);
         this.addSystem(new BroadcastEntitySystem(this.entityManager), 103);
+        this.addSystem(new DatabaseSystem(this.entityManager), 500);
 
         console.log(this.systems);
         console.log(this.systemsOrder)

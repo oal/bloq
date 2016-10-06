@@ -8,7 +8,7 @@ export class System {
         this.entityManager = em;
     }
 
-    update(dt: number) {
+    update(dt: number): void {
         console.warn('Please override update.')
     }
 }
