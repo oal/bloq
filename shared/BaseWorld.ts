@@ -1,3 +1,5 @@
+import now = require('performance-now');
+
 import EntityManager from "./EntityManager";
 import {registerSharedComponents} from "./components";
 import {System} from "./systems";
@@ -16,6 +18,8 @@ export default class BaseWorld {
 
     systems: Array<System> = [];
     systemsOrder: Array<number> = [];
+    systemTimings: Array<number> = [];
+    tickNumber: number = 0;
 
     constructor() {
         let em = new EntityManager();
@@ -37,16 +41,36 @@ export default class BaseWorld {
             return [ord, idx]
         }).filter(zip => zip[0] > order);
 
-        if(higher.length == 0) {
+        if (higher.length == 0) {
             this.systems.push(system);
             this.systemsOrder.push(order);
         } else {
             this.systems.splice(higher[0][1], 0, system);
             this.systemsOrder.splice(higher[0][1], 0, order);
         }
+
+        this.systemTimings.push(0);
     }
 
     tick(dt) {
-        this.systems.forEach(system => system.update(dt))
+        let i = 0;
+        let sumTime = 0;
+        this.systems.forEach(system => {
+            let start = now();
+            system.update(dt);
+            let time = now() - start;
+            this.systemTimings[i] += time;
+            sumTime += time;
+            i++;
+        });
+
+        if (this.tickNumber % 60 === 0) {
+            console.log(`----\nTICK (${sumTime.toFixed(4)}ms)\n----`);
+            for (var j = 0; j < this.systemTimings.length; j++) {
+                var time = this.systemTimings[j];
+                console.log(`${(time/this.tickNumber).toFixed(4)}ms\t ${this.systems[j].constructor.name}`);
+            }
+        }
+        this.tickNumber++;
     }
 }

@@ -19,6 +19,7 @@
     "@types/ws": "0.0.33",
     "fast-simplex-noise": "^2.2.0",
     "node-uuid": "^1.4.7",
+    "performance-now": "^0.2.0",
     "text-encoding": "^0.6.1"
   },
   "dependencies": {
