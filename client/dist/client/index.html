@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bloq</title>
+    <link href="https://fonts.googleapis.com/css?family=Skranji" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Skranji', sans-serif;
+        }
+
+        #mainmenu {
+            background-color: #351E0E;
+            color: #fff;
+            display: flex;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            flex-direction: column;
+            font-size: 5vw;
+            text-shadow: 0 2px 10px #000;
+        }
+
+        #mainmenu * {
+            margin: auto;
+        }
+
+        #mainmenu input, #mainmenu button {
+            font-family: 'Skranji', sans-serif;
+            font-size: 3vw;
+            text-align: center;
+            padding: 1vw 3vw;
+            border-radius: 3px;
+            border: 0;
+            box-shadow: 0 2px 10px #000;
+        }
+
+        #mainmenu button {
+            background-color: #ECEC7A;
+            transition: all 0.25s;
+            cursor: pointer;
+        }
+
+        #mainmenu button:hover {
+            background-color: #fff;
+        }
+
+        #gui {
+            display: none;
+        }
+
+        #overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        #inventory {
+            position: absolute;
+            z-index: 2;
+
+            bottom: 0;
+            width: 100%;
+            display: flex;
+        }
+
+        .inventory-row {
+            margin: 0 auto;
+            padding: 0.25vw;
+            display: flex;
+            list-style-type: none;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .inventory-row li {
+            width: 4vw;
+            height: 4vw;
+            margin: 0.25vw;
+            background-color: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) inset;
+            border-radius: 2px;
+            display: flex;
+        }
+
+        .inventory-row li.active {
+            background-color: #fff;
+        }
+
+        .inventory-row li span {
+            display: none;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            line-height: 1.5vw;
+            width: 1.5vw;
+            height: 3vw;
+            padding: 0 0.75vw;
+            margin: auto;
+            border-radius: 15%;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="mainmenu">
+    <h1>Bloq</h1>
+    <input type="text" id="server" placeholder="Server address and port">
+    <button id="play">Join server</button>
+</div>
+
+<div id="gui">
+    <div id="overlay"></div>
+
+    <div id="inventory">
+        <ol class="inventory-row">
+            <li class="active"><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+        </ol>
+    </div>
+</div>
+
+<script src="./game.js"></script>
+
+</body>
+</html>
