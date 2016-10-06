@@ -3,10 +3,11 @@ import {System} from "../../../shared/systems";
 import EntityManager from "../../../shared/EntityManager";
 import {EntityManagerEvent} from "../../../shared/EntityManager";
 import {ComponentId} from "../../../shared/constants";
+import {deserializeTerrainChunk} from "../../../client/src/Server";
 
 
 export default class DatabaseSystem extends System {
-    private db: Database = new Database(':memory:'); // WIP, only in memory for now
+    private db: Database = new Database('db.sqlite');
     private addedComponents: Array<Array> = [];
     private replacedComponents: Array<Array> = [];
     private removedComponents: Array<Array> = [];
@@ -14,25 +15,36 @@ export default class DatabaseSystem extends System {
     constructor(em: EntityManager) {
         super(em);
         this.initDatabase();
-        this.registerEntityEvents();
     }
 
     initDatabase() {
-        this.db.serialize(() => {
-            this.db.run(`
-            CREATE TABLE components (
-                type INTEGER NOT NULL,
-                entity STRING NOT NULL,
-                data BLOB,
-                PRIMARY KEY (type, entity)
-            );`);
-        });
+        this.db.run(`
+        CREATE TABLE IF NOT EXISTS components (
+            type INTEGER NOT NULL,
+            entity STRING NOT NULL,
+            data BLOB,
+            PRIMARY KEY (type, entity)
+        );`);
+    }
+
+    restore(complete: Function) {
+        this.db.each(`SELECT type, entity, data FROM components`, (err, row) => {
+            if(typeof row.data === 'string') {
+                this.entityManager.addComponentFromObject(row.entity, row.type, JSON.parse(row.data));
+            } else {
+                // Chunk
+                let [_, chunkComponent] = deserializeTerrainChunk(row.data.buffer);
+                this.entityManager.addComponent(row.entity, chunkComponent);
+            }
+
+        }, complete);
     }
 
     update(dt: number) {
         //this.db.exec(`BEGIN`);
 
         this.addedComponents.forEach(arr => {
+            if(this.entityManager.getComponent(arr[0], ComponentId.Player)) return;
             let component = this.entityManager.getComponent(arr[0], arr[1]);
             if(!component || !component.serialize) return;
 
@@ -62,15 +74,15 @@ export default class DatabaseSystem extends System {
         this.entityManager.addEventListener(EntityManagerEvent.ComponentRemoved, this.onComponentRemoved.bind(this));
     }
 
-    onComponentAdded(entity: string, componentId: ComponentId) {
+    private onComponentAdded(entity: string, componentId: ComponentId) {
         this.addedComponents.push([entity, componentId]);
     }
 
-    onComponentReplaced(entity: string, componentId: ComponentId) {
+    private onComponentReplaced(entity: string, componentId: ComponentId) {
         this.replacedComponents.push([entity, componentId]);
     }
 
-    onComponentRemoved(entity: string, componentId: ComponentId) {
+    private onComponentRemoved(entity: string, componentId: ComponentId) {
         this.removedComponents.push([entity, componentId]);
     }
 }

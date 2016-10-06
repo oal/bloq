@@ -30,7 +30,14 @@ export default class World extends BaseWorld {
         this.addSystem(new PlayerActionSystem(this.entityManager, this.actionManager), 101);
         this.addSystem(new PickUpSystem(this.entityManager), 102);
         this.addSystem(new BroadcastEntitySystem(this.entityManager), 103);
-        this.addSystem(new DatabaseSystem(this.entityManager), 500);
+
+        // Create DB system, restore world / entity manager, and then start listening for changes.
+        let dbSystem = new DatabaseSystem(this.entityManager);
+        this.addSystem(dbSystem, 500);
+        dbSystem.restore(() => {
+            console.log('Loaded entities from database.');
+            dbSystem.registerEntityEvents();
+        });
 
         console.log(this.systems);
         console.log(this.systemsOrder)

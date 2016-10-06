@@ -25,8 +25,7 @@ export class Component {
         return this.ID;
     }
 
-    // Pretty much full / partial deserialization, but JSON is already deserialized in entity deserializer.
-    update(data: Object) {
+    update(data: {}) {
         for (let key in data) {
             if (!data.hasOwnProperty(key)) continue;
 

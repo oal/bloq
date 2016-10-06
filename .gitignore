@@ -88,3 +88,4 @@ fabric.properties
 dist/client/game.js
 client/dist/
 server/dist/
+server/db.sqlite

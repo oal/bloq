@@ -24,7 +24,7 @@ export class PlayerComponent extends SerializableComponent {
     static ID = ComponentId.Player;
 }
 
-export class PickableComponent extends Component {
+export class PickableComponent extends SerializableComponent {
     static ID = ComponentId.Pickable;
 }
 

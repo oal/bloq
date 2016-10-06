@@ -4,7 +4,7 @@ import {MessageType, ComponentId} from "../../shared/constants";
 import {bufferToObject} from "./helpers";
 
 
-let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponent] => {
+export function deserializeTerrainChunk(data: ArrayBuffer): [string, TerrainChunkComponent] {
     let view = new DataView(data);
     let x = view.getInt32(0);
     let y = view.getInt32(Int32Array.BYTES_PER_ELEMENT);
@@ -14,7 +14,7 @@ let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponen
     let chunkComponent = new TerrainChunkComponent(x, y, z);
     chunkComponent.data = chunkData;
     return [`${x}x${y}x${z}`, chunkComponent]
-};
+}
 
 export interface EntityMessage {
     entity: string,
