@@ -3,14 +3,15 @@ import {System} from "../../../shared/systems";
 import EntityManager from "../../../shared/EntityManager";
 import {EntityManagerEvent} from "../../../shared/EntityManager";
 import {ComponentId} from "../../../shared/constants";
-import {deserializeTerrainChunk} from "../../../client/src/Server";
+import {TerrainChunkComponent, SerializableComponent} from "../../../shared/components";
+import {deserializeTerrainChunk} from "../../../shared/helpers";
 
 
 export default class DatabaseSystem extends System {
     private db: Database = new Database('db.sqlite');
-    private addedComponents: Array<Array> = [];
-    private replacedComponents: Array<Array> = [];
-    private removedComponents: Array<Array> = [];
+    private addedComponents: Array<[string, ComponentId]> = [];
+    private replacedComponents: Array<[string, ComponentId]> = [];
+    private removedComponents: Array<[string, ComponentId]> = [];
 
     constructor(em: EntityManager) {
         super(em);
@@ -29,7 +30,7 @@ export default class DatabaseSystem extends System {
 
     restore(complete: Function) {
         this.db.each(`SELECT type, entity, data FROM components`, (err, row) => {
-            if(typeof row.data === 'string') {
+            if (typeof row.data === 'string') {
                 this.entityManager.addComponentFromObject(row.entity, row.type, JSON.parse(row.data));
             } else {
                 // Chunk
@@ -42,27 +43,50 @@ export default class DatabaseSystem extends System {
 
     update(dt: number) {
         //this.db.exec(`BEGIN`);
+        let numInserts = 0;
+        let numUpdates = 0;
+        let numDeletes = 0;
 
+        let insertedEntities = new Set<string>();
         this.addedComponents.forEach(arr => {
-            if(this.entityManager.getComponent(arr[0], ComponentId.Player)) return;
-            let component = this.entityManager.getComponent(arr[0], arr[1]);
-            if(!component || !component.serialize) return;
+            let [entity, componentType] = arr;
+            if (this.entityManager.getComponent(entity, ComponentId.Player)) return;
+            let component = this.entityManager.getComponent<SerializableComponent>(entity, componentType);
+            if (!component || !component.serialize) return;
 
-            this.db.run(`INSERT INTO components (type, entity, data) VALUES (?, ?, ?)`, [arr[1], arr[0], component.serialize()]);
+            this.db.run(`INSERT INTO components (type, entity, data) VALUES (?, ?, ?)`, [componentType, entity, component.serialize()]);
+            insertedEntities.add(arr[0]);
+            numInserts++;
         });
         this.addedComponents = [];
 
         this.replacedComponents.forEach(arr => {
-            let component = this.entityManager.getComponent(arr[0], arr[1]);
-            if(!component || !component.serialize) return;
-            this.db.run(`UPDATE components SET data = ? WHERE type = ? AND entity = ?`, [component.serialize(), arr[1], arr[0]]);
+            let [entity, componentType] = arr;
+            let component = this.entityManager.getComponent<SerializableComponent>(entity, componentType);
+            if (!component || !component.serialize) return;
+            this.db.run(`UPDATE components SET data = ? WHERE type = ? AND entity = ?`, [component.serialize(), componentType, entity]);
+            numUpdates++;
         });
         this.replacedComponents = [];
 
         this.removedComponents.forEach(arr => {
-            this.db.run(`DELETE FROM components WHERE type = ? AND entity = ?`, [arr[1], arr[0]]);
+            let [entity, componentType] = arr;
+            this.db.run(`DELETE FROM components WHERE type = ? AND entity = ?`, [componentType, entity]);
+            numDeletes++;
         });
         this.removedComponents = [];
+
+        // Save dirty chunks, but not if they were just inserted (included in insertedEntities).
+        this.entityManager.getEntities(ComponentId.TerrainChunk).forEach((component: TerrainChunkComponent, entity: string) => {
+            if (component.isDirty('data') && !insertedEntities.has(entity)) {
+                this.db.run(`UPDATE components SET data = ? WHERE type = ? AND entity = ?`, [component.serialize(), ComponentId.TerrainChunk, entity]);
+                numUpdates++;
+            }
+        });
+
+        if(numInserts || numUpdates || numDeletes) {
+            console.log(`Inserts: ${numInserts} | Updates: ${numUpdates} | Deletes: ${numDeletes}`);
+        }
 
         //this.db.exec(`COMMIT`);
     }

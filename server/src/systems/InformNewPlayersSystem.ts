@@ -35,6 +35,11 @@ export default class InformNewPlayersSystem extends System {
                 Server.sendEntity(ws.websocket, data);
             });
 
+
+            this.entityManager.getEntities(ComponentId.Pickable).forEach((component, pickableEntity) => {
+                Server.sendEntity(ws.websocket, this.entityManager.serializeEntity(pickableEntity));
+            });
+
             console.log('New player informed.');
             this.entityManager.removeComponent(newEntity, component);
         });

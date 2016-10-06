@@ -1,4 +1,5 @@
 import {TERRAIN_CHUNK_SIZE, ComponentId} from "./constants";
+import {TerrainChunkComponent} from "./components";
 
 
 let objectHasKeys = (obj: Object, keys: Array<ComponentId>) => keys.filter(key => key in obj).length == keys.length;
@@ -6,7 +7,7 @@ let objectHasKeys = (obj: Object, keys: Array<ComponentId>) => keys.filter(key =
 let mod = (a, b) => ((a % b) + b) % b;
 
 let globalToChunk = (x: number) => {
-    if (x < 0) return Math.ceil((x - TERRAIN_CHUNK_SIZE+1) / TERRAIN_CHUNK_SIZE);
+    if (x < 0) return Math.ceil((x - TERRAIN_CHUNK_SIZE + 1) / TERRAIN_CHUNK_SIZE);
     else return Math.floor(x / TERRAIN_CHUNK_SIZE);
 };
 
@@ -25,10 +26,24 @@ let arraysEqual = (a, b) => {
     return true;
 };
 
+
+let deserializeTerrainChunk = (data: ArrayBuffer): [string, TerrainChunkComponent] => {
+    let view = new DataView(data);
+    let x = view.getInt32(0);
+    let y = view.getInt32(Int32Array.BYTES_PER_ELEMENT);
+    let z = view.getInt32(Int32Array.BYTES_PER_ELEMENT * 2);
+    let chunkData = new Uint8Array(data.slice(Int32Array.BYTES_PER_ELEMENT * 3));
+
+    let chunkComponent = new TerrainChunkComponent(x, y, z);
+    chunkComponent.data = chunkData;
+    return [`${x}x${y}x${z}`, chunkComponent]
+};
+
 export {
     objectHasKeys,
     mod,
     globalToChunk,
     chunkKey,
     arraysEqual,
+    deserializeTerrainChunk,
 }
