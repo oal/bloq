@@ -1,5 +1,6 @@
-import {Server as WebSocketServer} from 'ws';
+import {Server as WebSocketServer} from 'uws';
 import {TextEncoder} from 'text-encoding';
+
 import World from "./World";
 import {initPlayerEntity, updatePlayerInput, updatePlayerRotation, updatePlayerInventory} from "./entities";
 import {objectHasKeys} from "../../shared/helpers";

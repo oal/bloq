@@ -100,7 +100,7 @@ export default class EntityManager {
     }
 
     getComponent<T>(entity: string, componentType: ComponentId): T {
-        return this.components.get(componentType).get(entity) as T;
+        return (this.components.get(componentType).get(entity) as any) as T; // Have to double cast to force it to be T.
     }
 
     addComponent(entity: string, component: Component): Component {

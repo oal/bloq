@@ -22,7 +22,7 @@ export default class DatabaseManager {
     }
 
     registerEntityEvents(em: EntityManager) {
-        em.addEventListener(EntityManagerEvent.ComponentAdded, this.onComponentAdded.bind(this))
+        // em.addEventListener(EntityManagerEvent.ComponentAdded, this.onComponentAdded.bind(this))
     }
 
     onComponentAdded(entity: string, component: SerializableComponent) {
