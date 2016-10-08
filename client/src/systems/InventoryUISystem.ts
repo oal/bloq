@@ -25,7 +25,8 @@ export default class InventoryUISystem extends System {
                 if (entity) {
                     let block = this.entityManager.getComponent<BlockComponent>(entity, ComponentId.Block);
                     if(!block) return;
-                    domBlock.innerText = `${block.kind} (${block.count})`;
+                    domBlock.style.backgroundImage = `url('assets/blocks/${block.kind}.png')`;
+                    domBlock.innerText = ''+block.count;
                 }
             })
         });
