@@ -29,6 +29,7 @@ import BlockInitializer from "./initializers/BlockInitializer";
 import TerrainChunkInitializer from "./initializers/TerrainChunkInitializer";
 import PlayerInitializer from "./initializers/PlayerInitializer";
 import AnimatedMesh from "./AnimatedMesh";
+import InputInitializer from "./initializers/InputInitializer";
 
 
 export default class World extends BaseWorld {
@@ -104,6 +105,9 @@ export default class World extends BaseWorld {
             )
         );
         entitySystem.addInitializer(ComponentId.Block, new BlockInitializer(this.entityManager, this.blockMaterial));
+        let inputInitializer = new InputInitializer(this.entityManager);
+        entitySystem.addInitializer(ComponentId.Input, inputInitializer);
+        entitySystem.addInitializer(ComponentId.Rotation, inputInitializer);
         this.addSystem(entitySystem, -11);
 
         this.addSystem(new TerrainChunkSystem(this.entityManager, this.scene, this.terrainMaterial), -10);

@@ -12,6 +12,7 @@ import {
 
 export default class PlayerMeshSystem extends System {
     scene: Scene;
+    walkCounter: number = 0;
 
     constructor(em: EntityManager, scene: Scene) {
         super(em);
@@ -35,11 +36,21 @@ export default class PlayerMeshSystem extends System {
             let rot = this.entityManager.getComponent<RotationComponent>(entity, ComponentId.Rotation);
             mesh.rotation.y = rot.y;
 
+            let physComponent = this.entityManager.getComponent<PhysicsComponent>(entity, ComponentId.Physics);
             if (this.entityManager.getComponent<CurrentPlayerComponent>(entity, ComponentId.CurrentPlayer)) {
-                mesh.getObjectByName('camera').rotation.x = rot.x;
+                let camera = mesh.getObjectByName('camera');
+                camera.rotation.x = rot.x;
+
+                // Head / camera moving up and down when player is walking.
+                if (Math.abs(physComponent.velX) > 0.01 || Math.abs(physComponent.velZ) > 0.01) {
+                    camera.position.y = 2.5 + Math.sin(this.walkCounter) / 7.5;
+                    this.walkCounter += dt * 12.5;
+                } else {
+                    this.walkCounter = 0;
+                    camera.position.y = 2.5;
+                }
             } else {
                 // Animation is only relevant for other players, as current player has no mesh.
-                let physComponent = this.entityManager.getComponent<PhysicsComponent>(entity, ComponentId.Physics);
                 if (Math.abs(physComponent.velX) > 0.01 || Math.abs(physComponent.velZ) > 0.01) {
                     if (mesh.getCurrentAnimation() != 'walk') {
                         mesh.playAnimation('walk');

@@ -11,7 +11,7 @@ export default class BroadcastPlayerInputSystem extends System {
         this.entityManager.getEntities(ComponentId.Input).forEach((component, entity) => {
             let inputComponent = component as InputComponent;
             if (inputComponent.isDirty()) {
-                changedInputs.set(entity, inputComponent.serialize());
+                changedInputs.set(entity, this.entityManager.serializeEntity(entity, [ComponentId.Input, ComponentId.Position]));
             }
         });
 
@@ -19,16 +19,16 @@ export default class BroadcastPlayerInputSystem extends System {
         this.entityManager.getEntities(ComponentId.Rotation).forEach((component, entity) => {
             let rot = component as RotationComponent;
             if (rot.isDirty()) {
-                changedRots.set(entity, rot.serialize());
+                changedRots.set(entity, this.entityManager.serializeEntity(entity, [ComponentId.Rotation]));
             }
         });
 
         if (changedInputs.size > 0) {
             this.entityManager.getEntities(ComponentId.Network).forEach((component, entity) => {
                 let netComponent = component as NetworkComponent;
-                changedInputs.forEach((serializedInputs, changedEntity) => {
+                changedInputs.forEach((serializedComponents, changedEntity) => {
                     if (changedEntity === entity) return;
-                    Server.sendEntity(netComponent.websocket, `{"entity":"${changedEntity}","components":{"${ComponentId.Input}":${serializedInputs}}}`);
+                    Server.sendEntity(netComponent.websocket, serializedComponents);
                 });
             })
         }
@@ -38,7 +38,7 @@ export default class BroadcastPlayerInputSystem extends System {
                 let netComponent = component as NetworkComponent;
                 changedRots.forEach((serializedRot, changedEntity) => {
                     if (changedEntity === entity) return;
-                    Server.sendEntity(netComponent.websocket, `{"entity":"${changedEntity}","components":{"${ComponentId.Rotation}":${serializedRot}}}`)
+                    Server.sendEntity(netComponent.websocket, serializedRot)
                 })
             })
         }

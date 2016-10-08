@@ -47,9 +47,6 @@ export default class PlayerInitializer extends Initializer {
             playerMesh = this.mesh.clone() as AnimatedMesh
         }
 
-        // Debug helper to see how ground detection works.
-        playerMesh.add(new ArrowHelper(new Vector3(0, 0, -1), new Vector3(0, 0, 0), 1));
-
         // Only show selection box for current player.
         if (ComponentId.CurrentPlayer in components) {
             console.log('Spawning current player');
@@ -59,17 +56,9 @@ export default class PlayerInitializer extends Initializer {
             // Could also render this BoxGeometry in wireframe mode, but then we get diagonal lines,
             // as it renders triangles.
             let selectionGeom = new BoxBufferGeometry(1.0, 1.0, 1.0);
-            let selectionCube = new Mesh(selectionGeom, this.selectionMaterial);
-
-            // Box helper will only render edges.
-            // let cube = new BoxHelper(selectionCube, new Color(0xffffff));
-            // let mat = cube.material as LineBasicMaterial;
-            // mat.linewidth = 4;
-            // mat.transparent = true;
-            // mat.opacity = 0.5;
 
             // Update and add component.
-            selectionComponent.mesh = selectionCube;
+            selectionComponent.mesh = new Mesh(selectionGeom, this.selectionMaterial);
             this.entityManager.addComponent(entity, selectionComponent);
         }
 

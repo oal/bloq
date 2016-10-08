@@ -37,11 +37,13 @@ class PickUpEntityAction extends shared.PickUpEntityAction {
 
     execute(entityManager: EntityManager) {
         let inventoryComponent = entityManager.getComponent<InventoryComponent>(this.player, ComponentId.Inventory);
+        if(!inventoryComponent) return; // TODO: Might not even broadcast this event. Only send to one player.
+
         let existingEntity = inventoryComponent.getEntity(this.inventorySlot);
         if (existingEntity) {
             let pickableBlock = entityManager.getComponent<BlockComponent>(this.pickable, ComponentId.Block);
             let existingBlock = entityManager.getComponent<BlockComponent>(existingEntity, ComponentId.Block);
-            if(existingBlock && pickableBlock && existingBlock.kind === pickableBlock.kind) {
+            if (existingBlock && pickableBlock && existingBlock.kind === pickableBlock.kind) {
                 existingBlock.count++;
             }
         } else {

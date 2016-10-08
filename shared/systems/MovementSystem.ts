@@ -17,20 +17,23 @@ export default class MovementSystem extends System {
 
             let physComponent = component as PhysicsComponent;
 
-            let speed = dt * 4;
+            let speed = dt * 6;
             let sinSpeed = Math.sin(rotation.y) * speed;
             let cosSpeed = Math.cos(rotation.y) * speed;
+
+            physComponent.velX = 0;
+            physComponent.velZ = 0;
             if (input.moveForward) {
                 physComponent.velX -= sinSpeed;
                 physComponent.velZ -= cosSpeed;
             }
             if (input.moveLeft) {
-                physComponent.velX -= cosSpeed;
-                physComponent.velZ += sinSpeed;
+                physComponent.velX -= cosSpeed/1.5;
+                physComponent.velZ += sinSpeed/1.5;
             }
             if (input.moveRight) {
-                physComponent.velX += cosSpeed;
-                physComponent.velZ -= sinSpeed;
+                physComponent.velX += cosSpeed/1.5;
+                physComponent.velZ -= sinSpeed/1.5;
             }
             if (input.moveBackward) {
                 physComponent.velX += sinSpeed;

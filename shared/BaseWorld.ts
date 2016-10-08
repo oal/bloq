@@ -76,9 +76,5 @@ export default class BaseWorld {
         //     }
         // }
         this.tickNumber++;
-
-        if(dt > 60/1000) {
-            console.log(`Tick took too ${dt}ms!`);
-        }
     }
 }
