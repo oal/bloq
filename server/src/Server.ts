@@ -27,7 +27,7 @@ export default class Server {
     }
 
     startGameLoop() {
-        const dt = 1.0 / 30.0;
+        const dt = 1.0 / 60.0;
 
         let currentTime = hrtimeToSeconds(process.hrtime());
         let accumulator = 0.0;

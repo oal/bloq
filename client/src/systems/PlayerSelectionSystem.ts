@@ -111,6 +111,10 @@ export default class PlayerSelectionSystem extends System {
                     selectionComponent.target = [hitPoint.x, hitPoint.y, hitPoint.z];
                     selectionComponent.targetSide = hitSide;
                     selectionComponent.mesh.position.lerp(hitPoint, 0.75); // Lerp because it looks good. :-)
+
+                    // Update uniform so that selector deforms correctly to match terrain deformation.
+                    selectionComponent.mesh.material.uniforms.globalPosition.value = hitPoint;
+
                     break;
                 } else {
                     this.debugSelector.visible = false;

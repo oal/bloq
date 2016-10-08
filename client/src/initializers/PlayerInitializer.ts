@@ -2,13 +2,14 @@ import {
     LineBasicMaterial,
     Color,
     MeshBasicMaterial,
-    BoxGeometry,
+    BoxBufferGeometry,
     Vector3,
     Object3D,
     ArrowHelper,
     Mesh,
     BoxHelper,
-    PerspectiveCamera
+    PerspectiveCamera,
+    ShaderMaterial
 } from 'three';
 
 import Initializer from "./Initializer";
@@ -20,11 +21,13 @@ import EntityManager from "../../../shared/EntityManager";
 export default class PlayerInitializer extends Initializer {
     private camera: PerspectiveCamera;
     private mesh: AnimatedMesh;
+    private selectionMaterial: ShaderMaterial;
 
-    constructor(em: EntityManager, camera: PerspectiveCamera, playerMesh: AnimatedMesh) {
+    constructor(em: EntityManager, camera: PerspectiveCamera, playerMesh: AnimatedMesh, selectionMaterial: ShaderMaterial) {
         super(em);
         this.camera = camera;
-        this.mesh = playerMesh
+        this.mesh = playerMesh;
+        this.selectionMaterial = selectionMaterial;
     }
 
     initialize(entity: string, components: Object) {
@@ -55,18 +58,18 @@ export default class PlayerInitializer extends Initializer {
             // Need an underlying box for the Box helper to work.
             // Could also render this BoxGeometry in wireframe mode, but then we get diagonal lines,
             // as it renders triangles.
-            let selectionGeom = new BoxGeometry(1.01, 1.01, 1.01);
-            let selectionCube = new Mesh(selectionGeom, new MeshBasicMaterial());
+            let selectionGeom = new BoxBufferGeometry(1.0, 1.0, 1.0);
+            let selectionCube = new Mesh(selectionGeom, this.selectionMaterial);
 
             // Box helper will only render edges.
-            let cube = new BoxHelper(selectionCube, new Color(0xffffff));
-            let mat = cube.material as LineBasicMaterial;
-            mat.linewidth = 4;
-            mat.transparent = true;
-            mat.opacity = 0.5;
+            // let cube = new BoxHelper(selectionCube, new Color(0xffffff));
+            // let mat = cube.material as LineBasicMaterial;
+            // mat.linewidth = 4;
+            // mat.transparent = true;
+            // mat.opacity = 0.5;
 
             // Update and add component.
-            selectionComponent.mesh = cube;
+            selectionComponent.mesh = selectionCube;
             this.entityManager.addComponent(entity, selectionComponent);
         }
 

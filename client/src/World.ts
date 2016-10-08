@@ -3,6 +3,7 @@ import {
     PerspectiveCamera,
     ShaderMaterial,
     VertexColors,
+    Vector3
 } from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
@@ -34,6 +35,7 @@ export default class World extends BaseWorld {
     scene: Scene;
     camera: PerspectiveCamera;
     terrainMaterial: ShaderMaterial;
+    selectionMaterial: ShaderMaterial;
     blockMaterial: ShaderMaterial;
 
     game: Game;
@@ -61,6 +63,17 @@ export default class World extends BaseWorld {
             vertexColors: VertexColors
         });
 
+        this.selectionMaterial = new ShaderMaterial({
+            uniforms: {
+                globalPosition: {
+                    type: 'v3v',
+                    value: new Vector3(0, 0, 0)
+                }
+            },
+            vertexShader: require('../shaders/selection_vert.glsl'),
+            fragmentShader: require('../shaders/selection_frag.glsl'),
+        });
+
         this.blockMaterial = new ShaderMaterial({
             uniforms: {
                 texture: {
@@ -81,7 +94,15 @@ export default class World extends BaseWorld {
 
         let entitySystem = new ServerEntitySystem(this.entityManager, this.game.server);
         entitySystem.addInitializer(ComponentId.TerrainChunk, new TerrainChunkInitializer(this.entityManager));
-        entitySystem.addInitializer(ComponentId.Player, new PlayerInitializer(this.entityManager, this.camera, this.game.assetManager.getMesh('player') as AnimatedMesh));
+        entitySystem.addInitializer(
+            ComponentId.Player,
+            new PlayerInitializer(
+                this.entityManager,
+                this.camera,
+                this.game.assetManager.getMesh('player') as AnimatedMesh,
+                this.selectionMaterial
+            )
+        );
         entitySystem.addInitializer(ComponentId.Block, new BlockInitializer(this.entityManager, this.blockMaterial));
         this.addSystem(entitySystem, -11);
 
