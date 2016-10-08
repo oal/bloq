@@ -107,6 +107,7 @@ export default class World extends BaseWorld {
         this.addSystem(entitySystem, -11);
 
         this.addSystem(new TerrainChunkSystem(this.entityManager, this.scene, this.terrainMaterial), -10);
+        this.addSystem(new BlockSystem(this.entityManager), -9);
 
 
         let keyboardManager = new KeyboardManager(this.game.renderer.domElement);
@@ -117,7 +118,6 @@ export default class World extends BaseWorld {
         this.addSystem(new MeshSystem(this.entityManager, this.scene), 11);
         this.addSystem(new PlayerMeshSystem(this.entityManager, this.scene), 12);
         this.addSystem(new PlayerSelectionSystem(this.entityManager, this.scene), 13);
-        this.addSystem(new BlockSystem(this.entityManager), 14);
 
 
         this.addSystem(new InventoryUISystem(this.entityManager), 999);

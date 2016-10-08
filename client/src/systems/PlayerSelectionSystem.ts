@@ -4,21 +4,17 @@ import {System} from "../../../shared/systems";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId, Side} from "../../../shared/constants";
 import {PlayerSelectionComponent, MeshComponent} from "../components";
-import {PositionComponent} from "../../../shared/components";
+import {PositionComponent, RotationComponent} from "../../../shared/components";
 import {globalToChunk, chunkKey} from "../../../shared/helpers";
 import {findBlockMaterial} from "../helpers";
 
 
 export default class PlayerSelectionSystem extends System {
     scene: Scene;
-    debugSelector: Mesh;
 
     constructor(em: EntityManager, scene: Scene) {
         super(em);
         this.scene = scene;
-
-        this.debugSelector = new Mesh(new BoxGeometry(0.1, 0.1, 0.1), new MeshBasicMaterial(0xffffff));
-        this.scene.add(this.debugSelector);
     }
 
     update(dt: number) {
@@ -27,10 +23,12 @@ export default class PlayerSelectionSystem extends System {
         let yRot = new Vector3(0, 1, 0);
 
         this.entityManager.getEntities(ComponentId.PlayerSelection).forEach((component, entity) => {
-            // Load relevant components.
-            let selectionComponent = component as PlayerSelectionComponent;
             let positionComponent = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Position);
-            let rotComponent = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Rotation);
+            let rotComponent = this.entityManager.getComponent<RotationComponent>(entity, ComponentId.Rotation);
+
+            // If neither position nor rotation has changed, no need to recalculate selection target.
+            if(!positionComponent.isDirty() && !rotComponent.isDirty()) return;
+            let selectionComponent = component as PlayerSelectionComponent;
 
             // Get player's eye position, which we use for ray caster / collision detection origin.
             let [x, y, z] = [positionComponent.x, positionComponent.y + 2.5, positionComponent.z];
@@ -72,11 +70,6 @@ export default class PlayerSelectionSystem extends System {
                         let hit = hits[0];
                         let point = hit.point;
 
-                        // DEBUG
-                        this.debugSelector.position.x = point.x;
-                        this.debugSelector.position.y = point.y;
-                        this.debugSelector.position.z = point.z;
-
                         // Cube data is offset by half a unit vs raycaster hit point.
                         // For negative values, subtract -0.5, for positive, add 0.5.
                         let cubeOffset = new Vector3(
@@ -106,7 +99,6 @@ export default class PlayerSelectionSystem extends System {
 
                 // Did we hit the mesh during ray casting, and is there really a block there?
                 if (hitPoint && findBlockMaterial(this.entityManager, hitPoint.x, hitPoint.y, hitPoint.z) !== 0) {
-                    this.debugSelector.visible = true;
                     targetValid = true;
                     selectionComponent.target = [hitPoint.x, hitPoint.y, hitPoint.z];
                     selectionComponent.targetSide = hitSide;
@@ -116,8 +108,6 @@ export default class PlayerSelectionSystem extends System {
                     selectionComponent.mesh.material.uniforms.globalPosition.value = hitPoint;
 
                     break;
-                } else {
-                    this.debugSelector.visible = false;
                 }
             }
 

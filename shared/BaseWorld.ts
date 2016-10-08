@@ -55,10 +55,12 @@ export default class BaseWorld {
     tick(dt) {
         let i = 0;
         let sumTime = 0;
+        let frameTimes = new Float32Array(this.systems.length);
         this.systems.forEach(system => {
             let start = now();
             system.update(dt);
             let time = now() - start;
+            frameTimes[i] = time;
             this.systemTimings[i] += time;
             sumTime += time;
             i++;
@@ -67,8 +69,10 @@ export default class BaseWorld {
         if (this.tickNumber % 60 === 0) {
             console.log(`----\nTICK (${sumTime.toFixed(4)}ms)\n----`);
             for (var j = 0; j < this.systemTimings.length; j++) {
-                var time = this.systemTimings[j];
-                console.log(`${(time/this.tickNumber).toFixed(4)}ms\t ${this.systems[j].constructor.name}`);
+                let avgTime =(this.systemTimings[j]/this.tickNumber).toFixed(4);
+                let currTime = frameTimes[j].toFixed(4);
+                let sysName = this.systems[j].constructor.name;
+                console.log(`${avgTime}ms\t ${currTime}ms\t ${sysName}`);
             }
         }
         this.tickNumber++;

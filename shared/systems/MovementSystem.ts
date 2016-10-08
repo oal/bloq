@@ -9,7 +9,7 @@ import {
 export default class MovementSystem extends System {
     update(dt: number): any {
         this.entityManager.getEntities(ComponentId.Physics).forEach((component, entity) => {
-            if(!this.entityManager.getComponent(entity, ComponentId.Player)) return;
+            if(!this.entityManager.hasComponent(entity, ComponentId.Player)) return;
 
             let input = this.entityManager.getComponent<InputComponent>(entity, ComponentId.Input);
 

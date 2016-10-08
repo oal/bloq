@@ -20,19 +20,21 @@ export default class MeshSystem extends System {
             let meshComponent = component as MeshComponent;
             if (!meshComponent.mesh) return; // Mesh may be null.
 
+            let isNewMesh = false;
             if (!meshComponent.mesh.parent) {
                 this.scene.add(meshComponent.mesh);
+                isNewMesh = true;
             }
 
             let position = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Position);
-            if (position) {
+            if (position && (isNewMesh || position.isDirty())) {
                 meshComponent.mesh.position.x = position.x;
                 meshComponent.mesh.position.y = position.y;
                 meshComponent.mesh.position.z = position.z;
             }
 
             let rot = this.entityManager.getComponent<RotationComponent>(entity, ComponentId.Rotation);
-            if (rot) {
+            if (rot && rot.isDirty()) {
                 meshComponent.mesh.rotation.x = rot.x;
                 meshComponent.mesh.rotation.y = rot.y;
                 meshComponent.mesh.rotation.z = rot.z;

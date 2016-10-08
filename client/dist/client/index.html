@@ -63,9 +63,26 @@
             left: 0;
         }
 
+        #crosshair {
+            width: 4px;
+            height: 4px;
+            margin-top: -3px;
+            margin-left: -3px;
+            display: block;
+
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            opacity: 0.75;
+            z-index: 2;
+            border-radius: 100%;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.5);
+        }
+
         #inventory {
             position: absolute;
-            z-index: 2;
+            z-index: 3;
 
             bottom: 0;
             width: 100%;
@@ -120,6 +137,8 @@
 
 <div id="gui">
     <div id="overlay"></div>
+
+    <div id="crosshair"></div>
 
     <div id="inventory">
         <ol class="inventory-row">
