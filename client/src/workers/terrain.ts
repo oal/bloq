@@ -233,61 +233,74 @@ function buildChunkArrays(data: Uint8Array, neighbors: Array<Array<Array<Uint8Ar
     for (let z = 0; z < size; z++) {
         for (let y = 0; y < size; y++) {
             for (let x = 0; x < size; x++) {
-                let val = getPoint(x, y, z);
-                if (val) {
+                let material = getPoint(x, y, z);
+                if (material) {
                     // Insert faces where an actual value (like dirt) meets air/empty block.
                     // Use relative indexes from "faces", and get nearby blocks to check if they
                     // should be shadowed or not.
-                    if (transparentMaterials.has(getPoint(x, y, z + 1))) {
+                    let nextMaterial: number;
+
+                    nextMaterial = getPoint(x, y, z + 1);
+                    if (transparentMaterials.has(nextMaterial) && nextMaterial !== material) {
                         let face = faces[0];
                         for (let f = 0; f < 18; f += 3) {
                             addVertex(
-                                x + face[f] / 2, y + face[f + 1] / 2, z + face[f + 2] / 2, val,
+                                x + face[f] / 2, y + face[f + 1] / 2, z + face[f + 2] / 2, material,
                                 !!getPoint(x + face[f], y + face[f + 1], z + face[f + 2]) || !!getPoint(x, y + face[f + 1], z + face[f + 2]) || !!getPoint(x + face[f], y, z + face[f + 2])
                             );
                         }
                     }
-                    if (transparentMaterials.has(getPoint(x, y, z - 1))) {
+
+                    nextMaterial = getPoint(x, y, z - 1);
+                    if (transparentMaterials.has(nextMaterial) && nextMaterial !== material) {
                         let face = faces[1];
                         for (let f = 0; f < 18; f += 3) {
                             addVertex(
-                                x + face[f] / 2, y + face[f + 1] / 2, z + face[f + 2] / 2, val,
+                                x + face[f] / 2, y + face[f + 1] / 2, z + face[f + 2] / 2, material,
                                 !!getPoint(x + face[f], y + face[f + 1], z + face[f + 2]) || !!getPoint(x, y + face[f + 1], z + face[f + 2]) || !!getPoint(x + face[f], y, z + face[f + 2])
                             );
                         }
                     }
-                    if (transparentMaterials.has(getPoint(x, y + 1, z))) {
+
+                    nextMaterial = getPoint(x, y + 1, z);
+                    if (transparentMaterials.has(nextMaterial) && nextMaterial !== material) {
                         let face = faces[2];
                         for (let f = 0; f < 18; f += 3) {
                             addVertex(
-                                x + face[f] / 2, y + face[f + 1] / 2, z + face[f + 2] / 2, val,
+                                x + face[f] / 2, y + face[f + 1] / 2, z + face[f + 2] / 2, material,
                                 !!getPoint(x + face[f], y + face[f + 1], z + face[f + 2]) || !!getPoint(x, y + face[f + 1], z + face[f + 2]) || !!getPoint(x + face[f], y + face[f + 1], z)
                             );
                         }
                     }
-                    if (transparentMaterials.has(getPoint(x, y - 1, z))) {
+
+                    nextMaterial = getPoint(x, y - 1, z);
+                    if (transparentMaterials.has(nextMaterial) && nextMaterial !== material) {
                         let face = faces[3];
                         for (let f = 0; f < 18; f += 3) {
                             addVertex(
-                                x + face[f] / 2, y + face[f + 1] / 2, z + face[f + 2] / 2, val,
+                                x + face[f] / 2, y + face[f + 1] / 2, z + face[f + 2] / 2, material,
                                 !!getPoint(x + face[f], y + face[f + 1], z + face[f + 2]) || !!getPoint(x, y + face[f + 1], z + face[f + 2]) || !!getPoint(x + face[f], y + face[f + 1], z)
                             );
                         }
                     }
-                    if (transparentMaterials.has(getPoint(x + 1, y, z))) {
+
+                    nextMaterial = getPoint(x + 1, y, z);
+                    if (transparentMaterials.has(nextMaterial) && nextMaterial !== material) {
                         let face = faces[4];
                         for (let f = 0; f < 18; f += 3) {
                             addVertex(
-                                x + face[f] / 2, y + face[f + 1] / 2, z + face[f + 2] / 2, val,
+                                x + face[f] / 2, y + face[f + 1] / 2, z + face[f + 2] / 2, material,
                                 !!getPoint(x + face[f], y + face[f + 1], z + face[f + 2]) || !!getPoint(x + face[f], y, z + face[f + 2]) || !!getPoint(x + face[f], y + face[f + 1], z)
                             );
                         }
                     }
-                    if (transparentMaterials.has(getPoint(x - 1, y, z))) {
+
+                    nextMaterial = getPoint(x - 1, y, z);
+                    if (transparentMaterials.has(nextMaterial) && nextMaterial !== material) {
                         let face = faces[5];
                         for (let f = 0; f < 18; f += 3) {
                             addVertex(
-                                x + face[f] / 2, y + face[f + 1] / 2, z + face[f + 2] / 2, val,
+                                x + face[f] / 2, y + face[f + 1] / 2, z + face[f + 2] / 2, material,
                                 !!getPoint(x + face[f], y + face[f + 1], z + face[f + 2]) || !!getPoint(x + face[f], y, z + face[f + 2]) || !!getPoint(x + face[f], y + face[f + 1], z)
                             );
                         }
