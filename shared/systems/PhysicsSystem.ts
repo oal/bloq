@@ -11,7 +11,7 @@ export default class PhysicsSystem extends System {
         this.entityManager.getEntities(ComponentId.Physics).forEach((component, entity) => {
             // Update physics.
             let physComponent = component as PhysicsComponent;
-            physComponent.velY -= Gravity*dt;
+            physComponent.velY -= Gravity * dt;
             if (physComponent.velY < -TerminalVelocity) physComponent.velY = -TerminalVelocity;
 
             // Maybe this should be in a "PlayerPhysicsSystem".
@@ -37,8 +37,8 @@ export default class PhysicsSystem extends System {
                     physComponent.velZ -= sinSpeed / 1.5;
                 }
                 if (input.moveBackward) {
-                    physComponent.velX += sinSpeed;
-                    physComponent.velZ += cosSpeed;
+                    physComponent.velX += sinSpeed / 1.5;
+                    physComponent.velZ += cosSpeed / 1.5;
                 }
                 if (input.jump) {
                     let onGround = this.entityManager.getComponent<OnGroundComponent>(entity, ComponentId.OnGround);
@@ -49,12 +49,11 @@ export default class PhysicsSystem extends System {
                 }
 
                 let blockCollision = this.entityManager.getComponent<WallCollisionComponent>(entity, ComponentId.WallCollision);
-                    if (blockCollision.px && physComponent.velX > 0) physComponent.velX = 0;
+                if (blockCollision.px && physComponent.velX > 0) physComponent.velX = 0;
                 if (blockCollision.nx && physComponent.velX < 0) physComponent.velX = 0;
                 if (blockCollision.pz && physComponent.velZ > 0) physComponent.velZ = 0;
                 if (blockCollision.nz && physComponent.velZ < 0) physComponent.velZ = 0;
             }
-
 
 
             // TODO: Should use delta time here somewhere.

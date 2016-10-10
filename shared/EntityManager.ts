@@ -131,7 +131,7 @@ export default class EntityManager {
         let componentEntities = this.components.get(type);
         let component = componentEntities.get(entity);
         if (component) {
-            component.dispose(); // Hook into component in case it needs to do some cleanup.
+            component.dispose(this); // Hook into component in case it needs to do some cleanup.
             componentEntities.delete(entity);
             this.emit(EntityManagerEvent.ComponentRemoved, entity, type);
         }

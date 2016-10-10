@@ -33,7 +33,7 @@ export class Component {
         }
     }
 
-    dispose(): void {
+    dispose(entityManager: EntityManager): void {
     }
 }
 
@@ -183,6 +183,17 @@ export class InventoryComponent extends SerializableComponent {
 
     getEntity(slot: number): string {
         return this.slots[slot];
+    }
+
+    dispose(entityManager: EntityManager): void {
+        // When inventory is deleted, remove all its contents to avoid unused junk.
+        // This will probably change when players' data is saved between play sessions.
+        for(let i = 0; i < this.slots.length; i++) {
+            let entity = this.slots[i];
+            if(entity !== null) {
+                entityManager.removeEntity(entity);
+            }
+        }
     }
 }
 

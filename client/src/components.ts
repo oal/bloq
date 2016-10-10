@@ -10,10 +10,8 @@ export class MeshComponent extends Component {
 
     mesh: Mesh = null;
 
-    dispose(): void {
-        super.dispose();
+    dispose(entityManager: EntityManager): void {
         if(this.mesh && this.mesh.parent) {
-            //console.log('Disposing mesh.');
             this.mesh.geometry.dispose();
             this.mesh.parent.remove(this.mesh);
         }
