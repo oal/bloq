@@ -1,4 +1,4 @@
-import {System} from "../../../shared/systems";
+import {System} from "../../../shared/System";
 import {ComponentId, ActionId} from "../../../shared/constants";
 import {PositionComponent, InventoryComponent, BlockComponent} from "../../../shared/components";
 import {broadcastAction} from "../helpers";

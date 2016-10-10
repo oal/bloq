@@ -1,4 +1,4 @@
-import {System} from "../../../shared/systems";
+import {System} from "../../../shared/System";
 import {ServerActionManager} from "../actions";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId, Side, ActionId} from "../../../shared/constants";

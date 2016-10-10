@@ -1,4 +1,4 @@
-import {System} from "../systems";
+import {System} from "../System";
 import {ActionManager} from "../actions";
 import EntityManager from "../EntityManager";
 

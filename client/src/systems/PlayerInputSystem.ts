@@ -1,6 +1,6 @@
 import MouseManager from '../../lib/MouseManager';
 
-import {System} from "../../../shared/systems";
+import {System} from "../../../shared/System";
 import {ComponentId} from "../../../shared/constants";
 import {InputComponent, RotationComponent, InventoryComponent} from "../../../shared/components";
 import {PlayerSelectionComponent} from "../components";

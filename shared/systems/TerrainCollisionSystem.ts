@@ -1,5 +1,5 @@
-import {System} from "../systems";
-import {ComponentId, TERRAIN_CHUNK_SIZE} from "../constants";
+import {System} from "../System";
+import {ComponentId, TERRAIN_CHUNK_SIZE, PlayerJumpVelocity} from "../constants";
 import {
     PositionComponent, PhysicsComponent, TerrainChunkComponent, OnGroundComponent,
     WallCollisionComponent
@@ -49,13 +49,16 @@ export default class TerrainCollisionSystem extends System {
                 return chunk.getValue(lx, ly, lz)
             };
 
-            // Check and handle ground collisions.
-            if (checkCollisionAt(0, -0.1, 0)) {
+            // Check and handle ground collisions. If player velY === PlayerJumpVelocity it means player jumped this
+            // frame, and should not be anchored to ground again (have new OnGroundComponent assigned).
+            let yOffsetFromBlock = mod(posComponent.y, 1); // Player position offset compared to real ground level / block level.
+            if (physComponent.velY !== PlayerJumpVelocity && checkCollisionAt(0, -yOffsetFromBlock, 0)) {
                 // Clamp to ground, so player doesn't hover.
-                if (physComponent.velY < 0.0) {
-                    posComponent.y = (Math.round(Math.abs(posComponent.y) * 2) * Math.sign(posComponent.y)) / 2
+                if(physComponent.velY < 0) {
+                    posComponent.y = posComponent.y-yOffsetFromBlock+0.5;
+                    physComponent.velY = 0.0;
                 }
-                physComponent.velY = 0.0;
+
                 let onGround = new OnGroundComponent();
                 onGround.canJump = !checkCollisionAt(0, 3.1, 0); // Only able to jump unless there is a block overhead
                 this.entityManager.addComponent(entity, onGround);

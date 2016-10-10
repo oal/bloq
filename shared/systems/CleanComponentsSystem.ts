@@ -1,4 +1,4 @@
-import {System} from "../systems";
+import {System} from "../System";
 
 
 export class CleanComponentsSystem extends System {

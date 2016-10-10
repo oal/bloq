@@ -1,4 +1,4 @@
-import {System} from "../../../shared/systems";
+import {System} from "../../../shared/System";
 import {Terrain} from "../terrain";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId, ActionId} from "../../../shared/constants";

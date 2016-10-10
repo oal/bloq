@@ -1,4 +1,4 @@
-import {System} from "../systems";
+import {System} from "../System";
 import {ComponentId} from "../constants";
 import {PhysicsComponent, PositionComponent} from "../components";
 
@@ -11,9 +11,9 @@ export default class PositionSystem extends System {
 
             // Update positions.
             let posComponent = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Position);
-            posComponent.x += physComponent.velX;
-            posComponent.y += physComponent.velY;
-            posComponent.z += physComponent.velZ;
+            posComponent.x += physComponent.velX * dt;
+            posComponent.y += physComponent.velY * dt;
+            posComponent.z += physComponent.velZ * dt;
         })
     }
 }

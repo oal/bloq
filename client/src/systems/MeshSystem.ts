@@ -1,6 +1,6 @@
 import {Scene} from 'three';
 
-import {System} from "../../../shared/systems";
+import {System} from "../../../shared/System";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId} from "../../../shared/constants";
 import {MeshComponent} from "../components";

@@ -1,6 +1,6 @@
-import {Scene, Mesh, Vector3, Raycaster, MeshBasicMaterial, BoxGeometry} from 'three';
+import {Scene, Vector3, Raycaster} from 'three';
 
-import {System} from "../../../shared/systems";
+import {System} from "../../../shared/System";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId, Side} from "../../../shared/constants";
 import {PlayerSelectionComponent, MeshComponent} from "../components";

@@ -1,6 +1,6 @@
 import {WebGLRenderer} from 'three';
 
-import {System} from "../../../shared/systems";
+import {System} from "../../../shared/System";
 import {PositionComponent, RotationComponent, OnGroundComponent} from "../../../shared/components";
 import {ComponentId, TERRAIN_CHUNK_SIZE} from "../../../shared/constants";
 import {mod} from "../../../shared/helpers";

@@ -1,6 +1,6 @@
 import {Scene, ShaderMaterial, Mesh, Vector3} from 'three';
 
-import {System} from "../../../shared/systems";
+import {System} from "../../../shared/System";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId, TERRAIN_CHUNK_SIZE} from "../../../shared/constants";
 import {TerrainChunkComponent, PositionComponent} from "../../../shared/components";

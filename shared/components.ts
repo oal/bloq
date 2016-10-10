@@ -85,6 +85,10 @@ export class WallCollisionComponent extends SerializableComponent {
     public pz: boolean = false;
     public nx: boolean = false;
     public nz: boolean = false;
+
+    isColliding() {
+        return this.px || this.pz || this.nx || this.nz;
+    }
 }
 
 export class InputComponent extends SerializableComponent {

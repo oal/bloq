@@ -1,4 +1,4 @@
-import {System} from "../../../shared/systems";
+import {System} from "../../../shared/System";
 import {ComponentId} from "../../../shared/constants";
 import {NetworkComponent} from "../components";
 import Server from "../Server";
