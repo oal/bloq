@@ -31,11 +31,11 @@ export class Server {
         this.ws.onerror = this.onError.bind(this);
     }
 
-    onClose(evt: MessageEvent) {
+    private onClose(evt: MessageEvent) {
         console.log('close');
     }
 
-    onMessage(evt: MessageEvent) {
+    private onMessage(evt: MessageEvent) {
         //console.log('Got message');
         if (!(evt.data instanceof ArrayBuffer)) {
             console.error('Not array buffer!', evt.data);
@@ -81,7 +81,7 @@ export class Server {
         }
     }
 
-    onError(evt: MessageEvent) {
+    private onError(evt: MessageEvent) {
         console.log('error');
     }
 
@@ -101,9 +101,5 @@ export class Server {
         handlers.forEach((callback) => {
             callback(entity, components);
         })
-    }
-
-    sendEntity(data: Object) {
-        this.ws.send(JSON.stringify(data));
     }
 }

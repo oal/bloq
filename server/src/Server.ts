@@ -1,5 +1,5 @@
 import {Server as WebSocketServer} from 'uws';
-import {TextEncoder} from 'text-encoding';
+import {TextEncoder, TextDecoder} from 'text-encoding';
 
 import World from "./World";
 import {initPlayerEntity, updatePlayerInput, updatePlayerRotation, updatePlayerInventory} from "./entities";
@@ -21,6 +21,7 @@ export default class Server {
             host: '0.0.0.0',
             port: 8081
         });
+
         this.wss.on('connection', this.onConnect.bind(this));
 
         this.startGameLoop();
@@ -107,17 +108,34 @@ export default class Server {
         let netComponent = this.world.entityManager.getComponent<NetworkComponent>(playerEntity, ComponentId.Network);
         Server.sendEntity(netComponent.websocket, this.world.entityManager.serializeEntity(playerEntity));
 
-        ws.on('message', (data, flags) => {
-            let obj = JSON.parse(data);
-            if (obj.entity == playerEntity) {
-                if (objectHasKeys(obj.components, [ComponentId.Input, ComponentId.Position])) {
-                    updatePlayerInput(this.world.entityManager, this.world.actionManager, playerEntity, obj);
-                }
-                if (objectHasKeys(obj.components, [ComponentId.Rotation])) {
-                    updatePlayerRotation(this.world.entityManager, playerEntity, obj);
-                }
-                if (objectHasKeys(obj.components, [ComponentId.Inventory])) {
-                    updatePlayerInventory(this.world.entityManager, playerEntity, obj);
+        let textDecoder = new TextDecoder();
+        ws.on('message', (data: ArrayBuffer, flags) => {
+            // Each message starts with its length, followed by that many bytes of content.
+            // Length is always Uint16.
+            // TODO: Extract to its own method.
+            let pos = 0;
+            let view = new DataView(data);
+            while (pos < data.byteLength) {
+                // Read length.
+                let msgLength = view.getUint16(pos);
+                pos += Uint16Array.BYTES_PER_ELEMENT;
+
+                // Get message contents and decode JSON
+                let msg = data.slice(pos, pos + msgLength);
+                pos += msgLength;
+                let text = textDecoder.decode(msg);
+                let obj = JSON.parse(text);
+
+                if (obj.entity == playerEntity) {
+                    if (objectHasKeys(obj.components, [ComponentId.Input, ComponentId.Position])) {
+                        updatePlayerInput(this.world.entityManager, this.world.actionManager, playerEntity, obj);
+                    }
+                    if (objectHasKeys(obj.components, [ComponentId.Rotation])) {
+                        updatePlayerRotation(this.world.entityManager, playerEntity, obj);
+                    }
+                    if (objectHasKeys(obj.components, [ComponentId.Inventory])) {
+                        updatePlayerInventory(this.world.entityManager, playerEntity, obj);
+                    }
                 }
             }
         });

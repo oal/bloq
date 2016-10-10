@@ -30,6 +30,7 @@ import TerrainChunkInitializer from "./initializers/TerrainChunkInitializer";
 import PlayerInitializer from "./initializers/PlayerInitializer";
 import AnimatedMesh from "./AnimatedMesh";
 import InputInitializer from "./initializers/InputInitializer";
+import NetworkSystem from "./systems/NetworkSystem";
 
 
 export default class World extends BaseWorld {
@@ -90,6 +91,7 @@ export default class World extends BaseWorld {
     }
 
     addSystems() {
+        let netSystem = new NetworkSystem(this.entityManager, this.game.server);
         // TODO: Store system orders as constants in one place.
         this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), -1000); // Always process first
 
@@ -118,7 +120,7 @@ export default class World extends BaseWorld {
         let mouseManager = new MouseManager(this.game.renderer.domElement);
         this.addSystem(new PlayerInputSystem(this.entityManager, mouseManager, keyboardManager), -8);
 
-        this.addSystem(new PlayerInputSyncSystem(this.entityManager, this.game.server), 10);
+        this.addSystem(new PlayerInputSyncSystem(this.entityManager, netSystem, this.game.server), 10);
         this.addSystem(new MeshSystem(this.entityManager, this.scene), 11);
         this.addSystem(new PlayerMeshSystem(this.entityManager, this.scene), 12);
         this.addSystem(new PlayerSelectionSystem(this.entityManager, this.scene), 13);
@@ -126,6 +128,7 @@ export default class World extends BaseWorld {
 
         this.addSystem(new InventoryUISystem(this.entityManager), 999);
         this.addSystem(new DebugTextSystem(this.entityManager, this.game.renderer), 1000);
+        this.addSystem(netSystem, 1001);
     }
 
     tick(dt) {
