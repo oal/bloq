@@ -13,6 +13,7 @@ import {MoveEntityAction} from "../../shared/actions";
 import {globalToChunk} from "../../shared/helpers";
 import {broadcastAction} from "./helpers";
 import {ServerActionManager} from "./actions";
+import Server from "./Server";
 
 
 export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocket) {
@@ -29,7 +30,25 @@ export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocke
 
     em.addComponent(entity, new PhysicsComponent());
     em.addComponent(entity, new RotationComponent());
-    em.addComponent(entity, new InventoryComponent());
+
+    let inventory = new InventoryComponent();
+    for(let i = 0; i < 10; i++) {
+        let entity = em.createEntity();
+        let block = new BlockComponent();
+        block.kind = i+1;
+        block.count = 1;
+
+        em.addComponent(entity, block);
+        let pos = new PositionComponent();
+        pos.y = 15;
+        pos.x = 5;
+        pos.z = 5;
+        em.addComponent(entity, pos);
+
+        inventory.slots[i] = entity;
+        Server.sendEntity(ws, em.serializeEntity(entity));
+    }
+    em.addComponent(entity, inventory);
 
     em.addComponent(entity, new PlayerComponent()); // Treat as player / render as player? WIP
     em.addComponent(entity, new CurrentPlayerComponent()); // Treat as current player. A temporary way to signalize that this is the player to control.

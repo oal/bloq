@@ -18,6 +18,7 @@ void main() {
     else if(abs(fract(pos.y) - 0.5) < 0.0001) uv = fract(pos.xz)-0.5;
     else uv = fract(pos.xy)-0.5;
 
-    vec4 color = vec4(texture2D(texture, tex_pos(int(mat+0.1), uv)).rgb * col, 1.0);
-    gl_FragColor = color;
+    vec4 color = texture2D(texture, tex_pos(int(mat+0.1), uv));
+    if(color.a == 0.0) discard;
+    gl_FragColor = vec4(color.rgb * col, 1.0);
 }

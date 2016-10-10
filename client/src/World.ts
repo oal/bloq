@@ -73,7 +73,7 @@ export default class World extends BaseWorld {
                 }
             },
             vertexShader: require('../shaders/selection_vert.glsl'),
-            fragmentShader: require('../shaders/selection_frag.glsl'),
+            fragmentShader: require('../shaders/selection_frag.glsl')
         });
 
         this.blockMaterial = new ShaderMaterial({

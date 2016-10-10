@@ -227,6 +227,8 @@ function buildChunkArrays(data: Uint8Array, neighbors: Array<Array<Array<Uint8Ar
         colors[colorIdx++] = shadowVal;
     };
 
+    let transparentMaterials = new Set([0, 7]);
+
     // Low level, and kind of ugly, but it should not need to be changed very often.
     for (let z = 0; z < size; z++) {
         for (let y = 0; y < size; y++) {
@@ -236,7 +238,7 @@ function buildChunkArrays(data: Uint8Array, neighbors: Array<Array<Array<Uint8Ar
                     // Insert faces where an actual value (like dirt) meets air/empty block.
                     // Use relative indexes from "faces", and get nearby blocks to check if they
                     // should be shadowed or not.
-                    if (getPoint(x, y, z + 1) === 0) {
+                    if (transparentMaterials.has(getPoint(x, y, z + 1))) {
                         let face = faces[0];
                         for (let f = 0; f < 18; f += 3) {
                             addVertex(
@@ -245,7 +247,7 @@ function buildChunkArrays(data: Uint8Array, neighbors: Array<Array<Array<Uint8Ar
                             );
                         }
                     }
-                    if (getPoint(x, y, z - 1) === 0) {
+                    if (transparentMaterials.has(getPoint(x, y, z - 1))) {
                         let face = faces[1];
                         for (let f = 0; f < 18; f += 3) {
                             addVertex(
@@ -254,7 +256,7 @@ function buildChunkArrays(data: Uint8Array, neighbors: Array<Array<Array<Uint8Ar
                             );
                         }
                     }
-                    if (getPoint(x, y + 1, z) === 0) {
+                    if (transparentMaterials.has(getPoint(x, y + 1, z))) {
                         let face = faces[2];
                         for (let f = 0; f < 18; f += 3) {
                             addVertex(
@@ -263,7 +265,7 @@ function buildChunkArrays(data: Uint8Array, neighbors: Array<Array<Array<Uint8Ar
                             );
                         }
                     }
-                    if (getPoint(x, y - 1, z) === 0) {
+                    if (transparentMaterials.has(getPoint(x, y - 1, z))) {
                         let face = faces[3];
                         for (let f = 0; f < 18; f += 3) {
                             addVertex(
@@ -272,7 +274,7 @@ function buildChunkArrays(data: Uint8Array, neighbors: Array<Array<Array<Uint8Ar
                             );
                         }
                     }
-                    if (getPoint(x + 1, y, z) === 0) {
+                    if (transparentMaterials.has(getPoint(x + 1, y, z))) {
                         let face = faces[4];
                         for (let f = 0; f < 18; f += 3) {
                             addVertex(
@@ -281,7 +283,7 @@ function buildChunkArrays(data: Uint8Array, neighbors: Array<Array<Array<Uint8Ar
                             );
                         }
                     }
-                    if (getPoint(x - 1, y, z) === 0) {
+                    if (transparentMaterials.has(getPoint(x - 1, y, z))) {
                         let face = faces[5];
                         for (let f = 0; f < 18; f += 3) {
                             addVertex(
