@@ -79,8 +79,7 @@ export default class ChunkSubscriptionSystem extends System {
 
         let cumTime = 0.0;
         let startTime = clock(0);
-        //if(this.chunkQueue.length) console.log(`${this.chunkQueue.length} chunks left to send / generate.`);
-        while (cumTime < 2 && this.chunkQueue.length > 0) {
+        while (cumTime < 8 && this.chunkQueue.length > 0) {
             let [pos, playerEntity] = this.chunkQueue.shift();
             let [cx, cy, cz] = pos;
             let key = chunkKey(cx, cy, cz);
