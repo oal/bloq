@@ -16,7 +16,7 @@ export default class Server {
     world: World;
 
     constructor() {
-        this.world = new World();
+        this.world = new World(this);
 
         this.wss = new WebSocketServer({
             host: '0.0.0.0',
@@ -52,54 +52,36 @@ export default class Server {
         this.world.tick(dt);
     }
 
-    static sendEntity(ws: WebSocket, str: string) {
-        console.log('Sending entity:', str);
+    // TODO: These three might no longer belong here.
+    static sendEntity(netComponent: NetworkComponent, str: string) {
         let encoder = new TextEncoder();
         let bytes = encoder.encode(str);
 
-        let packet = new ArrayBuffer(Uint16Array.BYTES_PER_ELEMENT + bytes.length * bytes.BYTES_PER_ELEMENT);
-        let packetView = new DataView(packet);
-        for (let i = 0; i < bytes.length; i++) {
-            packetView.setUint8(i + Uint16Array.BYTES_PER_ELEMENT, bytes[i]);
-        }
-        packetView.setUint16(0, MessageType.Entity);
-
-        ws.send(packet);
+        netComponent.pushBuffer(MessageType.Entity, bytes.buffer);
     }
 
     // Could have been sendBinary or something, but currently only terrain is sent as binary
-    static sendTerrainChunk(ws: WebSocket, buf: ArrayBuffer) {
-        let packet = new ArrayBuffer(Uint16Array.BYTES_PER_ELEMENT + buf.byteLength);
-        let data = new Uint8Array(buf);
-
-        // TODO: There might be a builtin way to do this faster.
-        let packetView = new DataView(packet);
-        for (let i = 0; i < buf.byteLength; i++) {
-            packetView.setUint8(i + Uint16Array.BYTES_PER_ELEMENT, data[i]);
-        }
-
-        packetView.setUint16(0, MessageType.Terrain);
-        ws.send(packet);
+    static sendTerrainChunk(netComponent: NetworkComponent, buf: ArrayBuffer) {
+        netComponent.pushBuffer(MessageType.Terrain, buf);
     }
 
-    static sendAction(ws: WebSocket, actionId: ActionId, action: Action) {
+    static sendAction(netComponent: NetworkComponent, actionId: ActionId, action: Action) {
         let bytes = action.serialize();
 
         // Give room for message type and action ID.
-        const extraSpace = Uint16Array.BYTES_PER_ELEMENT * 2;
-        let packet = new ArrayBuffer(bytes.length * bytes.BYTES_PER_ELEMENT + extraSpace);
+        const extraSpace = Uint16Array.BYTES_PER_ELEMENT;
+        let packet = new ArrayBuffer(bytes.length + extraSpace);
         let packetView = new DataView(packet);
 
         // Set header data
-        packetView.setUint16(0, MessageType.Action);
-        packetView.setUint16(Uint16Array.BYTES_PER_ELEMENT, actionId);
+        packetView.setUint16(0, actionId);
 
         // Copy over message data.
         for (let i = 0; i < bytes.length; i++) {
             packetView.setUint8(i + extraSpace, bytes[i]);
         }
 
-        ws.send(packet);
+        netComponent.pushBuffer(MessageType.Action, packet);
     }
 
     onConnect(ws) {
@@ -107,7 +89,7 @@ export default class Server {
         initPlayerEntity(this.world.entityManager, playerEntity, ws);
 
         let netComponent = this.world.entityManager.getComponent<NetworkComponent>(playerEntity, ComponentId.Network);
-        Server.sendEntity(netComponent.websocket, this.world.entityManager.serializeEntity(playerEntity));
+        Server.sendEntity(netComponent, this.world.entityManager.serializeEntity(playerEntity));
 
         let textDecoder = new TextDecoder();
         ws.on('message', (data: ArrayBuffer, flags) => {

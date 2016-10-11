@@ -4,7 +4,6 @@ import {bufferToObject} from "./helpers";
 import {deserializeTerrainChunk} from "../../shared/helpers";
 
 
-
 export interface EntityMessage {
     entity: string,
     components: {
@@ -36,48 +35,56 @@ export class Server {
     }
 
     private onMessage(evt: MessageEvent) {
-        //console.log('Got message');
         if (!(evt.data instanceof ArrayBuffer)) {
             console.error('Not array buffer!', evt.data);
         }
 
-        let bufView = new DataView(evt.data);
-        let msgType = bufView.getUint16(0);
+        let buf = evt.data;
+        let bufView = new DataView(buf);
+        let bufPos = 0;
 
-        let data;
-        let obj;
-        switch(msgType) {
-            case MessageType.Entity:
-                data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
-                obj = bufferToObject(data) as EntityMessage;
+        while (bufPos < buf.byteLength) {
+            let msgLength = bufView.getUint16(bufPos);
+            bufPos += Uint16Array.BYTES_PER_ELEMENT;
 
-                Object.keys(obj.components).forEach(componentId => {
-                    let key = parseInt(componentId);
-                    this.emit(key as ComponentId, obj.entity, obj.components);
-                });
-                break;
+            let msgType = bufView.getUint16(bufPos);
+            bufPos += Uint16Array.BYTES_PER_ELEMENT;
 
-            case MessageType.Terrain:
-                data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT);
-                let [entity, component] = deserializeTerrainChunk(data);
+            let msgData = buf.slice(bufPos, bufPos + msgLength);
+            bufPos += msgLength;
 
-                let componentsObj = {};
-                componentsObj[ComponentId.TerrainChunk] = component;
-                this.emit(ComponentId.TerrainChunk, entity, componentsObj);
-                break;
+            let obj;
+            switch (msgType) {
+                case MessageType.Entity:
+                    obj = bufferToObject(msgData) as EntityMessage;
 
-            case MessageType.Action:
-                let actionId = bufView.getUint16(Uint16Array.BYTES_PER_ELEMENT);
-                data = evt.data.slice(Uint16Array.BYTES_PER_ELEMENT * 2);
+                    Object.keys(obj.components).forEach(componentId => {
+                        let key = parseInt(componentId);
+                        this.emit(key as ComponentId, obj.entity, obj.components);
+                    });
+                    break;
 
-                obj = bufferToObject(data);
+                case MessageType.Terrain:
+                    let [entity, component] = deserializeTerrainChunk(msgData);
 
-                // Queue action directly. No "event" to be emitted.
-                this.game.world.actionManager.queueRawAction(actionId, obj);
-                break;
+                    let componentsObj = {};
+                    componentsObj[ComponentId.TerrainChunk] = component;
+                    this.emit(ComponentId.TerrainChunk, entity, componentsObj);
+                    break;
 
-            default:
-                console.warn('Unknown message type: ', msgType)
+                case MessageType.Action:
+                    let actionId = new DataView(msgData).getUint16(0);
+                    let data = msgData.slice(Uint16Array.BYTES_PER_ELEMENT);
+
+                    obj = bufferToObject(data);
+
+                    // Queue action directly. No "event" to be emitted.
+                    this.game.world.actionManager.queueRawAction(actionId, obj);
+                    break;
+
+                default:
+                    console.warn('Unknown message type: ', msgType, msgData.byteLength)
+            }
         }
     }
 
@@ -87,7 +94,7 @@ export class Server {
 
     addEventListener(componentId: ComponentId, listener) {
         let handlers = this.componentHandlers.get(componentId);
-        if(!handlers) {
+        if (!handlers) {
             handlers = [];
             this.componentHandlers.set(componentId, handlers);
         }
@@ -96,7 +103,7 @@ export class Server {
 
     private emit(componentId: ComponentId, entity: string, components: Object) {
         let handlers = this.componentHandlers.get(componentId);
-        if(!handlers) return;
+        if (!handlers) return;
 
         handlers.forEach((callback) => {
             callback(entity, components);

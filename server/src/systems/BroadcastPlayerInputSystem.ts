@@ -28,7 +28,7 @@ export default class BroadcastPlayerInputSystem extends System {
                 let netComponent = component as NetworkComponent;
                 changedInputs.forEach((serializedComponents, changedEntity) => {
                     if (changedEntity === entity) return;
-                    Server.sendEntity(netComponent.websocket, serializedComponents);
+                    Server.sendEntity(netComponent, serializedComponents);
                 });
             })
         }
@@ -38,7 +38,7 @@ export default class BroadcastPlayerInputSystem extends System {
                 let netComponent = component as NetworkComponent;
                 changedRots.forEach((serializedRot, changedEntity) => {
                     if (changedEntity === entity) return;
-                    Server.sendEntity(netComponent.websocket, serializedRot)
+                    Server.sendEntity(netComponent, serializedRot)
                 })
             })
         }

@@ -32,10 +32,10 @@ export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocke
     em.addComponent(entity, new RotationComponent());
 
     let inventory = new InventoryComponent();
-    for(let i = 0; i < 10; i++) {
+    for (let i = 0; i < 10; i++) {
         let entity = em.createEntity();
         let block = new BlockComponent();
-        block.kind = i+1;
+        block.kind = i + 1;
         block.count = 1;
 
         em.addComponent(entity, block);
@@ -46,7 +46,7 @@ export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocke
         em.addComponent(entity, pos);
 
         inventory.slots[i] = entity;
-        Server.sendEntity(ws, em.serializeEntity(entity));
+        Server.sendEntity(net, em.serializeEntity(entity));
     }
     em.addComponent(entity, inventory);
 

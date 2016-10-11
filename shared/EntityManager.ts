@@ -74,9 +74,7 @@ export default class EntityManager {
             let component = this.components.get(typeName).get(entity);
             if (component instanceof SerializableComponent) {
                 components.push(`"${typeName}":${component.serialize()}`);
-            } else if (!component) {
-                console.error(`Tried to serialize ${component}`)
-            } else {
+            } else if(component) {
                 console.warn(`Tried to serialize non-serializeable component: "${component.typeName()}"`)
             }
         });

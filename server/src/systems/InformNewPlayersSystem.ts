@@ -1,7 +1,6 @@
 import {System} from "../../../shared/System";
-import {ComponentId} from "../../../shared/constants";
+import {ComponentId, MessageType} from "../../../shared/constants";
 import {NetworkComponent} from "../components";
-import Server from "../Server";
 
 
 export default class InformNewPlayersSystem extends System {
@@ -18,26 +17,26 @@ export default class InformNewPlayersSystem extends System {
 
         this.entityManager.getEntities(ComponentId.NewPlayer).forEach((component, newEntity) => {
             let newPlayerData = this.entityManager.serializeEntity(newEntity, syncComponents);
+            console.log(newPlayerData);
             let existingPlayerDatas = [];
 
             // Send info about new player to existing players.
             this.entityManager.getEntities(ComponentId.Player).forEach((component, existingEntity) => {
                 if (existingEntity == newEntity) return; // Never send info about the new player to themselves.
-                let ws = this.entityManager.getComponent<NetworkComponent>(existingEntity, ComponentId.Network);
-                Server.sendEntity(ws.websocket, newPlayerData);
+                let netComponent = this.entityManager.getComponent<NetworkComponent>(existingEntity, ComponentId.Network);
+                netComponent.pushBuffer(MessageType.Entity, newPlayerData);
 
                 existingPlayerDatas.push(this.entityManager.serializeEntity(existingEntity, syncComponents));
             });
 
             // Inform new player about existing players.
-            let ws = this.entityManager.getComponent<NetworkComponent>(newEntity, ComponentId.Network);
+            let netComponent = this.entityManager.getComponent<NetworkComponent>(newEntity, ComponentId.Network);
             existingPlayerDatas.forEach(data => {
-                Server.sendEntity(ws.websocket, data);
+                netComponent.pushBuffer(MessageType.Entity, data);
             });
 
-
             this.entityManager.getEntities(ComponentId.Pickable).forEach((component, pickableEntity) => {
-                Server.sendEntity(ws.websocket, this.entityManager.serializeEntity(pickableEntity));
+                netComponent.pushBuffer(MessageType.Entity, this.entityManager.serializeEntity(pickableEntity));
             });
 
             console.log('New player informed.');

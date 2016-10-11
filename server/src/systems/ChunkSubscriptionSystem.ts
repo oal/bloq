@@ -9,10 +9,10 @@ import Server from "../Server";
 import {UnsubscribeTerrainChunksAction} from "../../../shared/actions";
 
 
-let clock = (start) : (number | number[]) => {
-    if ( !start ) return process.hrtime();
+let clock = (start): (number | number[]) => {
+    if (!start) return process.hrtime();
     let end = process.hrtime(start);
-    return Math.round((end[0]*1000) + (end[1]/1000000));
+    return Math.round((end[0] * 1000) + (end[1] / 1000000));
 };
 
 export default class ChunkSubscriptionSystem extends System {
@@ -44,10 +44,10 @@ export default class ChunkSubscriptionSystem extends System {
                 const viewDist = 4;
                 for (let dist = 0; dist <= viewDist; dist++) {
                     for (let z = -viewDist; z <= viewDist; z++) {
-                        for (let y = -viewDist/2; y <= viewDist/2; y++) {
+                        for (let y = -viewDist / 2; y <= viewDist / 2; y++) {
                             for (let x = -viewDist; x <= viewDist; x++) {
-                                let realDist = Math.sqrt(x*x+y*y+z*z);
-                                if(realDist < dist || realDist > dist+1) continue;
+                                let realDist = Math.sqrt(x * x + y * y + z * z);
+                                if (realDist < dist || realDist > dist + 1) continue;
 
                                 let [cx, cy, cz] = [currChunk[0] + x, currChunk[1] + y, currChunk[2] + z];
                                 let key = chunkKey(cx, cy, cz);
@@ -69,7 +69,7 @@ export default class ChunkSubscriptionSystem extends System {
                     if (!newChunkSubs.has(chunkKey)) unsubChunks.push(chunkKey)
                 });
                 if (unsubChunks.length) {
-                    Server.sendAction(netComponent.websocket, ActionId.UnsubscribeTerrainChunks, new UnsubscribeTerrainChunksAction(unsubChunks));
+                    Server.sendAction(netComponent, ActionId.UnsubscribeTerrainChunks, new UnsubscribeTerrainChunksAction(unsubChunks));
                 }
 
                 // Update chunk subscription.
@@ -92,7 +92,7 @@ export default class ChunkSubscriptionSystem extends System {
             }
 
             let netComponent = this.entityManager.getComponent<NetworkComponent>(playerEntity, ComponentId.Network);
-            Server.sendTerrainChunk(netComponent.websocket, chunkComponent.serialize().buffer);
+            Server.sendTerrainChunk(netComponent, chunkComponent.serialize().buffer);
 
             cumTime += clock(startTime) as number;
             startTime = clock(0);

@@ -12,12 +12,12 @@ export function broadcastAction(em: EntityManager, chunk: [number, number, numbe
     em.getEntities(ComponentId.ChunkSubscription).forEach((component, entity) => {
         // If we are going to remove an entity, and this entity a networked entity (Player),
         // it means this player has disconnected, so no need to try sending on a closed socket.
-        if(actionId === ActionId.RemoveEntities && (action as RemoveEntitiesAction).entities.indexOf(entity) !== -1) return;
+        if (actionId === ActionId.RemoveEntities && (action as RemoveEntitiesAction).entities.indexOf(entity) !== -1) return;
 
         let subComponent = component as ChunkSubscriptionComponent;
-        if(subComponent.chunks.has(key)) {
+        if (subComponent.chunks.has(key)) {
             let netComponent = em.getComponent<NetworkComponent>(entity, ComponentId.Network);
-            Server.sendAction(netComponent.websocket, actionId, action);
+            Server.sendAction(netComponent, actionId, action);
         }
     });
 }
@@ -28,9 +28,9 @@ export function broadcastEntity(em: EntityManager, chunk: [number, number, numbe
     em.getEntities(ComponentId.ChunkSubscription).forEach((component, entity) => {
         let subComponent = component as ChunkSubscriptionComponent;
 
-        if(subComponent.chunks.has(key)) {
+        if (subComponent.chunks.has(key)) {
             let netComponent = em.getComponent<NetworkComponent>(entity, ComponentId.Network);
-            Server.sendEntity(netComponent.websocket, em.serializeEntity(blockEntity));
+            Server.sendEntity(netComponent, em.serializeEntity(blockEntity));
         }
     });
 }

@@ -9,15 +9,16 @@ import BroadcastPlayerInputSystem from "./systems/BroadcastPlayerInputSystem";
 import ChunkSubscriptionSystem from "./systems/ChunkSubscriptionSystem";
 import PlayerActionSystem from "./systems/PlayerActionSystem";
 import PickUpSystem from "./systems/PickUpSystem";
-import {EntityManagerEvent} from "../../shared/EntityManager";
 import BroadcastEntitySystem from "./systems/BroadcastEntitySystem";
 import DatabaseSystem from "./systems/DatabaseSystem";
+import NetworkSystem from "./systems/NetworkSystem";
+import Server from "./Server";
 
 
 export default class World extends BaseWorld {
     terrain = new Terrain();
 
-    constructor() {
+    constructor(server: Server) {
         super();
         this.actionManager = new ServerActionManager();
 
@@ -31,6 +32,8 @@ export default class World extends BaseWorld {
         this.addSystem(new PickUpSystem(this.entityManager), 102);
         this.addSystem(new BroadcastEntitySystem(this.entityManager), 103);
 
+        this.addSystem(new NetworkSystem(this.entityManager, server), 409);
+
         // Create DB system, restore world / entity manager, and then start listening for changes.
         let dbSystem = new DatabaseSystem(this.entityManager);
         this.addSystem(dbSystem, 500);
@@ -38,6 +41,7 @@ export default class World extends BaseWorld {
             console.log('Loaded entities from database.');
             dbSystem.registerEntityEvents();
         });
+
 
         console.log(this.systems);
         console.log(this.systemsOrder)
