@@ -22,23 +22,28 @@ export default class ChatSystem extends System {
         this.entityManager.getEntities(ComponentId.CurrentPlayer).forEach((component, entity) => {
             let messageComponent = this.entityManager.getComponent<ChatMessageComponent>(entity, ComponentId.ChatMessage);
 
-            // TODO: Clean up.
-            if (this.keyboardManager.isPressed('T'.charCodeAt(0)) && !messageComponent) {
+            if (!messageComponent && this.keyboardManager.isPressed('T'.charCodeAt(0))) {
+                // Create new ChatMessageComponent, and focus field
                 this.entityManager.addComponent(entity, new ChatMessageComponent());
 
                 this.messageInput.disabled = false;
                 this.messageInput.focus();
-            } else if (this.keyboardManager.isPressed(13 /* enter */) && messageComponent) {
-                messageComponent.text = this.messageInput.value;
-                let data = this.entityManager.serializeEntity(entity, [ComponentId.ChatMessage]);
-                this.netSystem.pushBuffer(data);
+            } else if (messageComponent) {
+                // Send by pressing enter
+                let messageSent = false;
+                if (this.keyboardManager.isPressed(13 /* enter */)) {
+                    messageComponent.text = this.messageInput.value;
+                    let data = this.entityManager.serializeEntity(entity, [ComponentId.ChatMessage]);
+                    this.netSystem.pushBuffer(data);
+                    messageSent = true;
+                }
 
-                this.entityManager.removeComponentType(entity, ComponentId.ChatMessage);
-
-                this.messageInput.value = '';
-            } else if (!messageComponent) {
-                this.messageInput.disabled = true;
-                return;
+                // If sent, or game has lost focus (dark overlay is displayed), reset message box.
+                if (messageSent || !document.pointerLockElement) {
+                    this.entityManager.removeComponentType(entity, ComponentId.ChatMessage);
+                    this.messageInput.value = '';
+                    this.messageInput.disabled = true;
+                }
             }
         });
     }
