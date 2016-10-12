@@ -10,7 +10,6 @@ import {objectHasKeys} from "../../shared/helpers";
 import {NetworkComponent} from "./components";
 import {ComponentId, ActionId, MessageType} from "../../shared/constants";
 import {Action} from "../../shared/actions";
-import {BlockComponent} from "../../shared/components";
 
 let hrtimeToSeconds = (hrtime: number[]) => hrtime[0] + hrtime[1] / 1000000000;
 
@@ -23,7 +22,8 @@ export default class Server {
 
         this.wss = new WebSocketServer({
             host: '0.0.0.0',
-            port: 8081
+            port: 8081,
+            perMessageDeflate: true,
         });
 
         this.wss.on('connection', this.onConnect.bind(this));
