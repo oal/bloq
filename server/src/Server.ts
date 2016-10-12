@@ -4,7 +4,7 @@ import {TextEncoder, TextDecoder} from 'text-encoding';
 import World from "./World";
 import {
     initPlayerEntity, updatePlayerInput, updatePlayerRotation, updatePlayerInventory,
-    updatePlayerPosition
+    updatePlayerPosition, updateChatLog
 } from "./entities";
 import {objectHasKeys} from "../../shared/helpers";
 import {NetworkComponent} from "./components";
@@ -112,6 +112,7 @@ export default class Server {
                 let text = textDecoder.decode(msg);
                 let obj = JSON.parse(text);
 
+                // Need something similar to "Initializers" that I have on client, also on server.
                 if (obj.entity == playerEntity) {
                     if (objectHasKeys(obj.components, [ComponentId.Input, ComponentId.Position])) {
                         updatePlayerInput(this.world.entityManager, playerEntity, obj);
@@ -124,6 +125,9 @@ export default class Server {
                     }
                     if (objectHasKeys(obj.components, [ComponentId.Inventory])) {
                         updatePlayerInventory(this.world.entityManager, playerEntity, obj);
+                    }
+                    if (objectHasKeys(obj.components, [ComponentId.ChatMessage])) {
+                        updateChatLog(this.world.entityManager, playerEntity, obj);
                     }
                 }
             }

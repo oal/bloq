@@ -8,13 +8,11 @@ import NetworkSystem from "./NetworkSystem";
 
 export default class PlayerInputSyncSystem extends System {
     private netSystem: NetworkSystem;
-    private server: Server;
     private timeSincePositionSync: number = 0.0;
 
-    constructor(em: EntityManager, netSystem: NetworkSystem, server: Server) {
+    constructor(em: EntityManager, netSystem: NetworkSystem) {
         super(em);
         this.netSystem = netSystem;
-        this.server = server;
     }
 
     update(dt: number) {

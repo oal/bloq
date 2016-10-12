@@ -205,6 +205,18 @@ export class BlockComponent extends SerializableComponent {
     count: number = 1;
 }
 
+export class ChatLogComponent extends SerializableComponent {
+    static ID = ComponentId.ChatLog;
+
+    messages: Array<string>; // list of entities
+}
+
+export class ChatMessageComponent extends SerializableComponent {
+    static ID = ComponentId.ChatMessage;
+
+    text: string;
+}
+
 
 export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new PositionComponent());
@@ -217,4 +229,6 @@ export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new TerrainChunkComponent());
     manager.registerComponentType(new InventoryComponent());
     manager.registerComponentType(new BlockComponent());
+    manager.registerComponentType(new ChatLogComponent());
+    manager.registerComponentType(new ChatMessageComponent());
 }

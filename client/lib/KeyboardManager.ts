@@ -22,7 +22,7 @@ export default class KeyboardManager {
         }, false);
     }
 
-    isPressed(key: string) {
-        return this.pressedKeys.has(key.charCodeAt(0));
+    isPressed(keyCode: number) {
+        return this.pressedKeys.has(keyCode);
     }
 }

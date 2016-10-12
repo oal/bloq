@@ -20,14 +20,19 @@ export default class PlayerInputSystem extends System {
 
     update(dt: number) {
         this.entityManager.getEntities(ComponentId.CurrentPlayer).forEach((component, entity) => {
+            // Block any input while player has ChatMessageComponent (writing chat message)
+            if(this.entityManager.hasComponent(entity, ComponentId.ChatMessage)) {
+                return;
+            }
+
             // Movement related
             let input = this.entityManager.getComponent<InputComponent>(entity, ComponentId.Input);
 
-            let moveForward = this.keyboardManager.isPressed('W');
-            let moveLeft = this.keyboardManager.isPressed('A');
-            let moveRight = this.keyboardManager.isPressed('D');
-            let moveBackward = this.keyboardManager.isPressed('S');
-            let jump = this.keyboardManager.isPressed(' ');
+            let moveForward = this.keyboardManager.isPressed('W'.charCodeAt(0));
+            let moveLeft = this.keyboardManager.isPressed('A'.charCodeAt(0));
+            let moveRight = this.keyboardManager.isPressed('D'.charCodeAt(0));
+            let moveBackward = this.keyboardManager.isPressed('S'.charCodeAt(0));
+            let jump = this.keyboardManager.isPressed(' '.charCodeAt(0));
 
             if (moveForward !== input.moveForward) {
                 input.moveForward = moveForward;
@@ -82,7 +87,7 @@ export default class PlayerInputSystem extends System {
 
             // Update slot based on number keys pressed.
             ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].forEach(numKey => {
-                if (this.keyboardManager.isPressed(numKey)) {
+                if (this.keyboardManager.isPressed(numKey.charCodeAt(0))) {
                     // 0 is the rightmost slot, so we need to adjust by one.
                     inventory.activeSlot = (parseInt(numKey) + 9) % 10;
                 }

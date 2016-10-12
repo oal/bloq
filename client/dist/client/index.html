@@ -80,6 +80,64 @@
             box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
         }
 
+        #chat {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            min-width: 33vw;
+            z-index: 4;
+        }
+
+        #chat-log {
+            margin: 0;
+            padding: 0.5vw;
+            list-style: none;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+
+        #chat-log li {
+            margin: 0;
+            padding: 0;
+            color: #fff;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.25);
+            display: flex;
+        }
+
+        #chat-log li:nth-child(3) {
+            opacity: 0.8
+        }
+
+        #chat-log li:nth-child(4) {
+            opacity: 0.6
+        }
+
+        #chat-log li:nth-child(5) {
+            opacity: 0.4
+        }
+
+        #chat-log li:nth-child(6) {
+            opacity: 0.2
+        }
+        #chat-log li:nth-child(7) {
+            opacity: 0.1
+        }
+
+        #chat-log strong {
+            width: 33%;
+        }
+
+        #chat-input {
+            font-family: 'Skranji', sans-serif;
+            box-sizing: border-box;
+            padding: 0.5vw;
+            width: 100%;
+            background: transparent;
+            border: 0;
+            outline: none;
+            color: #fff;
+        }
+
         #inventory {
             position: absolute;
             z-index: 3;
@@ -125,7 +183,7 @@
 
             background-size: cover;
             color: #fff;
-            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(0, 0, 0, 0.8);
             box-shadow: 0 0 1px rgba(0, 0, 0, 0.6) inset;
         }
     </style>
@@ -142,6 +200,19 @@
     <div id="overlay"></div>
 
     <div id="crosshair"></div>
+
+    <div id="chat">
+        <ul id="chat-log">
+            <li><strong>Player 1</strong><span>message</span></li>
+            <li><strong>Player 2</strong><span>sdsds</span></li>
+            <li><strong>Player 3</strong><span>meddfdf dsfsf  sdfsdf  sdf sdfssage</span></li>
+            <li><strong>Player 4</strong><span>meddfdf dsfsf  sdfsdf  sdf sdfssage</span></li>
+            <li><strong>Player 5</strong><span>message asd asdad</span></li>
+            <li><strong>Player 6</strong><span>meddfdf dsfsf  sdfsdf  sdf sdfssage</span></li>
+            <li><strong>Player 7</strong><span>sdsds</span></li>
+        </ul>
+        <input id="chat-input" type="text" autocomplete="false" placeholder="Press T to chat">
+    </div>
 
     <div id="inventory">
         <ol class="inventory-row">

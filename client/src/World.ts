@@ -31,6 +31,7 @@ import PlayerInitializer from "./initializers/PlayerInitializer";
 import AnimatedMesh from "./AnimatedMesh";
 import InputInitializer from "./initializers/InputInitializer";
 import NetworkSystem from "./systems/NetworkSystem";
+import ChatSystem from "./systems/ChatSystem";
 
 
 export default class World extends BaseWorld {
@@ -117,10 +118,11 @@ export default class World extends BaseWorld {
 
 
         let keyboardManager = new KeyboardManager(this.game.renderer.domElement);
+        this.addSystem(new ChatSystem(this.entityManager, keyboardManager, netSystem), -8);
         let mouseManager = new MouseManager(this.game.renderer.domElement);
-        this.addSystem(new PlayerInputSystem(this.entityManager, mouseManager, keyboardManager), -8);
+        this.addSystem(new PlayerInputSystem(this.entityManager, mouseManager, keyboardManager), -7);
 
-        this.addSystem(new PlayerInputSyncSystem(this.entityManager, netSystem, this.game.server), 10);
+        this.addSystem(new PlayerInputSyncSystem(this.entityManager, netSystem), 10);
         this.addSystem(new MeshSystem(this.entityManager, this.scene), 11);
         this.addSystem(new PlayerMeshSystem(this.entityManager, this.scene), 12);
         this.addSystem(new PlayerSelectionSystem(this.entityManager, this.scene), 13);

@@ -99,6 +99,11 @@ export function updatePlayerInventory(em: EntityManager, playerEntity, obj) {
     inventory.activeSlot = inventoryData.activeSlot;
 }
 
+export function updateChatLog(em: EntityManager, playerEntity, obj) {
+    let msg = obj.components[ComponentId.ChatMessage];
+    em.addComponentFromObject(playerEntity, ComponentId.ChatMessage, msg);
+}
+
 export function initBlockEntity(em: EntityManager, x: number, y: number, z: number, kind: BlockId): string {
     let blockEntity = em.createEntity();
     let pos = new PositionComponent();

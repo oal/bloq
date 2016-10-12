@@ -19,6 +19,8 @@ export const enum ComponentId {
     TerrainChunk,
     Inventory,
     Block,
+    ChatLog,
+    ChatMessage,
 
     // Client
     Mesh,
