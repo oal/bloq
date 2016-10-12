@@ -2,7 +2,10 @@ import {Server as WebSocketServer} from 'uws';
 import {TextEncoder, TextDecoder} from 'text-encoding';
 
 import World from "./World";
-import {initPlayerEntity, updatePlayerInput, updatePlayerRotation, updatePlayerInventory} from "./entities";
+import {
+    initPlayerEntity, updatePlayerInput, updatePlayerRotation, updatePlayerInventory,
+    updatePlayerPosition
+} from "./entities";
 import {objectHasKeys} from "../../shared/helpers";
 import {NetworkComponent} from "./components";
 import {ComponentId, ActionId, MessageType} from "../../shared/constants";
@@ -111,7 +114,10 @@ export default class Server {
 
                 if (obj.entity == playerEntity) {
                     if (objectHasKeys(obj.components, [ComponentId.Input, ComponentId.Position])) {
-                        updatePlayerInput(this.world.entityManager, this.world.actionManager, playerEntity, obj);
+                        updatePlayerInput(this.world.entityManager, playerEntity, obj);
+                    }
+                    if (objectHasKeys(obj.components, [ComponentId.Position])) {
+                        updatePlayerPosition(this.world.entityManager, this.world.actionManager, playerEntity, obj);
                     }
                     if (objectHasKeys(obj.components, [ComponentId.Rotation])) {
                         updatePlayerRotation(this.world.entityManager, playerEntity, obj);

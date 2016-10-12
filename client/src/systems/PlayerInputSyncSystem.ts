@@ -7,8 +7,9 @@ import NetworkSystem from "./NetworkSystem";
 
 
 export default class PlayerInputSyncSystem extends System {
-    netSystem: NetworkSystem;
-    server: Server;
+    private netSystem: NetworkSystem;
+    private server: Server;
+    private timeSincePositionSync: number = 0.0;
 
     constructor(em: EntityManager, netSystem: NetworkSystem, server: Server) {
         super(em);
@@ -18,13 +19,15 @@ export default class PlayerInputSyncSystem extends System {
 
     update(dt: number) {
         this.entityManager.getEntities(ComponentId.CurrentPlayer).forEach((component, entity) => {
+            let positionSync = false;
             let input = this.entityManager.getComponent<InputComponent>(entity, ComponentId.Input);
 
             if (input.isDirty()) {
                 this.netSystem.pushBuffer(this.entityManager.serializeEntity(entity, [
                     ComponentId.Position,
                     ComponentId.Input
-                ]))
+                ]));
+                positionSync = true;
             }
 
             let rot = this.entityManager.getComponent<RotationComponent>(entity, ComponentId.Rotation);
@@ -40,6 +43,19 @@ export default class PlayerInputSyncSystem extends System {
                     ComponentId.Inventory
                 ]))
             }
-        })
+
+            // Sync position if it was last done >250ms ago.
+            if(!positionSync) {
+                if(this.timeSincePositionSync > 0.25) {
+                    this.netSystem.pushBuffer(this.entityManager.serializeEntity(entity, [
+                        ComponentId.Position
+                    ]));
+                    this.timeSincePositionSync = 0;
+                }
+                this.timeSincePositionSync += dt;
+            }
+        });
+
+
     }
 }

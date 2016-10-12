@@ -58,11 +58,13 @@ export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocke
     em.addComponent(entity, new ChunkSubscriptionComponent())
 }
 
-export function updatePlayerInput(em: EntityManager, am: ServerActionManager, playerEntity: string, obj) {
+export function updatePlayerInput(em: EntityManager, playerEntity: string, obj) {
     let input = obj.components[ComponentId.Input];
     let existingInput = em.getComponent<InputComponent>(playerEntity, ComponentId.Input);
     existingInput.update(input);
+}
 
+export function updatePlayerPosition(em: EntityManager, am: ServerActionManager, playerEntity: string, obj) {
     let position = obj.components[ComponentId.Position];
     let existingPosition = em.getComponent<PositionComponent>(playerEntity, ComponentId.Position);
     let prevPos: [number, number, number] = [existingPosition.x, existingPosition.y, existingPosition.z];
