@@ -2,7 +2,7 @@ import EntityManager from "../../shared/EntityManager";
 import {
     InputComponent, PositionComponent,
     CurrentPlayerComponent, PhysicsComponent, RotationComponent, WallCollisionComponent, InventoryComponent,
-    BlockComponent
+    BlockComponent, ChatMessageComponent
 } from "../../shared/components";
 import {
     NetworkComponent, NewPlayerComponent, PlayerComponent, ChunkSubscriptionComponent,

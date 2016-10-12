@@ -61,6 +61,7 @@
             right: 0;
             bottom: 0;
             left: 0;
+            z-index: 999;
         }
 
         #crosshair {
@@ -84,7 +85,7 @@
             position: absolute;
             left: 0;
             bottom: 0;
-            min-width: 33vw;
+            width: 25vw;
             z-index: 4;
         }
 
@@ -100,7 +101,7 @@
             margin: 0;
             padding: 0;
             color: #fff;
-            text-shadow: 0 1px 1px rgba(0,0,0,0.25);
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
             display: flex;
         }
 
@@ -119,12 +120,20 @@
         #chat-log li:nth-child(6) {
             opacity: 0.2
         }
+
         #chat-log li:nth-child(7) {
             opacity: 0.1
         }
 
         #chat-log strong {
+            display: block;
             width: 33%;
+        }
+
+        #chat-log span {
+            display: block;
+            width: 67%;
+            overflow-wrap: break-word;
         }
 
         #chat-input {
@@ -202,15 +211,7 @@
     <div id="crosshair"></div>
 
     <div id="chat">
-        <ul id="chat-log">
-            <li><strong>Player 1</strong><span>message</span></li>
-            <li><strong>Player 2</strong><span>sdsds</span></li>
-            <li><strong>Player 3</strong><span>meddfdf dsfsf  sdfsdf  sdf sdfssage</span></li>
-            <li><strong>Player 4</strong><span>meddfdf dsfsf  sdfsdf  sdf sdfssage</span></li>
-            <li><strong>Player 5</strong><span>message asd asdad</span></li>
-            <li><strong>Player 6</strong><span>meddfdf dsfsf  sdfsdf  sdf sdfssage</span></li>
-            <li><strong>Player 7</strong><span>sdsds</span></li>
-        </ul>
+        <ul id="chat-log"></ul>
         <input id="chat-input" type="text" autocomplete="false" placeholder="Press T to chat">
     </div>
 

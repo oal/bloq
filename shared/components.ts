@@ -214,6 +214,7 @@ export class ChatLogComponent extends SerializableComponent {
 export class ChatMessageComponent extends SerializableComponent {
     static ID = ComponentId.ChatMessage;
 
+    from: string;
     text: string;
 }
 

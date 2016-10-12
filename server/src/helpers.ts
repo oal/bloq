@@ -22,15 +22,15 @@ export function broadcastAction(em: EntityManager, chunk: [number, number, numbe
     });
 }
 
-export function broadcastEntity(em: EntityManager, chunk: [number, number, number], blockEntity: string) {
+export function broadcastEntity(em: EntityManager, chunk: [number, number, number], entity: string) {
     let key = chunkKey(chunk[0], chunk[1], chunk[2]);
 
-    em.getEntities(ComponentId.ChunkSubscription).forEach((component, entity) => {
+    em.getEntities(ComponentId.ChunkSubscription).forEach((component, playerEntity) => {
         let subComponent = component as ChunkSubscriptionComponent;
 
         if (subComponent.chunks.has(key)) {
-            let netComponent = em.getComponent<NetworkComponent>(entity, ComponentId.Network);
-            Server.sendEntity(netComponent, em.serializeEntity(blockEntity));
+            let netComponent = em.getComponent<NetworkComponent>(playerEntity, ComponentId.Network);
+            Server.sendEntity(netComponent, em.serializeEntity(entity));
         }
     });
 }

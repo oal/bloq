@@ -32,6 +32,7 @@ import AnimatedMesh from "./AnimatedMesh";
 import InputInitializer from "./initializers/InputInitializer";
 import NetworkSystem from "./systems/NetworkSystem";
 import ChatSystem from "./systems/ChatSystem";
+import ChatMessageInitializer from "./initializers/ChatMessageInitializer";
 
 
 export default class World extends BaseWorld {
@@ -111,6 +112,7 @@ export default class World extends BaseWorld {
         let inputInitializer = new InputInitializer(this.entityManager);
         entitySystem.addInitializer(ComponentId.Input, inputInitializer);
         entitySystem.addInitializer(ComponentId.Rotation, inputInitializer);
+        entitySystem.addInitializer(ComponentId.ChatMessage, new ChatMessageInitializer(this.entityManager));
         this.addSystem(entitySystem, -11);
 
         this.addSystem(new TerrainChunkSystem(this.entityManager, this.scene, this.terrainMaterial), -10);

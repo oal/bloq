@@ -60,7 +60,12 @@ export const enum ActionId {
     PickUpEntity
 }
 
+// Physics
 export const PlayerSpeed = 6;
 export const PlayerJumpVelocity = 15;
 export const Gravity = 90;
 export const TerminalVelocity = 45;
+
+// Chat
+export const ChatLogSize = 6;
+export const ChatMaxLength = 120;
