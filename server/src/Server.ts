@@ -2,16 +2,13 @@ import {Server as WebSocketServer} from 'uws';
 import {TextEncoder, TextDecoder} from 'text-encoding';
 
 import World from "./World";
-import {
-    initPlayerEntity, updatePlayerInput, updatePlayerRotation, updatePlayerInventory,
-    updatePlayerPosition, updateChatLog
-} from "./entities";
-import {objectHasKeys} from "../../shared/helpers";
 import {NetworkComponent} from "./components";
 import {ComponentId, ActionId, MessageType} from "../../shared/constants";
 import {Action} from "../../shared/actions";
 import {ComponentEventEmitter} from "../../shared/EventEmitter";
+import {initPlayerEntity} from "./entities";
 
+// TODO: Use performance.now, like in the client.
 let hrtimeToSeconds = (hrtime: number[]) => hrtime[0] + hrtime[1] / 1000000000;
 
 export default class Server {
@@ -33,7 +30,7 @@ export default class Server {
         this.startGameLoop();
     }
 
-    startGameLoop() {
+    private startGameLoop() {
         const dt = 1.0 / 30.0;
 
         let currentTime = hrtimeToSeconds(process.hrtime());
@@ -89,55 +86,49 @@ export default class Server {
         netComponent.pushBuffer(MessageType.Action, packet);
     }
 
-    onConnect(ws) {
+    private onConnect(ws) {
         let playerEntity = this.world.entityManager.createEntity();
         initPlayerEntity(this.world.entityManager, playerEntity, ws);
 
         let netComponent = this.world.entityManager.getComponent<NetworkComponent>(playerEntity, ComponentId.Network);
         Server.sendEntity(netComponent, this.world.entityManager.serializeEntity(playerEntity));
 
+        ws.on('message', (data: ArrayBuffer, flags) => this.onMessage(playerEntity, data));
+        ws.on('close', () => this.onClose(playerEntity));
+    }
+
+    private onMessage(playerEntity: string, buffer: ArrayBuffer) {
+        let pos = 0;
+        let view = new DataView(buffer);
         let textDecoder = new TextDecoder();
-        ws.on('message', (data: ArrayBuffer, flags) => {
-            // Each message starts with its length, followed by that many bytes of content.
-            // Length is always Uint16.
-            // TODO: Extract to its own method.
-            let pos = 0;
-            let view = new DataView(data);
-            while (pos < data.byteLength) {
-                // Read length.
-                let msgLength = view.getUint16(pos);
-                pos += Uint16Array.BYTES_PER_ELEMENT;
 
-                // Get message contents and decode JSON
-                let msg = data.slice(pos, pos + msgLength);
-                pos += msgLength;
-                let text = textDecoder.decode(msg);
-                let obj = JSON.parse(text);
+        // Each message starts with its length, followed by that many bytes of content.
+        // Length is always Uint16.
+        while (pos < buffer.byteLength) {
+            // Read length.
+            let msgLength = view.getUint16(pos);
+            pos += Uint16Array.BYTES_PER_ELEMENT;
 
-                // Need something similar to "Initializers" that I have on client, also on server.
-                if (obj.entity == playerEntity) {
-                    if (objectHasKeys(obj.components, [ComponentId.Input, ComponentId.Position])) {
-                        this.eventEmitter.emit(ComponentId.Input, playerEntity, obj.components);
-                    }
-                    if (objectHasKeys(obj.components, [ComponentId.Position])) {
-                        updatePlayerPosition(this.world.entityManager, this.world.actionManager, playerEntity, obj);
-                    }
-                    if (objectHasKeys(obj.components, [ComponentId.Rotation])) {
-                        updatePlayerRotation(this.world.entityManager, playerEntity, obj);
-                    }
-                    if (objectHasKeys(obj.components, [ComponentId.Inventory])) {
-                        updatePlayerInventory(this.world.entityManager, playerEntity, obj);
-                    }
-                    if (objectHasKeys(obj.components, [ComponentId.ChatMessage])) {
-                        updateChatLog(this.world.entityManager, playerEntity, obj);
-                    }
-                }
+            // Get message contents and decode JSON
+            let msg = buffer.slice(pos, pos + msgLength);
+            pos += msgLength;
+            let text = textDecoder.decode(msg);
+            let obj = JSON.parse(text);
+
+            // Noone should be able to send data on behalf of others.
+            // Really "obj" doesn't need an "entity" property, but might need it in the future.
+            // Also, keeps interface between server and client in line.
+            if (obj.entity != playerEntity) continue;
+
+            // Loop over all components received in packet, and emit events for them.
+            // These events are used by the initializers to be processed further.
+            for (let componentType in obj.components) {
+                this.eventEmitter.emit(parseInt(componentType) as ComponentId, playerEntity, obj.components);
             }
-        });
+        }
+    }
 
-        ws.on('close', () => {
-            console.log('Removing player', playerEntity);
-            this.world.entityManager.removeEntity(playerEntity);
-        })
+    private onClose(playerEntity: string) {
+        this.world.entityManager.removeEntity(playerEntity)
     }
 }
