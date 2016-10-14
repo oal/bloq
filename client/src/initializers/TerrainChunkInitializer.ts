@@ -1,4 +1,4 @@
-import Initializer from "./Initializer";
+import Initializer from "../../../shared/Initializer";
 import {ComponentId} from "../../../shared/constants";
 import {TerrainChunkComponent} from "../../../shared/components";
 

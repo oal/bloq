@@ -1,4 +1,4 @@
-import Initializer from "./Initializer";
+import Initializer from "../../../shared/Initializer";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId, ChatLogSize, ChatMaxLength} from "../../../shared/constants";
 

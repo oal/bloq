@@ -1,4 +1,4 @@
-import EntityManager from "../../../shared/EntityManager";
+import EntityManager from "./EntityManager";
 
 
 export default class Initializer {
@@ -7,5 +7,5 @@ export default class Initializer {
         this.entityManager = em;
     }
 
-    initialize(entity: string, components: Object) {}
+    initialize(entity: string, components: Object): void {}
 }

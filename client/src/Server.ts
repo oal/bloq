@@ -1,21 +1,16 @@
 import Game from "./Game";
 import {MessageType, ComponentId} from "../../shared/constants";
 import {bufferToObject} from "./helpers";
-import {deserializeTerrainChunk} from "../../shared/helpers";
+import {deserializeTerrainChunk} from "../../shared/helpers"
+import {ComponentEventEmitter} from "../../shared/EventEmitter";
+import {EntityMessage} from "../../shared/interfaces";
 
-
-export interface EntityMessage {
-    entity: string,
-    components: {
-        [propName: number]: Object
-    }
-}
 
 export class Server {
     url: string;
     ws: WebSocket;
     game: Game;
-    private componentHandlers: Map<ComponentId, Array<Function>> = new Map<ComponentId, Array<Function>>();
+    eventEmitter: ComponentEventEmitter = new ComponentEventEmitter();
 
     constructor(game: Game, server: string, connCallback: Function) {
         this.game = game;
@@ -60,7 +55,7 @@ export class Server {
 
                     Object.keys(obj.components).forEach(componentId => {
                         let key = parseInt(componentId);
-                        this.emit(key as ComponentId, obj.entity, obj.components);
+                        this.eventEmitter.emit(key as ComponentId, obj.entity, obj.components);
                     });
                     break;
 
@@ -69,7 +64,7 @@ export class Server {
 
                     let componentsObj = {};
                     componentsObj[ComponentId.TerrainChunk] = component;
-                    this.emit(ComponentId.TerrainChunk, entity, componentsObj);
+                    this.eventEmitter.emit(ComponentId.TerrainChunk, entity, componentsObj);
                     break;
 
                 case MessageType.Action:
@@ -90,23 +85,5 @@ export class Server {
 
     private onError(evt: MessageEvent) {
         console.log('error');
-    }
-
-    addEventListener(componentId: ComponentId, listener) {
-        let handlers = this.componentHandlers.get(componentId);
-        if (!handlers) {
-            handlers = [];
-            this.componentHandlers.set(componentId, handlers);
-        }
-        handlers.push(listener);
-    }
-
-    private emit(componentId: ComponentId, entity: string, components: Object) {
-        let handlers = this.componentHandlers.get(componentId);
-        if (!handlers) return;
-
-        handlers.forEach((callback) => {
-            callback(entity, components);
-        })
     }
 }

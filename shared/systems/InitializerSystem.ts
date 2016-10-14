@@ -1,18 +1,19 @@
-import {System} from "../../../shared/System";
-import {ComponentId} from "../../../shared/constants";
-import Initializer from "../initializers/Initializer";
-import EntityManager from "../../../shared/EntityManager";
-import {Server, EntityMessage} from "../Server";
+import {ComponentId} from "../constants";
+import {System} from "../System";
+import Initializer from "../Initializer";
+import EntityManager from "../EntityManager";
+import {EntityMessage} from "../interfaces";
+import {ComponentEventEmitter} from "../EventEmitter";
 
 
-export default class ServerEntitySystem extends System {
+export default class InitializerSystem extends System {
     private componentQueue: Map<ComponentId, Array<Object>> = new Map<ComponentId, Array<EntityMessage>>();
     private initializers: Map<ComponentId, Initializer> = new Map<ComponentId, Initializer>();
-    private serverConn: Server;
+    private eventEmitter: ComponentEventEmitter;
 
-    constructor(em: EntityManager, server: Server) {
+    constructor(em: EntityManager, eventManager: ComponentEventEmitter) {
         super(em);
-        this.serverConn = server;
+        this.eventEmitter = eventManager;
     }
 
     update(dt: number) {
@@ -29,7 +30,7 @@ export default class ServerEntitySystem extends System {
     addInitializer(componentId: ComponentId, initializer: Initializer) {
         this.initializers.set(componentId, initializer);
 
-        this.serverConn.addEventListener(componentId, (entity, components) => {
+        this.eventEmitter.addEventListener(componentId, (entity, components) => {
             let compQueue = this.componentQueue.get(componentId);
             if (!compQueue) {
                 compQueue = [];

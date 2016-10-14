@@ -14,6 +14,9 @@ import DatabaseSystem from "./systems/DatabaseSystem";
 import NetworkSystem from "./systems/NetworkSystem";
 import Server from "./Server";
 import ChatSystem from "./systems/ChatSystem";
+import {ComponentId} from "../../shared/constants";
+import InitializerSystem from "../../shared/systems/InitializerSystem";
+import PlayerInputInitializer from "./initializers/PlayerInputInitializer";
 
 
 export default class World extends BaseWorld {
@@ -26,7 +29,12 @@ export default class World extends BaseWorld {
         registerServerComponents(this.entityManager);
 
         this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), -1000); // Always process first
-        this.addSystem(new ChatSystem(this.entityManager), -999);
+
+        let initializerSystem = new InitializerSystem(this.entityManager, server.eventEmitter);
+        initializerSystem.addInitializer(ComponentId.Input, new PlayerInputInitializer(this.entityManager));
+        this.addSystem(initializerSystem, -999);
+
+        this.addSystem(new ChatSystem(this.entityManager), -998);
         this.addSystem(new InformNewPlayersSystem(this.entityManager), -9);
         this.addSystem(new BroadcastPlayerInputSystem(this.entityManager), -8);
         this.addSystem(new ChunkSubscriptionSystem(this.entityManager, this.terrain), 100);

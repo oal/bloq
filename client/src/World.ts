@@ -23,7 +23,6 @@ import MouseManager from "../lib/MouseManager";
 import KeyboardManager from "../lib/KeyboardManager";
 import InventoryUISystem from "./systems/InventoryUISystem";
 import BlockSystem from "./systems/BlockSystem";
-import ServerEntitySystem from "./systems/ServerEntitySystem";
 import {ComponentId} from "../../shared/constants";
 import BlockInitializer from "./initializers/BlockInitializer";
 import TerrainChunkInitializer from "./initializers/TerrainChunkInitializer";
@@ -33,6 +32,7 @@ import InputInitializer from "./initializers/InputInitializer";
 import NetworkSystem from "./systems/NetworkSystem";
 import ChatSystem from "./systems/ChatSystem";
 import ChatMessageInitializer from "./initializers/ChatMessageInitializer";
+import InitializerSystem from "../../shared/systems/InitializerSystem";
 
 
 export default class World extends BaseWorld {
@@ -97,9 +97,9 @@ export default class World extends BaseWorld {
         // TODO: Store system orders as constants in one place.
         this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), -1000); // Always process first
 
-        let entitySystem = new ServerEntitySystem(this.entityManager, this.game.server);
-        entitySystem.addInitializer(ComponentId.TerrainChunk, new TerrainChunkInitializer(this.entityManager));
-        entitySystem.addInitializer(
+        let initializerSystem = new InitializerSystem(this.entityManager, this.game.server.eventEmitter);
+        initializerSystem.addInitializer(ComponentId.TerrainChunk, new TerrainChunkInitializer(this.entityManager));
+        initializerSystem.addInitializer(
             ComponentId.Player,
             new PlayerInitializer(
                 this.entityManager,
@@ -108,12 +108,12 @@ export default class World extends BaseWorld {
                 this.selectionMaterial
             )
         );
-        entitySystem.addInitializer(ComponentId.Block, new BlockInitializer(this.entityManager, this.blockMaterial));
+        initializerSystem.addInitializer(ComponentId.Block, new BlockInitializer(this.entityManager, this.blockMaterial));
         let inputInitializer = new InputInitializer(this.entityManager);
-        entitySystem.addInitializer(ComponentId.Input, inputInitializer);
-        entitySystem.addInitializer(ComponentId.Rotation, inputInitializer);
-        entitySystem.addInitializer(ComponentId.ChatMessage, new ChatMessageInitializer(this.entityManager));
-        this.addSystem(entitySystem, -11);
+        initializerSystem.addInitializer(ComponentId.Input, inputInitializer);
+        initializerSystem.addInitializer(ComponentId.Rotation, inputInitializer);
+        initializerSystem.addInitializer(ComponentId.ChatMessage, new ChatMessageInitializer(this.entityManager));
+        this.addSystem(initializerSystem, -11);
 
         this.addSystem(new TerrainChunkSystem(this.entityManager, this.scene, this.terrainMaterial), -10);
         this.addSystem(new BlockSystem(this.entityManager), -9);

@@ -10,12 +10,14 @@ import {objectHasKeys} from "../../shared/helpers";
 import {NetworkComponent} from "./components";
 import {ComponentId, ActionId, MessageType} from "../../shared/constants";
 import {Action} from "../../shared/actions";
+import {ComponentEventEmitter} from "../../shared/EventEmitter";
 
 let hrtimeToSeconds = (hrtime: number[]) => hrtime[0] + hrtime[1] / 1000000000;
 
 export default class Server {
     wss: WebSocketServer;
     world: World;
+    eventEmitter: ComponentEventEmitter = new ComponentEventEmitter();
 
     constructor() {
         this.world = new World(this);
@@ -115,7 +117,7 @@ export default class Server {
                 // Need something similar to "Initializers" that I have on client, also on server.
                 if (obj.entity == playerEntity) {
                     if (objectHasKeys(obj.components, [ComponentId.Input, ComponentId.Position])) {
-                        updatePlayerInput(this.world.entityManager, playerEntity, obj);
+                        this.eventEmitter.emit(ComponentId.Input, playerEntity, obj.components);
                     }
                     if (objectHasKeys(obj.components, [ComponentId.Position])) {
                         updatePlayerPosition(this.world.entityManager, this.world.actionManager, playerEntity, obj);
@@ -137,6 +139,5 @@ export default class Server {
             console.log('Removing player', playerEntity);
             this.world.entityManager.removeEntity(playerEntity);
         })
-
     }
 }

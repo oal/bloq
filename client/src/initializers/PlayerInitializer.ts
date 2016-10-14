@@ -1,18 +1,12 @@
 import {
-    LineBasicMaterial,
-    Color,
-    MeshBasicMaterial,
     BoxBufferGeometry,
-    Vector3,
     Object3D,
-    ArrowHelper,
     Mesh,
-    BoxHelper,
     PerspectiveCamera,
     ShaderMaterial
 } from 'three';
 
-import Initializer from "./Initializer";
+import Initializer from "../../../shared/Initializer";
 import {PlayerComponent, PlayerSelectionComponent} from "../components";
 import {ComponentId} from "../../../shared/constants";
 import AnimatedMesh from "../AnimatedMesh";
