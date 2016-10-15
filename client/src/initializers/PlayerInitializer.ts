@@ -7,7 +7,7 @@ import {
 } from 'three';
 
 import Initializer from "../../../shared/Initializer";
-import {PlayerComponent, PlayerSelectionComponent} from "../components";
+import {PlayerComponent, PlayerSelectionComponent, PlayerChunkComponent} from "../components";
 import {ComponentId} from "../../../shared/constants";
 import AnimatedMesh from "../AnimatedMesh";
 import EntityManager from "../../../shared/EntityManager";
@@ -59,5 +59,8 @@ export default class PlayerInitializer extends Initializer {
         let playerComponent = new PlayerComponent();
         playerComponent.mesh = playerMesh;
         this.entityManager.addComponent(entity, playerComponent);
+
+
+        this.entityManager.addComponent(entity, new PlayerChunkComponent());
     }
 }

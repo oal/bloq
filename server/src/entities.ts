@@ -2,11 +2,10 @@ import EntityManager from "../../shared/EntityManager";
 import {
     InputComponent, PositionComponent,
     CurrentPlayerComponent, PhysicsComponent, RotationComponent, WallCollisionComponent, InventoryComponent,
-    BlockComponent
+    BlockComponent, ChunkRequestComponent
 } from "../../shared/components";
 import {
-    NetworkComponent, NewPlayerComponent, PlayerComponent, ChunkSubscriptionComponent,
-    PickableComponent
+    NetworkComponent, NewPlayerComponent, PlayerComponent, PickableComponent
 } from "./components";
 import {BlockId} from "../../shared/constants";
 import Server from "./Server";
@@ -51,7 +50,7 @@ export function initPlayerEntity(em: EntityManager, entity: string, ws: WebSocke
     em.addComponent(entity, new NewPlayerComponent()); // Deleted as soon as all players have been informed of this new player
     em.addComponent(entity, new WallCollisionComponent()); // For wall collisions.
 
-    em.addComponent(entity, new ChunkSubscriptionComponent())
+    em.addComponent(entity, new ChunkRequestComponent())
 }
 
 export function initBlockEntity(em: EntityManager, x: number, y: number, z: number, kind: BlockId): string {

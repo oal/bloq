@@ -33,6 +33,7 @@ import NetworkSystem from "./systems/NetworkSystem";
 import ChatSystem from "./systems/ChatSystem";
 import ChatMessageInitializer from "./initializers/ChatMessageInitializer";
 import InitializerSystem from "../../shared/systems/InitializerSystem";
+import ChunkSystem from "./systems/ChunkSystem";
 
 
 export default class World extends BaseWorld {
@@ -128,7 +129,7 @@ export default class World extends BaseWorld {
         this.addSystem(new MeshSystem(this.entityManager, this.scene), 11);
         this.addSystem(new PlayerMeshSystem(this.entityManager, this.scene), 12);
         this.addSystem(new PlayerSelectionSystem(this.entityManager, this.scene), 13);
-
+        this.addSystem(new ChunkSystem(this.entityManager, netSystem), 14);
 
         this.addSystem(new InventoryUISystem(this.entityManager), 999);
         this.addSystem(new DebugTextSystem(this.entityManager, this.game.renderer), 1000);

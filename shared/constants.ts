@@ -21,15 +21,16 @@ export const enum ComponentId {
     Block,
     ChatLog,
     ChatMessage,
+    ChunkRequest,
 
     // Client
     Mesh,
     PlayerSelection,
     Player,
+    PlayerChunk,
 
     // Server
     Network,
-    ChunkSubscription,
     NewPlayer,
     Pickable,
 }
@@ -69,3 +70,6 @@ export const TerminalVelocity = 45;
 // Chat
 export const ChatLogSize = 6;
 export const ChatMaxLength = 120;
+
+// Other
+export const ViewDistance = 5;

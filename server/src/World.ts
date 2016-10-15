@@ -7,7 +7,6 @@ import Server from "./Server";
 import ActionExecutionSystem from "../../shared/systems/ActionExecutionSystem";
 import InformNewPlayersSystem from "./systems/InformNewPlayersSystem";
 import BroadcastPlayerInputSystem from "./systems/BroadcastPlayerInputSystem";
-import ChunkSubscriptionSystem from "./systems/ChunkSubscriptionSystem";
 import PlayerActionSystem from "./systems/PlayerActionSystem";
 import PickUpSystem from "./systems/PickUpSystem";
 import BroadcastEntitySystem from "./systems/BroadcastEntitySystem";
@@ -21,6 +20,8 @@ import PositionInitializer from "./initializers/PositionInitializer";
 import RotationInitializer from "./initializers/RotationInitializer";
 import InventoryInitializer from "./initializers/InventoryInitializer";
 import ChatMessageInitializer from "./initializers/ChatMessageInitializer";
+import ChunkRequestInitializer from "./initializers/ChunkRequestInitializer";
+import ChunkRequestSystem from "./systems/ChunkRequestSystem";
 
 
 export default class World extends BaseWorld {
@@ -38,12 +39,13 @@ export default class World extends BaseWorld {
         initializerSystem.addInitializer(ComponentId.Rotation, new RotationInitializer(this.entityManager));
         initializerSystem.addInitializer(ComponentId.Inventory, new InventoryInitializer(this.entityManager));
         initializerSystem.addInitializer(ComponentId.ChatMessage, new ChatMessageInitializer(this.entityManager));
+        initializerSystem.addInitializer(ComponentId.ChunkRequest, new ChunkRequestInitializer(this.entityManager));
         this.addSystem(initializerSystem, -999);
 
         this.addSystem(new ChatSystem(this.entityManager), -998);
         this.addSystem(new InformNewPlayersSystem(this.entityManager), -9);
         this.addSystem(new BroadcastPlayerInputSystem(this.entityManager), -8);
-        this.addSystem(new ChunkSubscriptionSystem(this.entityManager), 100);
+        this.addSystem(new ChunkRequestSystem(this.entityManager), 100);
         this.addSystem(new PlayerActionSystem(this.entityManager, this.actionManager), 101);
         this.addSystem(new PickUpSystem(this.entityManager), 102);
         this.addSystem(new BroadcastEntitySystem(this.entityManager), 103);

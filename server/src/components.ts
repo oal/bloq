@@ -2,14 +2,14 @@ import {TextEncoder} from 'text-encoding';
 
 import {Component, SerializableComponent} from "../../shared/components";
 import EntityManager from "../../shared/EntityManager";
-import {ComponentId, MessageType} from "../../shared/constants";
+import {ComponentId, MessageType, TERRAIN_CHUNK_SIZE} from "../../shared/constants";
 
 export class NetworkComponent extends Component {
     static ID = ComponentId.Network;
 
     websocket: WebSocket;
     private bufferPos: number = 0;
-    private buffer: ArrayBuffer = new ArrayBuffer(1 << 16);
+    private buffer: ArrayBuffer = new ArrayBuffer(Math.pow(TERRAIN_CHUNK_SIZE, 3) * 3);
 
     bytesLeft(): number {
         return this.buffer.byteLength - this.bufferPos;
@@ -47,12 +47,6 @@ export class NetworkComponent extends Component {
     }
 }
 
-export class ChunkSubscriptionComponent extends Component {
-    static ID = ComponentId.ChunkSubscription;
-
-    inChunk: [number, number, number];
-    chunks: Map<string, boolean> = new Map<string, boolean>();
-}
 
 export class NewPlayerComponent extends Component {
     static ID = ComponentId.NewPlayer;
@@ -69,7 +63,6 @@ export class PickableComponent extends SerializableComponent {
 
 export function registerServerComponents(manager: EntityManager) {
     manager.registerComponentType(new NetworkComponent());
-    manager.registerComponentType(new ChunkSubscriptionComponent());
     manager.registerComponentType(new NewPlayerComponent());
     manager.registerComponentType(new PlayerComponent());
     manager.registerComponentType(new PickableComponent());

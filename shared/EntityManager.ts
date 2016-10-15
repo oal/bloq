@@ -93,6 +93,12 @@ export default class EntityManager {
         return this.components.get(componentType);
     }
 
+    getFirstEntity<T>(componentType: ComponentId): [string, T] {
+        let ec = this.components.get(componentType).entries().next();
+        if(!ec.done) return (ec.value as any) as [string, T]; // Double cast to make TS compiler understand.
+        return [null, null];
+    }
+
     hasComponent(entity: string, componentType: ComponentId): boolean {
         return this.components.get(componentType).has(entity);
     }

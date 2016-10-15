@@ -218,6 +218,12 @@ export class ChatMessageComponent extends SerializableComponent {
     text: string;
 }
 
+export class ChunkRequestComponent extends SerializableComponent {
+    static ID = ComponentId.ChunkRequest;
+
+    chunks: Array<string> = [];
+}
+
 
 export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new PositionComponent());
@@ -232,4 +238,5 @@ export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new BlockComponent());
     manager.registerComponentType(new ChatLogComponent());
     manager.registerComponentType(new ChatMessageComponent());
+    manager.registerComponentType(new ChunkRequestComponent());
 }
