@@ -28,11 +28,16 @@ export default class ChunkRequestSystem extends System {
     }
 
     update(dt: number) {
+        let startTime = now();
         this.entityManager.getEntities(ComponentId.ChunkRequest).forEach((component, entity) => {
+            if(now()-startTime > 8) return;
             let reqComponent = component as ChunkRequestComponent;
             let netComponent = this.entityManager.getComponent<NetworkComponent>(entity, ComponentId.Network);
-
             reqComponent.chunks.some(key => {
+                if(now()-startTime > 8) {
+                    return true;
+                }
+
                 let chunkComponent = this.entityManager.getComponent<TerrainChunkComponent>(key, ComponentId.TerrainChunk);
                 if (chunkComponent) {
                     Server.sendTerrainChunk(netComponent, chunkComponent.serialize().buffer);
