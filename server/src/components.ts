@@ -8,8 +8,12 @@ export class NetworkComponent extends Component {
     static ID = ComponentId.Network;
 
     websocket: WebSocket;
-    bufferPos: number = 0;
-    buffer: ArrayBuffer = new ArrayBuffer(1 << 21); // TODO: Maybe this is too much?
+    private bufferPos: number = 0;
+    private buffer: ArrayBuffer = new ArrayBuffer(1 << 16);
+
+    bytesLeft(): number {
+        return this.buffer.byteLength - this.bufferPos;
+    }
 
     pushBuffer(msgType: MessageType, data: ArrayBuffer | string) {
         let bufferData: ArrayBuffer;

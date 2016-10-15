@@ -1,7 +1,7 @@
 var Worker = require("tiny-worker");
 import {System} from "../../../shared/System";
 import EntityManager from "../../../shared/EntityManager";
-import {ComponentId, ActionId} from "../../../shared/constants";
+import {ComponentId, ActionId, TERRAIN_CHUNK_SIZE} from "../../../shared/constants";
 import {ChunkSubscriptionComponent, NetworkComponent} from "../components";
 import {PositionComponent, TerrainChunkComponent} from "../../../shared/components";
 import {arraysEqual, chunkKey} from "../../../shared/helpers";
@@ -91,12 +91,15 @@ export default class ChunkSubscriptionSystem extends System {
             let chunkComponent = this.entityManager.getComponent<TerrainChunkComponent>(key, ComponentId.TerrainChunk);
             if (chunkComponent) {
                 playerSet.forEach(playerEntity => {
-                    // TODO: Add "bytesLeft" that returns how much space is left in network buffer.
                     // And don't send everything at once.
                     let netComponent = this.entityManager.getComponent<NetworkComponent>(playerEntity, ComponentId.Network);
+                    // Add 32 because there's some metdata that needs to be sent too, however much that currently is.
+                    if (netComponent.bytesLeft() < TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE + 32) return;
+
+                    playerSet.delete(playerEntity);
                     Server.sendTerrainChunk(netComponent, chunkComponent.serialize().buffer);
                 });
-                this.chunkQueue.delete(key);
+                if (playerSet.size === 0) this.chunkQueue.delete(key);
             }
         });
     }
