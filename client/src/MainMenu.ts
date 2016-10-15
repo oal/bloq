@@ -6,7 +6,7 @@ export default class MainMenu {
     }
 
     init() {
-        (document.querySelector('#server') as HTMLInputElement).value = `${location.hostname}:${parseInt(location.port) + 1}`;
+        (document.querySelector('#server') as HTMLInputElement).value = `${location.hostname}:8081`;
     }
 
     registerEvents() {
