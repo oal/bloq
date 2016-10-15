@@ -1,4 +1,5 @@
 var Worker = require("tiny-worker");
+var now = require('performance-now');
 import {System} from "../../../shared/System";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId, ActionId, TERRAIN_CHUNK_SIZE} from "../../../shared/constants";
@@ -87,7 +88,11 @@ export default class ChunkSubscriptionSystem extends System {
             }
         });
 
-        this.chunkQueue.forEach((playerSet, key) => {
+        let startTime = now();
+        let mapIter = this.chunkQueue.entries();
+        let entry = mapIter.next();
+        while(entry.value && now()-startTime < 60/1000) {
+            let [key, playerSet] = entry.value;
             let chunkComponent = this.entityManager.getComponent<TerrainChunkComponent>(key, ComponentId.TerrainChunk);
             if (chunkComponent) {
                 playerSet.forEach(playerEntity => {
@@ -101,6 +106,7 @@ export default class ChunkSubscriptionSystem extends System {
                 });
                 if (playerSet.size === 0) this.chunkQueue.delete(key);
             }
-        });
+            entry = mapIter.next();
+        }
     }
 }
