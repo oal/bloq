@@ -63,16 +63,16 @@ export default class BaseWorld {
             sumTime += time;
             i++;
         });
-        //
-        // if (this.tickNumber % 60 === 0) {
-        //     console.log(`----\nTICK (${sumTime.toFixed(4)}ms)\n----`);
-        //     for (var j = 0; j < this.systemTimings.length; j++) {
-        //         let avgTime =(this.systemTimings[j]/this.tickNumber).toFixed(4);
-        //         let currTime = frameTimes[j].toFixed(4);
-        //         let sysName = this.systems[j].constructor.name;
-        //         console.log(`${avgTime}ms\t ${currTime}ms\t ${sysName}`);
-        //     }
-        // }
+
+        if (this.tickNumber % 60 === 0) {
+            console.log(`----\nTICK (${sumTime.toFixed(4)}ms)\n----`);
+            for (var j = 0; j < this.systemTimings.length; j++) {
+                let avgTime =(this.systemTimings[j]/this.tickNumber).toFixed(4);
+                let currTime = frameTimes[j].toFixed(4);
+                let sysName = this.systems[j].constructor.name;
+                console.log(`${avgTime}ms\t ${currTime}ms\t ${sysName}`);
+            }
+        }
         this.tickNumber++;
     }
 }
