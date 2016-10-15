@@ -1,5 +1,5 @@
+var Worker = require("tiny-worker");
 import {System} from "../../../shared/System";
-import {Terrain} from "../terrain";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId, ActionId} from "../../../shared/constants";
 import {ChunkSubscriptionComponent, NetworkComponent} from "../components";
@@ -7,25 +7,36 @@ import {PositionComponent, TerrainChunkComponent} from "../../../shared/componen
 import {arraysEqual, chunkKey} from "../../../shared/helpers";
 import Server from "../Server";
 import {UnsubscribeTerrainChunksAction} from "../../../shared/actions";
+import TerrainWorker from "../workers/TerrainWorker";
 
-
-let clock = (start): (number | number[]) => {
-    if (!start) return process.hrtime();
-    let end = process.hrtime(start);
-    return Math.round((end[0] * 1000) + (end[1] / 1000000));
-};
 
 export default class ChunkSubscriptionSystem extends System {
-    terrain: Terrain;
-    chunkQueue: Array<[[number, number, number], string]> = [];
+    worker: Worker = new Worker(TerrainWorker);
+    chunkQueue: Map<string, Set<string>> = new Map<string, Set<string>>();
 
-    constructor(em: EntityManager, terrain: Terrain) {
+    constructor(em: EntityManager) {
         super(em);
-        this.terrain = terrain;
+
+        this.worker.onmessage = (evt) => {
+            let entity = chunkKey(evt.data.x, evt.data.y, evt.data.z);
+            let chunkComponent = new TerrainChunkComponent(evt.data.x, evt.data.y, evt.data.z);
+            chunkComponent.data = Uint8Array.from(evt.data.data); // Serialized as Array in JSON, but needs to be Uint8.
+            this.entityManager.addComponent(entity, chunkComponent);
+        }
     }
 
     private queueChunkFor(x: number, y: number, z: number, entity: string) {
-        this.chunkQueue.push([[x, y, z], entity]);
+        let key = chunkKey(x, y, z);
+        let set = this.chunkQueue.get(key);
+        if (!set) {
+            set = new Set<string>();
+            this.chunkQueue.set(key, set);
+
+            if (!this.entityManager.hasComponent(key, ComponentId.TerrainChunk)) {
+                this.worker.postMessage({x, y, z});
+            }
+        }
+        set.add(entity);
     }
 
     update(dt: number) {
@@ -62,7 +73,6 @@ export default class ChunkSubscriptionSystem extends System {
                     }
                 }
 
-
                 // Signal that the chunks too far away be removed.
                 let unsubChunks = [];
                 chunkSubComponent.chunks.forEach((_, chunkKey) => {
@@ -77,24 +87,17 @@ export default class ChunkSubscriptionSystem extends System {
             }
         });
 
-        let cumTime = 0.0;
-        let startTime = clock(0);
-        while (cumTime < 8 && this.chunkQueue.length > 0) {
-            let [pos, playerEntity] = this.chunkQueue.shift();
-            let [cx, cy, cz] = pos;
-            let key = chunkKey(cx, cy, cz);
-
+        this.chunkQueue.forEach((playerSet, key) => {
             let chunkComponent = this.entityManager.getComponent<TerrainChunkComponent>(key, ComponentId.TerrainChunk);
-            if (!chunkComponent) {
-                chunkComponent = this.terrain.generateChunk(cx, cy, cz);
-                this.entityManager.addComponent(key, chunkComponent);
+            if (chunkComponent) {
+                playerSet.forEach(playerEntity => {
+                    // TODO: Add "bytesLeft" that returns how much space is left in network buffer.
+                    // And don't send everything at once.
+                    let netComponent = this.entityManager.getComponent<NetworkComponent>(playerEntity, ComponentId.Network);
+                    Server.sendTerrainChunk(netComponent, chunkComponent.serialize().buffer);
+                });
+                this.chunkQueue.delete(key);
             }
-
-            let netComponent = this.entityManager.getComponent<NetworkComponent>(playerEntity, ComponentId.Network);
-            Server.sendTerrainChunk(netComponent, chunkComponent.serialize().buffer);
-
-            cumTime += clock(startTime) as number;
-            startTime = clock(0);
-        }
+        });
     }
 }

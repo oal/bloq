@@ -1,6 +1,5 @@
 import BaseWorld from "../../shared/BaseWorld";
 import {registerServerComponents} from "./components";
-import {Terrain} from "./terrain";
 import {ServerActionManager} from "./actions";
 import {ComponentId} from "../../shared/constants";
 import Server from "./Server";
@@ -25,8 +24,6 @@ import ChatMessageInitializer from "./initializers/ChatMessageInitializer";
 
 
 export default class World extends BaseWorld {
-    terrain = new Terrain();
-
     constructor(server: Server) {
         super();
         this.actionManager = new ServerActionManager();
@@ -46,7 +43,7 @@ export default class World extends BaseWorld {
         this.addSystem(new ChatSystem(this.entityManager), -998);
         this.addSystem(new InformNewPlayersSystem(this.entityManager), -9);
         this.addSystem(new BroadcastPlayerInputSystem(this.entityManager), -8);
-        this.addSystem(new ChunkSubscriptionSystem(this.entityManager, this.terrain), 100);
+        this.addSystem(new ChunkSubscriptionSystem(this.entityManager), 100);
         this.addSystem(new PlayerActionSystem(this.entityManager, this.actionManager), 101);
         this.addSystem(new PickUpSystem(this.entityManager), 102);
         this.addSystem(new BroadcastEntitySystem(this.entityManager), 103);

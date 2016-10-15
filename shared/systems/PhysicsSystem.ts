@@ -54,11 +54,6 @@ export default class PhysicsSystem extends System {
                 if (blockCollision.pz && physComponent.velZ > 0) physComponent.velZ = 0;
                 if (blockCollision.nz && physComponent.velZ < 0) physComponent.velZ = 0;
             }
-
-
-            // TODO: Should use delta time here somewhere.
-            // physComponent.velX *= 25 * dt;
-            // physComponent.velZ *= 25 * dt;
         })
     }
 }

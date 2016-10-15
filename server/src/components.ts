@@ -9,7 +9,7 @@ export class NetworkComponent extends Component {
 
     websocket: WebSocket;
     bufferPos: number = 0;
-    buffer: ArrayBuffer = new ArrayBuffer(1 << 16);
+    buffer: ArrayBuffer = new ArrayBuffer(1 << 21); // TODO: Maybe this is too much?
 
     pushBuffer(msgType: MessageType, data: ArrayBuffer | string) {
         let bufferData: ArrayBuffer;
