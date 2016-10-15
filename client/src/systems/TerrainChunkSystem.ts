@@ -60,7 +60,7 @@ export default class TerrainChunkSystem extends System {
 
             // Chunk may have been unsubscribed between when it was added to queue, and now.
             let chunkComponent = this.entityManager.getComponent<TerrainChunkComponent>(entity, ComponentId.TerrainChunk);
-            if(!chunkComponent) continue;
+            if (!chunkComponent) continue;
 
             let chunkGeom = geometryFromArrays(arrays);
 

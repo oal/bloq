@@ -34,7 +34,9 @@ export default class ChunkSubscriptionSystem extends System {
             this.chunkQueue.set(key, set);
 
             if (!this.entityManager.hasComponent(key, ComponentId.TerrainChunk)) {
+                console.log('Must create new')
                 this.worker.postMessage({x, y, z});
+                console.log('...')
             }
         }
         set.add(entity);
@@ -49,6 +51,7 @@ export default class ChunkSubscriptionSystem extends System {
             // Do we need to update chunk subscriptions?
             let currChunk = posComponent.toChunk();
             if (!arraysEqual(currChunk, chunkSubComponent.inChunk)) {
+                let startTime = now();
                 let newChunkSubs = new Map<string, boolean>();
                 chunkSubComponent.inChunk = currChunk;
 
@@ -73,15 +76,18 @@ export default class ChunkSubscriptionSystem extends System {
                         }
                     }
                 }
+                console.log('After dist loop:', now()-startTime);
 
                 // Signal that the chunks too far away be removed.
                 let unsubChunks = [];
                 chunkSubComponent.chunks.forEach((_, chunkKey) => {
                     if (!newChunkSubs.has(chunkKey)) unsubChunks.push(chunkKey)
                 });
+                console.log('After creating unsubChunks loop:', now()-startTime);
                 if (unsubChunks.length) {
                     Server.sendAction(netComponent, ActionId.UnsubscribeTerrainChunks, new UnsubscribeTerrainChunksAction(unsubChunks));
                 }
+                console.log('After sendAction:', now()-startTime);
 
                 // Update chunk subscription.
                 chunkSubComponent.chunks = newChunkSubs;
@@ -91,7 +97,7 @@ export default class ChunkSubscriptionSystem extends System {
         let startTime = now();
         let mapIter = this.chunkQueue.entries();
         let entry = mapIter.next();
-        while(entry.value && now()-startTime < 60/1000) {
+        while(entry.value && now()-startTime < 8) {
             let [key, playerSet] = entry.value;
             let chunkComponent = this.entityManager.getComponent<TerrainChunkComponent>(key, ComponentId.TerrainChunk);
             if (chunkComponent) {

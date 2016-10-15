@@ -85,5 +85,7 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+client/dist/**/*.js
+client/dist/**/*.js.map
 server/dist/
 server/db.sqlite
