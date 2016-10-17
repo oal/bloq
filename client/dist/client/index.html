@@ -13,8 +13,9 @@
         }
 
         #mainmenu {
-            background-color: #351E0E;
-            color: #fff;
+            background-image: url('assets/menu.jpg');
+            background-size: cover;
+            color: #000;
             display: flex;
             position: absolute;
             top: 0;
@@ -22,28 +23,47 @@
             bottom: 0;
             left: 0;
             flex-direction: column;
-            font-size: 3vw;
-            text-shadow: 0 2px 10px #000;
+            font-size: 1.5vw;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
         }
 
-        #mainmenu * {
+        #mainmenu > * {
             margin: auto;
+        }
+
+        #mainmenu ul {
+            background: url('assets/blocks/5.png');
+            padding: 1vw 1.5vw 1.5vw 1.5vw;
+            border-radius: 5px;
+            border: 5px solid rgba(0, 0, 0, 0.15);
+            box-shadow: 0 3px 4px rgba(0, 0, 0, 0.5);
+            list-style: none;
+        }
+
+        #mainmenu li {
+            padding: 1.5vw;
+            display: flex;
+            align-content: space-between;
+            flex-direction: column;
         }
 
         #mainmenu input, #mainmenu button {
             font-family: 'Skranji', sans-serif;
-            font-size: 3vw;
-            text-align: center;
-            padding: 1vw 3vw;
+            font-size: 1.5vw;
+            padding: 0.5vw 1vw;
             border-radius: 3px;
             border: 0;
-            box-shadow: 0 2px 10px #000;
+            box-shadow: 0 -2px 2px #000;
+            background-color: rgba(255, 255, 255, 0.75);
         }
 
         #mainmenu button {
             background-color: #ECEC7A;
             transition: all 0.25s;
             cursor: pointer;
+            width: 100%;
+            box-shadow: 0 -2px 2px #000 inset;
+            text-align: center;
         }
 
         #mainmenu button:hover {
@@ -200,12 +220,21 @@
 <body>
 
 <div id="mainmenu">
-    <h1>Bloq</h1>
-    <strong>Player name:</strong>
-    <input type="text" id="name" placeholder="Name">
-    <strong>Server:</strong>
-    <input type="text" id="server" placeholder="Server address and port">
-    <button id="play">Join server</button>
+    <ul>
+        <li>
+            <span>Player name:</span>
+            <input type="text" id="name" placeholder="Name">
+        </li>
+
+        <li>
+            <span>Server:</span>
+            <input type="text" id="server" placeholder="Server address and port">
+        </li>
+
+        <li>
+            <button id="play">Join server</button>
+        </li>
+    </ul>
 </div>
 
 <div id="gui">
