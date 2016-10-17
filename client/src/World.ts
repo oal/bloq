@@ -34,6 +34,7 @@ import ChatSystem from "./systems/ChatSystem";
 import ChatMessageInitializer from "./initializers/ChatMessageInitializer";
 import InitializerSystem from "../../shared/systems/InitializerSystem";
 import ChunkSystem from "./systems/ChunkSystem";
+import {EntityManagerEvent} from "../../shared/EntityManager";
 
 
 export default class World extends BaseWorld {
@@ -51,6 +52,7 @@ export default class World extends BaseWorld {
         this.game = game;
 
         registerClientComponents(this.entityManager);
+
 
         this.scene = new Scene();
 
@@ -104,6 +106,7 @@ export default class World extends BaseWorld {
             ComponentId.Player,
             new PlayerInitializer(
                 this.entityManager,
+                netSystem,
                 this.camera,
                 this.game.assetManager.getMesh('player') as AnimatedMesh,
                 this.selectionMaterial

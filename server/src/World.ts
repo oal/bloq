@@ -22,6 +22,7 @@ import InventoryInitializer from "./initializers/InventoryInitializer";
 import ChatMessageInitializer from "./initializers/ChatMessageInitializer";
 import ChunkRequestInitializer from "./initializers/ChunkRequestInitializer";
 import ChunkRequestSystem from "./systems/ChunkRequestSystem";
+import PlayerInitializer from "./initializers/PlayerInitializer";
 
 
 export default class World extends BaseWorld {
@@ -34,6 +35,7 @@ export default class World extends BaseWorld {
         this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), -1000); // Always process first
 
         let initializerSystem = new InitializerSystem(this.entityManager, server.eventEmitter);
+        initializerSystem.addInitializer(ComponentId.Player, new PlayerInitializer(this.entityManager));
         initializerSystem.addInitializer(ComponentId.Input, new PlayerInputInitializer(this.entityManager));
         initializerSystem.addInitializer(ComponentId.Position, new PositionInitializer(this.entityManager, this.actionManager));
         initializerSystem.addInitializer(ComponentId.Rotation, new RotationInitializer(this.entityManager));

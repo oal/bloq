@@ -17,6 +17,7 @@ export default class PickUpSystem extends System {
 
         this.entityManager.getEntities(ComponentId.Player).forEach((component, entity) => {
             let posComponent = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Position);
+            if (!posComponent) return;
 
             pickableEntities.forEach((blockPosComponent, pickableEntity) => {
                 let diffX = Math.pow(posComponent.x - blockPosComponent.x, 2);

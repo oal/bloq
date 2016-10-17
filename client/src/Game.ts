@@ -94,7 +94,7 @@ export default class Game {
         let overlay = document.getElementById('overlay');
         overlay.onclick = () => {
             let canvas = this.renderer.domElement;
-            canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock;
+            canvas.requestPointerLock = canvas.requestPointerLock || (canvas as any).mozRequestPointerLock;
             canvas.requestPointerLock();
         };
 
@@ -107,8 +107,7 @@ export default class Game {
         let overlay = document.getElementById('overlay');
 
         let canvas = this.renderer.domElement;
-        // FIXME: Still doesn't hide overlay in Firefox.
-        if (document.pointerLockElement === canvas || document.mozPointerLockElement === canvas) {
+        if (document.pointerLockElement === canvas || (document as any).mozPointerLockElement === canvas) {
             this.state = GameState.Active;
             overlay.style.display = 'none';
         } else {

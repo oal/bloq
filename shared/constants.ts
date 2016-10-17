@@ -19,12 +19,12 @@ export const enum ComponentId {
     TerrainChunk,
     Inventory,
     Block,
-    ChatLog,
     ChatMessage,
     ChunkRequest,
 
     // Client
     Mesh,
+    AnimatedMesh,
     PlayerSelection,
     Player,
     PlayerChunk,

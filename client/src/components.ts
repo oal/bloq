@@ -18,6 +18,12 @@ export class MeshComponent extends Component {
     }
 }
 
+export class AnimatedMeshComponent extends MeshComponent {
+    static ID = ComponentId.AnimatedMesh;
+
+    mesh: AnimatedMesh = null;
+}
+
 export class PlayerSelectionComponent extends MeshComponent {
     static ID = ComponentId.PlayerSelection;
 
@@ -26,13 +32,6 @@ export class PlayerSelectionComponent extends MeshComponent {
     targetValid: boolean = false;
 }
 
-
-// Similar, but simpler component is found on server. Server version doesn't need to be concerned with meshes etc.
-export class PlayerComponent extends MeshComponent {
-    static ID = ComponentId.Player;
-
-    mesh: AnimatedMesh;
-}
 
 export class PlayerChunkComponent extends Component {
     static ID = ComponentId.PlayerChunk;
@@ -44,7 +43,7 @@ export class PlayerChunkComponent extends Component {
 
 export function registerClientComponents(manager: EntityManager) {
     manager.registerComponentType(new MeshComponent());
-    manager.registerComponentType(new PlayerComponent());
+    manager.registerComponentType(new AnimatedMeshComponent());
     manager.registerComponentType(new PlayerSelectionComponent());
     manager.registerComponentType(new PlayerChunkComponent());
 }

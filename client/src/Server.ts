@@ -4,6 +4,7 @@ import {bufferToObject} from "./helpers";
 import {deserializeTerrainChunk} from "../../shared/helpers"
 import {ComponentEventEmitter} from "../../shared/EventEmitter";
 import {EntityMessage} from "../../shared/interfaces";
+import {PlayerComponent} from "./components";
 
 
 export class Server {

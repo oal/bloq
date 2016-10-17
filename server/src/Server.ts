@@ -6,7 +6,7 @@ import {NetworkComponent} from "./components";
 import {ComponentId, ActionId, MessageType} from "../../shared/constants";
 import {Action} from "../../shared/actions";
 import {ComponentEventEmitter} from "../../shared/EventEmitter";
-import {initPlayerEntity} from "./entities";
+import {PlayerComponent} from "../../shared/components";
 
 // TODO: Use performance.now, like in the client.
 let hrtimeToSeconds = (hrtime: number[]) => hrtime[0] + hrtime[1] / 1000000000;
@@ -88,10 +88,12 @@ export default class Server {
 
     private onConnect(ws) {
         let playerEntity = this.world.entityManager.createEntity();
-        initPlayerEntity(this.world.entityManager, playerEntity, ws);
 
-        let netComponent = this.world.entityManager.getComponent<NetworkComponent>(playerEntity, ComponentId.Network);
-        Server.sendEntity(netComponent, this.world.entityManager.serializeEntity(playerEntity));
+        let netComponent = new NetworkComponent();
+        netComponent.websocket = ws;
+        this.world.entityManager.addComponent(playerEntity, netComponent);
+        this.world.entityManager.addComponent(playerEntity, new PlayerComponent());
+        Server.sendEntity(netComponent, this.world.entityManager.serializeEntity(playerEntity, [ComponentId.Player]));
 
         ws.on('message', (data: ArrayBuffer, flags) => this.onMessage(playerEntity, data));
         ws.on('close', () => this.onClose(playerEntity));

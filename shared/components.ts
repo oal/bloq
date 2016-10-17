@@ -205,12 +205,6 @@ export class BlockComponent extends SerializableComponent {
     count: number = 1;
 }
 
-export class ChatLogComponent extends SerializableComponent {
-    static ID = ComponentId.ChatLog;
-
-    messages: Array<string>; // list of entities
-}
-
 export class ChatMessageComponent extends SerializableComponent {
     static ID = ComponentId.ChatMessage;
 
@@ -224,6 +218,11 @@ export class ChunkRequestComponent extends SerializableComponent {
     chunks: Array<string> = [];
 }
 
+export class PlayerComponent extends SerializableComponent {
+    static ID = ComponentId.Player;
+
+    name: string;
+}
 
 export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new PositionComponent());
@@ -236,7 +235,7 @@ export function registerSharedComponents(manager: EntityManager) {
     manager.registerComponentType(new TerrainChunkComponent());
     manager.registerComponentType(new InventoryComponent());
     manager.registerComponentType(new BlockComponent());
-    manager.registerComponentType(new ChatLogComponent());
     manager.registerComponentType(new ChatMessageComponent());
     manager.registerComponentType(new ChunkRequestComponent());
+    manager.registerComponentType(new PlayerComponent());
 }

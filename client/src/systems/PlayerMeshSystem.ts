@@ -3,7 +3,7 @@ import {Scene} from 'three';
 import {System} from "../../../shared/System";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId} from "../../../shared/constants";
-import {PlayerComponent} from "../components";
+import {PlayerComponent, AnimatedMeshComponent} from "../components";
 import {
     PositionComponent, RotationComponent, PhysicsComponent,
     CurrentPlayerComponent
@@ -21,8 +21,10 @@ export default class PlayerMeshSystem extends System {
 
     update(dt: number) {
         this.entityManager.getEntities(ComponentId.Player).forEach((component, entity) => {
-            let playerComponent = component as PlayerComponent;
-            let mesh = playerComponent.mesh;
+            let animMeshComponent = this.entityManager.getComponent<AnimatedMeshComponent>(entity, ComponentId.AnimatedMesh);
+            if(!animMeshComponent) return;
+
+            let mesh = animMeshComponent.mesh;
 
             if (!mesh.parent) {
                 this.scene.add(mesh);
@@ -58,7 +60,7 @@ export default class PlayerMeshSystem extends System {
                 } else {
                     mesh.playAnimation('idle');
                 }
-                playerComponent.mesh.mixer.update(dt);
+                animMeshComponent.mesh.mixer.update(dt);
             }
 
         })

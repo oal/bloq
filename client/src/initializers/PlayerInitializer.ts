@@ -7,24 +7,39 @@ import {
 } from 'three';
 
 import Initializer from "../../../shared/Initializer";
-import {PlayerComponent, PlayerSelectionComponent, PlayerChunkComponent} from "../components";
+import {PlayerSelectionComponent, PlayerChunkComponent, AnimatedMeshComponent} from "../components";
 import {ComponentId} from "../../../shared/constants";
 import AnimatedMesh from "../AnimatedMesh";
 import EntityManager from "../../../shared/EntityManager";
+import NetworkSystem from "../systems/NetworkSystem";
+import {PlayerComponent} from "../../../shared/components";
 
 export default class PlayerInitializer extends Initializer {
+    private netSystem: NetworkSystem;
     private camera: PerspectiveCamera;
     private mesh: AnimatedMesh;
     private selectionMaterial: ShaderMaterial;
 
-    constructor(em: EntityManager, camera: PerspectiveCamera, playerMesh: AnimatedMesh, selectionMaterial: ShaderMaterial) {
+    constructor(em: EntityManager, netSystem: NetworkSystem, camera: PerspectiveCamera, playerMesh: AnimatedMesh, selectionMaterial: ShaderMaterial) {
         super(em);
+        this.netSystem = netSystem;
         this.camera = camera;
         this.mesh = playerMesh;
         this.selectionMaterial = selectionMaterial;
     }
 
     initialize(entity: string, components: Object) {
+        // New player just joined. Set and send username.
+        if (!components[ComponentId.Player]['name']) {
+            let playerComponent = new PlayerComponent();
+            playerComponent.name = localStorage.getItem('name');
+            this.entityManager.addComponent(entity, playerComponent);
+
+            this.netSystem.pushBuffer(this.entityManager.serializeEntity(entity));
+            return;
+        }
+
+        // Initialize joining player.
         Object.keys(components).forEach((componentTypeStr) => {
             let componentType = parseInt(componentTypeStr) as ComponentId;
             let componentData = components[componentType];
@@ -56,9 +71,9 @@ export default class PlayerInitializer extends Initializer {
             this.entityManager.addComponent(entity, selectionComponent);
         }
 
-        let playerComponent = new PlayerComponent();
-        playerComponent.mesh = playerMesh;
-        this.entityManager.addComponent(entity, playerComponent);
+        let animMeshComponent = new AnimatedMeshComponent();
+        animMeshComponent.mesh = playerMesh;
+        this.entityManager.addComponent(entity, animMeshComponent);
 
 
         this.entityManager.addComponent(entity, new PlayerChunkComponent());
