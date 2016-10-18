@@ -1,0 +1,48 @@
+#inventory {
+  position: absolute;
+  z-index: 3;
+
+  bottom: 0;
+  width: 100%;
+  display: flex;
+}
+
+.inventory-row {
+  margin: 0 auto;
+  padding: 0.25vw;
+  display: flex;
+  list-style-type: none;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px 3px 0 0;
+}
+
+.inventory-row li {
+  display: flex;
+  width: 4vw;
+  height: 4vw;
+  margin: 0.25vw;
+
+  border-radius: 2px;
+  background-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) inset;
+}
+
+.inventory-row li.active {
+  background-color: #fff;
+}
+
+.inventory-row li span {
+  display: none;
+  width: 1.5vw;
+  height: 1.5vw;
+  padding: 0.75vw;
+  margin: auto;
+
+  text-align: center;
+  border-radius: 2px;
+
+  background-size: cover;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.6) inset;
+}

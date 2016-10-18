@@ -15,7 +15,7 @@ module.exports = {
     entry: './src/main.ts',
     output: {
         path: __dirname + '/dist/',
-        publicPath: '/dist/',
+        publicPath: '/',
         filename: 'game.js'
     },
 
@@ -46,6 +46,7 @@ module.exports = {
     devServer: {
         historyApiFallback: true,
         hot: true,
-        host: '0.0.0.0'
+        host: '0.0.0.0',
+        contentBase: './dist'
     }
 };

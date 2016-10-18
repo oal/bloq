@@ -1,0 +1,65 @@
+#chat {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 25vw;
+  z-index: 4;
+}
+
+#chat-log {
+  margin: 0;
+  padding: 0.5vw;
+  list-style: none;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+#chat-log li {
+  margin: 0;
+  padding: 0;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+  display: flex;
+}
+
+#chat-log li:nth-child(3) {
+  opacity: 0.8
+}
+
+#chat-log li:nth-child(4) {
+  opacity: 0.6
+}
+
+#chat-log li:nth-child(5) {
+  opacity: 0.4
+}
+
+#chat-log li:nth-child(6) {
+  opacity: 0.2
+}
+
+#chat-log li:nth-child(7) {
+  opacity: 0.1
+}
+
+#chat-log strong {
+  display: block;
+  width: 33%;
+}
+
+#chat-log span {
+  display: block;
+  width: 67%;
+  overflow-wrap: break-word;
+}
+
+#chat-input {
+  font-family: 'Skranji', sans-serif;
+  box-sizing: border-box;
+  padding: 0.5vw;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: #fff;
+}

@@ -4,9 +4,20 @@ import EntityManager from "../../../shared/EntityManager";
 import {ComponentId, ChatMaxLength} from "../../../shared/constants";
 import {ChatMessageComponent} from "../../../shared/components";
 import NetworkSystem from "./NetworkSystem";
+import HTMLParser from "../HTMLParser";
+import '../../assets/stylesheets/chat.scss';
+
+
+const html = `
+    <div id="chat">
+        <ul id="chat-log"></ul>
+        <input id="chat-input" type="text" autocomplete="false" placeholder="Press T to chat">
+    </div>
+`;
 
 export default class ChatSystem extends System {
-    private messageInput: HTMLInputElement = document.querySelector('#chat-input') as HTMLInputElement;
+    private domNode: Element;
+    private messageInput: HTMLInputElement;
     private keyboardManager: KeyboardManager;
     private netSystem: NetworkSystem;
 
@@ -15,6 +26,13 @@ export default class ChatSystem extends System {
         this.keyboardManager = km;
         this.netSystem = netSystem;
 
+        // Parse and show in GUI.
+        let parser = new HTMLParser();
+        this.domNode = parser.parse(html);
+        document.body.appendChild(this.domNode);
+
+        // Set up selectors.
+        this.messageInput = this.domNode.querySelector('#chat-input') as HTMLInputElement;
         this.messageInput.maxLength = ChatMaxLength;
     }
 

@@ -3,12 +3,9 @@ import EntityManager from "../../../shared/EntityManager";
 import {ComponentId, ChatLogSize, ChatMaxLength} from "../../../shared/constants";
 
 
-
 // ChatMessageInitializer doesn't initialize entity in EntityManager, but uses entity data to update DOM.
 // We never need to reference this entity again, so therefore we can ignore it.
 export default class ChatMessageInitializer extends Initializer {
-    private messageLog: HTMLUListElement = document.querySelector('#chat-log') as HTMLUListElement;
-
     constructor(em: EntityManager) {
         super(em);
     }
@@ -28,15 +25,16 @@ export default class ChatMessageInitializer extends Initializer {
         msgEl.appendChild(playerNameEl);
         msgEl.appendChild(msgTextEl);
 
-        if(this.messageLog.children.length > ChatLogSize) {
-            this.messageLog.removeChild(this.messageLog.children[ChatLogSize]);
+        let messageLog = document.querySelector('#chat-log') as HTMLUListElement;
+        if(messageLog.children.length > ChatLogSize) {
+            messageLog.removeChild(messageLog.children[ChatLogSize]);
         }
 
-        let firstChild = this.messageLog.children[0];
+        let firstChild = messageLog.children[0];
         if (firstChild) {
-            this.messageLog.insertBefore(msgEl, firstChild);
+            messageLog.insertBefore(msgEl, firstChild);
         } else {
-            this.messageLog.appendChild(msgEl);
+            messageLog.appendChild(msgEl);
         }
     }
 }
