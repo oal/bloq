@@ -7,7 +7,7 @@ import {
 } from 'three';
 
 import BaseWorld from "../../shared/BaseWorld";
-import Game from "./Game";
+import PlayState from "./states/PlayState";
 import {registerClientComponents} from "./components";
 import {ClientActionManager} from "./actions";
 
@@ -27,14 +27,13 @@ import {ComponentId} from "../../shared/constants";
 import BlockInitializer from "./initializers/BlockInitializer";
 import TerrainChunkInitializer from "./initializers/TerrainChunkInitializer";
 import PlayerInitializer from "./initializers/PlayerInitializer";
-import AnimatedMesh from "./AnimatedMesh";
+import AnimatedMesh from "../lib/AnimatedMesh";
 import InputInitializer from "./initializers/InputInitializer";
 import NetworkSystem from "./systems/NetworkSystem";
 import ChatSystem from "./systems/ChatSystem";
 import ChatMessageInitializer from "./initializers/ChatMessageInitializer";
 import InitializerSystem from "../../shared/systems/InitializerSystem";
 import ChunkSystem from "./systems/ChunkSystem";
-import {EntityManagerEvent} from "../../shared/EntityManager";
 
 
 export default class World extends BaseWorld {
@@ -44,9 +43,9 @@ export default class World extends BaseWorld {
     selectionMaterial: ShaderMaterial;
     blockMaterial: ShaderMaterial;
 
-    game: Game;
+    game: PlayState;
 
-    constructor(game: Game) {
+    constructor(game: PlayState) {
         super();
         this.actionManager = new ClientActionManager();
         this.game = game;

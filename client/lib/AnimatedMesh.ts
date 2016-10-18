@@ -10,7 +10,7 @@ export default class AnimatedMesh extends SkinnedMesh {
 
         this.mixer = new AnimationMixer(this);
 
-        this.geometry.animations.forEach(anim => {
+        (this.geometry as Geometry).animations.forEach(anim => {
             this.animations[anim.name] = anim;
         });
 

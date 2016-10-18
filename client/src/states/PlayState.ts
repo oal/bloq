@@ -1,21 +1,22 @@
-import AssetManager from "./AssetManager";
-import {Server} from "./Server";
-import World from "./World";
+import AssetManager from "../../lib/AssetManager";
+import {Server} from "../Server";
+import World from "../World";
 import {WebGLRenderer} from 'three';
 import Stats = require('stats.js');
+import {State} from "./State";
 
 // Debug performance.
 var stats = new Stats();
 stats.showPanel(1); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
 
-const enum GameState {
+const enum GameFocus {
     Active,
     Inactive
 }
 
-export default class Game {
-    state: GameState = GameState.Inactive;
+export default class PlayState extends State {
+    state: GameFocus = GameFocus.Inactive;
 
     assetManager: AssetManager;
 
@@ -24,15 +25,19 @@ export default class Game {
 
     renderer: WebGLRenderer;
 
-    constructor(server: string) {
+    onEnter(context: Object) {
         this.loadAssets(() => {
-            this.server = new Server(this, server, () => {
+            this.server = new Server(this, context['server'], () => {
                 this.initRenderer();
                 this.world = new World(this);
 
                 this.startGameLoop();
             });
         });
+    }
+
+    onExit() {
+        // Clean up?
     }
 
     initRenderer() {
@@ -49,9 +54,9 @@ export default class Game {
 
     loadAssets(callback: Function) {
         let assets = new AssetManager();
-        assets.addTexture('terrain', require('../assets/textures.png'));
-        assets.addTexture('player', require('../assets/player.png'));
-        assets.addMesh('player', require('../assets/player.json'));
+        assets.addTexture('terrain', require('../../assets/textures.png'));
+        assets.addTexture('player', require('../../assets/player.png'));
+        assets.addMesh('player', require('../../assets/player.json'));
         assets.load(progress => {
             // TODO: Show loading progress in GUI.
             console.log(progress);
@@ -108,10 +113,10 @@ export default class Game {
 
         let canvas = this.renderer.domElement;
         if (document.pointerLockElement === canvas || (document as any).mozPointerLockElement === canvas) {
-            this.state = GameState.Active;
+            this.state = GameFocus.Active;
             overlay.style.display = 'none';
         } else {
-            this.state = GameState.Inactive;
+            this.state = GameFocus.Inactive;
             overlay.style.display = 'block';
         }
     }

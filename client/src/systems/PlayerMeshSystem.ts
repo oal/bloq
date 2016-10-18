@@ -3,7 +3,7 @@ import {Scene} from 'three';
 import {System} from "../../../shared/System";
 import EntityManager from "../../../shared/EntityManager";
 import {ComponentId} from "../../../shared/constants";
-import {PlayerComponent, AnimatedMeshComponent} from "../components";
+import {AnimatedMeshComponent} from "../components";
 import {
     PositionComponent, RotationComponent, PhysicsComponent,
     CurrentPlayerComponent

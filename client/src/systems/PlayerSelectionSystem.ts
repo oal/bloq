@@ -1,4 +1,4 @@
-import {Scene, Vector3, Raycaster} from 'three';
+import {Scene, Vector3, Raycaster, ShaderMaterial} from 'three';
 
 import {System} from "../../../shared/System";
 import EntityManager from "../../../shared/EntityManager";
@@ -105,7 +105,7 @@ export default class PlayerSelectionSystem extends System {
                     selectionComponent.mesh.position.lerp(hitPoint, 0.75); // Lerp because it looks good. :-)
 
                     // Update uniform so that selector deforms correctly to match terrain deformation.
-                    selectionComponent.mesh.material.uniforms.globalPosition.value = hitPoint;
+                    (selectionComponent.mesh.material as ShaderMaterial).uniforms.globalPosition.value = hitPoint;
 
                     break;
                 }

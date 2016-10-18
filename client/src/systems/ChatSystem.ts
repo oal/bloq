@@ -4,7 +4,7 @@ import EntityManager from "../../../shared/EntityManager";
 import {ComponentId, ChatMaxLength} from "../../../shared/constants";
 import {ChatMessageComponent} from "../../../shared/components";
 import NetworkSystem from "./NetworkSystem";
-import HTMLParser from "../HTMLParser";
+import HTMLParser from "../../lib/HTMLParser";
 import '../../assets/stylesheets/chat.scss';
 
 

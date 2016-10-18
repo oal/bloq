@@ -3,7 +3,7 @@ import {Mesh} from 'three';
 import {Component} from '../../shared/components';
 import EntityManager from "../../shared/EntityManager";
 import {ComponentId, Side} from "../../shared/constants";
-import AnimatedMesh from "./AnimatedMesh";
+import AnimatedMesh from "../lib/AnimatedMesh";
 
 export class MeshComponent extends Component {
     static ID = ComponentId.Mesh;

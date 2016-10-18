@@ -1,19 +1,18 @@
-import Game from "./Game";
+import PlayState from "./states/PlayState";
 import {MessageType, ComponentId} from "../../shared/constants";
 import {bufferToObject} from "./helpers";
 import {deserializeTerrainChunk} from "../../shared/helpers"
 import {ComponentEventEmitter} from "../../shared/EventEmitter";
 import {EntityMessage} from "../../shared/interfaces";
-import {PlayerComponent} from "./components";
 
 
 export class Server {
     url: string;
     ws: WebSocket;
-    game: Game;
+    game: PlayState;
     eventEmitter: ComponentEventEmitter = new ComponentEventEmitter();
 
-    constructor(game: Game, server: string, connCallback: Function) {
+    constructor(game: PlayState, server: string, connCallback: Function) {
         this.game = game;
 
         this.url = `ws://${server}`;

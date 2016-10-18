@@ -9,7 +9,7 @@ import {
 import Initializer from "../../../shared/Initializer";
 import {PlayerSelectionComponent, PlayerChunkComponent, AnimatedMeshComponent} from "../components";
 import {ComponentId} from "../../../shared/constants";
-import AnimatedMesh from "../AnimatedMesh";
+import AnimatedMesh from "../../lib/AnimatedMesh";
 import EntityManager from "../../../shared/EntityManager";
 import NetworkSystem from "../systems/NetworkSystem";
 import {PlayerComponent} from "../../../shared/components";

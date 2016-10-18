@@ -1,7 +1,7 @@
-import Game from "./Game";
-import HTMLParser from "./HTMLParser";
-import '../assets/stylesheets/menu.scss';
-
+import HTMLParser from "../../lib/HTMLParser";
+import {StateId} from "./StateManager";
+import '../../assets/stylesheets/menu.scss';
+import {State} from "./State";
 
 const html = `
     <div id="mainmenu">
@@ -23,36 +23,33 @@ const html = `
     </div>
 `;
 
-export default class MainMenu {
+
+export default class MenuState extends State {
     private menuNode: Element;
-    constructor() {
+
+    onEnter(context?: Object) {
         let parser = new HTMLParser();
         this.menuNode = parser.parse(html);
         document.body.appendChild(this.menuNode);
 
-        this.init();
-        this.registerEvents();
-    }
-
-    init() {
         let nameInput = (this.menuNode.querySelector('#name') as HTMLInputElement);
         nameInput.value = localStorage.getItem('name') || `Player${Math.round(Math.random() * 100000)}`;
         (this.menuNode.querySelector('#server') as HTMLInputElement).value = `${location.hostname}:8081`;
+
+        this.menuNode.querySelector('#play').addEventListener('click', () => {
+            let name = (this.menuNode.querySelector('#name') as HTMLInputElement).value;
+            if (name.length === 0) return;
+            localStorage.setItem('name', name);
+
+            let serverAddress = (this.menuNode.querySelector('#server') as HTMLInputElement).value;
+            if (serverAddress.length === 0) return;
+            this.transitionTo(StateId.Play, {
+                server: serverAddress
+            });
+        });
     }
 
-    registerEvents() {
-        this.menuNode.querySelector('#play').addEventListener('click', this.play.bind(this));
-    }
-
-    play() {
-        let name = (this.menuNode.querySelector('#name') as HTMLInputElement).value; // TODO: Use this.
-        if (name.length === 0) return;
-        localStorage.setItem('name', name);
-
-        let serverAddress = (this.menuNode.querySelector('#server') as HTMLInputElement).value;
-        if (serverAddress.length === 0) return;
-
+    onExit() {
         (this.menuNode as HTMLDivElement).style.display = 'none';
-        new Game(serverAddress);
     }
 }
