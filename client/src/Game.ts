@@ -27,7 +27,7 @@ export default class Game {
     constructor(server: string) {
         this.loadAssets(() => {
             this.server = new Server(this, server, () => {
-                this.init();
+                this.initRenderer();
                 this.world = new World(this);
 
                 this.startGameLoop();
@@ -35,7 +35,7 @@ export default class Game {
         });
     }
 
-    init() {
+    initRenderer() {
         this.renderer = new WebGLRenderer({
             antialias: false // TODO: Handle in a settings menu.
         });
@@ -49,9 +49,9 @@ export default class Game {
 
     loadAssets(callback: Function) {
         let assets = new AssetManager();
-        assets.addTexture('terrain', './assets/textures.png');
-        assets.addTexture('player', './assets/player.png');
-        assets.addMesh('player', './assets/player.json');
+        assets.addTexture('terrain', require('../assets/textures.png'));
+        assets.addTexture('player', require('../assets/player.png'));
+        assets.addMesh('player', require('../assets/player.json'));
         assets.load(progress => {
             // TODO: Show loading progress in GUI.
             console.log(progress);

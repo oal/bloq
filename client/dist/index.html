@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bloq</title>
+    <link href="https://fonts.googleapis.com/css?family=Skranji" rel="stylesheet">
+</head>
+<body>
+
+<div id="mainmenu">
+    <ul>
+        <li>
+            <span>Player name:</span>
+            <input type="text" id="name" placeholder="Name">
+        </li>
+
+        <li>
+            <span>Server:</span>
+            <input type="text" id="server" placeholder="Server address and port">
+        </li>
+
+        <li>
+            <button id="play">Join server</button>
+        </li>
+    </ul>
+</div>
+
+<div id="gui">
+    <div id="overlay"></div>
+
+    <div id="crosshair"></div>
+
+    <div id="chat">
+        <ul id="chat-log"></ul>
+        <input id="chat-input" type="text" autocomplete="false" placeholder="Press T to chat">
+    </div>
+
+    <div id="inventory">
+        <ol class="inventory-row">
+            <li class="active"><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+            <li><span></span></li>
+        </ol>
+    </div>
+</div>
+
+<script src="./game.js"></script>
+
+</body>
+</html>
