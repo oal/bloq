@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bloq</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Skranji">
+    <style>
+        body {
+            font-family: 'Skranji', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #loader {
+            background: linear-gradient(to bottom, #bff0ff 0%, #84dde0 100%);
+            display: flex;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        #loader progress {
+            margin: auto;
+            width: 300px;
+            height: 50px;
+            border: 0;
+        }
+
+        #loader progress:before {
+            content: 'Loading Bloq';
+            padding-bottom: 5px;
+        }
+
+        #loader progress[value]::-webkit-progress-bar {
+            background-color: #eee;
+            border-radius: 2px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+            border: 1px solid #fff;
+            padding: 2px;
+        }
+
+        #loader progress[value]::-webkit-progress-value {
+            border-radius: 2px;
+            background: linear-gradient(to bottom, #A05A2C 0%, #814824 100%);
+            transition: 0.25s width;
+        }
+    </style>
+</head>
+<body>
+
+<div id="gui">
+    <div id="overlay"></div>
+    <div id="crosshair"></div>
+</div>
+
+<div id="loader"></div>
+
+<script>
+    // Load the game
+    (function () {
+        var loader = document.body.querySelector('#loader');
+        var progress = document.createElement('progress');
+        progress.value = 0;
+        progress.max = 1;
+        loader.appendChild(progress);
+
+        var req = new XMLHttpRequest();
+
+        req.addEventListener('progress', function (e) {
+            if (e.lengthComputable) {
+                progress.value = e.loaded / e.total;
+            }
+        });
+
+        req.addEventListener('load', function (e) {
+            var script = document.createElement('script');
+            script.src = URL.createObjectURL(req.response);
+
+            document.body.removeChild(loader);
+            document.body.appendChild(script);
+        });
+
+        req.responseType = 'blob';
+        req.overrideMimeType('application/javascript');
+        req.open('GET', './game.js', true);
+        req.send();
+    })();
+</script>
+
+</body>
+</html>

@@ -1,5 +1,6 @@
 var path = require('path');
 var webpack = require('webpack');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     resolve: {
@@ -42,6 +43,15 @@ module.exports = {
             }
         ]
     },
+
+    plugins: [
+        new HtmlWebpackPlugin({
+            title: 'Bloq',
+            filename: 'index.html',
+            template: './assets/index.html',
+            inject: false,
+        })
+    ],
 
     devServer: {
         historyApiFallback: true,
