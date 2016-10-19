@@ -1,17 +1,9 @@
-import {StateId, StateManager} from "./StateManager";
-
 export class State {
-    private stateManager: StateManager;
-
-    constructor(stateManager: StateManager) {
-        this.stateManager = stateManager;
+    tick(dt: number): (State | null) {
+        return null;
     }
 
-    transitionTo(nextState: StateId, context?: Object) {
-        this.stateManager.setState(nextState, context);
-    }
-
-    onEnter(context?: Object) {
+    onEnter() {
 
     }
 

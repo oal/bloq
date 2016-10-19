@@ -1,27 +1,28 @@
-import MenuState from "./MenuState";
-import PlayState from "./PlayState";
 import {State} from "./State";
 
-export const enum StateId {
-    Menu,
-    Play
-}
+export default class StateManager {
+    private state: State;
+    private currentTime: number = performance.now();
 
-export class StateManager {
-    state: State;
-    states: Array<State>;
+    setState(nextState: State) {
+        if (this.state) this.state.onExit();
+        this.state = nextState;
+        this.state.onEnter();
 
-    constructor() {
-        this.states = [
-            new MenuState(this),
-            new PlayState(this)
-        ];
+        this.update();
     }
 
-    setState(nextState: StateId, context: Object = {}) {
-        if (this.state) this.state.onExit();
-        this.state = this.states[nextState];
-        this.state.onEnter(context);
+    private update() {
+        let newTime = performance.now();
+        let dt = (newTime - this.currentTime) / 1000;
+
+        let nextState = this.state.tick(dt);
+        if(nextState) {
+            this.setState(nextState);
+        } else {
+            this.currentTime = newTime;
+            requestAnimationFrame(this.update.bind(this));
+        }
     }
 }
 

@@ -5,41 +5,60 @@ import {WebGLRenderer} from 'three';
 import Stats = require('stats.js');
 import {State} from "./State";
 
-// Debug performance.
+// Debug performance. TODO: Should go in DebugTextSystem.
 var stats = new Stats();
 stats.showPanel(1); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
 
-const enum GameFocus {
+const enum GameState {
     Active,
     Inactive
 }
 
 export default class PlayState extends State {
-    state: GameFocus = GameFocus.Inactive;
+    state: GameState = GameState.Inactive;
 
     assetManager: AssetManager;
 
     world: World;
+    serverAddress: string; // TODO: Create Server instance in constructor, but don't connect until onEnter.
     server: Server;
 
     renderer: WebGLRenderer;
+    isRunning: boolean = false;
 
-    onEnter(context: Object) {
+    constructor(server: string) {
+        super();
+        this.serverAddress = server;
+    }
+
+    onEnter() {
         this.loadAssets(() => {
-            this.server = new Server(this, context['server'], () => {
+            this.server = new Server(this, this.serverAddress, () => {
                 this.initRenderer();
                 this.world = new World(this);
-
-                this.startGameLoop();
+                this.isRunning = true;
             });
         });
     }
 
     onExit() {
-        // Clean up?
+        // Possibly cleanup. We never leave the PlayState at the moment, though.
     }
 
+    tick(dt: number): State|null {
+        if(!this.isRunning) return null;
+
+        stats.begin();
+        this.world.tick(dt);
+        stats.end();
+
+        // Render
+        this.renderer.render(this.world.scene, this.world.camera);
+        return null;
+    }
+
+    // Init
     initRenderer() {
         this.renderer = new WebGLRenderer({
             antialias: false // TODO: Handle in a settings menu.
@@ -50,7 +69,6 @@ export default class PlayState extends State {
         document.body.appendChild(this.renderer.domElement);
         this.registerEvents();
     }
-
 
     loadAssets(callback: Function) {
         let assets = new AssetManager();
@@ -68,30 +86,6 @@ export default class PlayState extends State {
         this.assetManager = assets;
     }
 
-    startGameLoop() {
-        // Use closure to avoid adding time related stuff to the game object.
-        let currentTime = performance.now();
-        let update = () => {
-            let newTime = performance.now();
-            let dt = (newTime - currentTime) / 1000;
-
-            // Process frame
-            this.tick(dt);
-
-            // Render
-            this.renderer.render(this.world.scene, this.world.camera);
-
-            currentTime = newTime;
-            requestAnimationFrame(update);
-        };
-        update();
-    }
-
-    tick(dt: number) {
-        stats.begin();
-        this.world.tick(dt);
-        stats.end();
-    }
 
     // Events
     private registerEvents() {
@@ -113,10 +107,10 @@ export default class PlayState extends State {
 
         let canvas = this.renderer.domElement;
         if (document.pointerLockElement === canvas || (document as any).mozPointerLockElement === canvas) {
-            this.state = GameFocus.Active;
+            this.state = GameState.Active;
             overlay.style.display = 'none';
         } else {
-            this.state = GameFocus.Inactive;
+            this.state = GameState.Inactive;
             overlay.style.display = 'block';
         }
     }
