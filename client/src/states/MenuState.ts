@@ -1,10 +1,20 @@
 import HTMLParser from "../../lib/HTMLParser";
-import '../../assets/stylesheets/menu.scss';
 import {State} from "./State";
 import PlayState from "./PlayState";
 
+import '../../assets/stylesheets/menu.scss';
+let Modernizr = require('../.modernizrrc');
+
 const html = `
     <div id="mainmenu">
+        <div class="warning" style="display: none">
+            Your browser has poor support for some technologies used in this game.
+            It may still be playable, but please consider upgrading your browser.
+        </div>
+        <div class="error" style="display: none">
+            Your browser does not support all the technologies required to play this game,
+            and it will most likely not work. Please upgrade your browser.
+        </div>
         <ul>
             <li>
                 <span>Player name:</span>
@@ -36,6 +46,7 @@ export default class MenuState extends State {
     }
 
     onEnter() {
+        this.checkBrowserSupport();
         document.body.appendChild(this.menuNode);
 
         let nameInput = (this.menuNode.querySelector('#name') as HTMLInputElement);
@@ -54,6 +65,17 @@ export default class MenuState extends State {
             return new PlayState(this.serverAddress);
         }
         return null;
+    }
+
+    private checkBrowserSupport() {
+        let hasErrors = !Modernizr.canvas || !Modernizr.dataview || !Modernizr.es6math || !Modernizr.performance || !Modernizr.pointerlock || !Modernizr.postmessage || !Modernizr.webgl || !Modernizr.websockets || !Modernizr.webworkers;
+        let hasWarnings = !Modernizr.cssanimations || !Modernizr.cssvwunit || !Modernizr.flexbox || !Modernizr.fullscreen || !Modernizr.audio;
+
+        if(hasErrors) {
+            (this.menuNode.querySelector('.error') as HTMLDivElement).style.display = 'block';
+        } else if (hasWarnings) {
+            (this.menuNode.querySelector('.warning') as HTMLDivElement).style.display = 'block';
+        }
     }
 
     private join() {

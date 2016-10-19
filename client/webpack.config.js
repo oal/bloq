@@ -5,7 +5,10 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
     resolve: {
         extensions: ['', '.ts', '.js'],
-        root: [path.resolve(__dirname, 'node_modules')]
+        root: [path.resolve(__dirname, 'node_modules')],
+        alias: {
+            modernizr$: path.resolve(__dirname, "./.modernizrrc")
+        }
     },
 
     resolveLoader: {
@@ -40,6 +43,10 @@ module.exports = {
             {
                 test: /\.(png|jpg|json)$/,
                 loaders: ['file']
+            },
+            {
+                test: /\.modernizrrc$/,
+                loader: 'modernizr'
             }
         ]
     },

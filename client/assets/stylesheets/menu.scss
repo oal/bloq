@@ -56,3 +56,19 @@
 #mainmenu button:hover {
   background-color: #fff;
 }
+
+#mainmenu {
+  .warning, .error {
+    background-color: rgba(0,0,0,0.75);
+    width: 100%;
+    padding: 2.5vh;
+    margin: 0;
+  }
+
+  .warning {
+    color: #FFE700;
+  }
+  .error {
+    color: #FF1500;
+  }
+}

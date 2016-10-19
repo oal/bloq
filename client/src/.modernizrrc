@@ -1,0 +1,23 @@
+{
+  "minify": true,
+  "options": [
+    "setClasses"
+  ],
+  "feature-detects": [
+    "canvas",
+    "css/animations",
+    "css/vwunit",
+    "dataview-api",
+    "es6/math",
+    "css/flexbox",
+    "fullscreen-api",
+    "performance",
+    "pointerlock-api",
+    "postmessage",
+    "audio",
+    "webgl",
+    "websockets",
+    "workers/webworkers"
+  ]
+}
+
