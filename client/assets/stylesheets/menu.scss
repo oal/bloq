@@ -2,6 +2,7 @@
   background-image: url('../menu.jpg');
   background-size: cover;
   color: #000;
+  display: -webkit-flex;
   display: flex;
   position: absolute;
   top: 0;
@@ -9,6 +10,7 @@
   bottom: 0;
   left: 0;
   z-index: 1000;
+  -webkit-flex-direction: column;
   flex-direction: column;
   font-size: 1.5vw;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
@@ -25,12 +27,16 @@
   border: 5px solid rgba(0, 0, 0, 0.15);
   box-shadow: 0 3px 4px rgba(0, 0, 0, 0.5);
   list-style: none;
+  max-width: 40vw;
 }
 
 #mainmenu li {
   padding: 1.5vw;
+  display: -webkit-flex;
   display: flex;
+  -webkit-align-content: space-between;
   align-content: space-between;
+  -webkit-flex-direction: column;
   flex-direction: column;
 }
 

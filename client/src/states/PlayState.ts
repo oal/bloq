@@ -38,6 +38,10 @@ export default class PlayState extends State {
                 this.initRenderer();
                 this.world = new World(this);
                 this.isRunning = true;
+
+                let m = this.assetManager.getMusic('music');
+                m.loop = true;
+                m.play();
             });
         });
     }
@@ -75,6 +79,7 @@ export default class PlayState extends State {
         assets.addTexture('terrain', require('../../assets/textures.png'));
         assets.addTexture('player', require('../../assets/player.png'));
         assets.addMesh('player', require('../../assets/player.json'));
+        assets.addMusic('music', require('file!../../assets/sound/music.ogg'));
         assets.load(progress => {
             // TODO: Show loading progress in GUI.
             console.log(progress);
@@ -94,7 +99,7 @@ export default class PlayState extends State {
         overlay.onclick = () => {
             let canvas = this.renderer.domElement;
             canvas.requestPointerLock = canvas.requestPointerLock || (canvas as any).mozRequestPointerLock;
-            canvas.requestPointerLock();
+            if(canvas.requestPointerLock) canvas.requestPointerLock();
         };
 
         let registerEvent = (eventName, method, target?) => (target || document).addEventListener(eventName, method.bind(this), false);

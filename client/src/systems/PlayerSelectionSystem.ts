@@ -26,8 +26,6 @@ export default class PlayerSelectionSystem extends System {
             let positionComponent = this.entityManager.getComponent<PositionComponent>(entity, ComponentId.Position);
             let rotComponent = this.entityManager.getComponent<RotationComponent>(entity, ComponentId.Rotation);
 
-            // If neither position nor rotation has changed, no need to recalculate selection target.
-            if(!positionComponent.isDirty() && !rotComponent.isDirty()) return;
             let selectionComponent = component as PlayerSelectionComponent;
 
             // Get player's eye position, which we use for ray caster / collision detection origin.

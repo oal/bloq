@@ -3,36 +3,45 @@ import AnimatedMesh from "./AnimatedMesh";
 
 
 export default class AssetManager {
-    isLoaded: boolean;
-    textureLoader: TextureLoader = new TextureLoader();
-    meshLoader: JSONLoader = new JSONLoader();
+    private isLoaded: boolean;
+    private textureLoader: TextureLoader = new TextureLoader();
+    private meshLoader: JSONLoader = new JSONLoader();
 
     queue: {
         textures: Array<[string, string]>,
-        meshes: Array<[string, string]>
+        meshes: Array<[string, string]>,
+        music: Array<[string, string]>
     };
 
     assets: {
         textures: Map<string, Texture>,
-        meshes: Map<string, Mesh | AnimatedMesh>
+        meshes: Map<string, Mesh | AnimatedMesh>,
+        music: Map<string, HTMLAudioElement>
     };
 
     constructor() {
         this.queue = {
             textures: [],
-            meshes: []
+            meshes: [],
+            music: [],
         };
         this.assets = {
             textures: new Map<string, Texture>(),
-            meshes: new Map<string, Mesh | SkinnedMesh>()
+            meshes: new Map<string, Mesh | SkinnedMesh>(),
+            music: new Map<string, HTMLAudioElement>()
         };
     }
+
     addTexture(name: string, url: string) {
         this.queue.textures.push([name, url]);
     }
 
     addMesh(name: string, url: string) {
         this.queue.meshes.push([name, url]);
+    }
+
+    addMusic(name: string, url: string) {
+        this.queue.music.push([name, url]);
     }
 
     load(callback: Function) {
@@ -44,13 +53,16 @@ export default class AssetManager {
             this.loadMeshes(callback, () => {
                 console.log('Meshes loaded.');
                 this.queue.meshes = [];
-                this.isLoaded = true;
+                this.loadMusic(callback, () => {
+                    this.queue.music = [];
+                    this.isLoaded = true;
+                });
             });
         });
     }
 
     loadTextures(progress: Function, done: Function) {
-        let totalFiles = this.queue.textures.length + this.queue.meshes.length;
+        let totalFiles = this.queue.textures.length + this.queue.meshes.length + this.queue.music.length;
         let filesDone = 0;
 
         this.queue.textures.forEach(pair => {
@@ -67,7 +79,7 @@ export default class AssetManager {
     }
 
     loadMeshes(progress: Function, done: Function) {
-        let totalFiles = this.queue.textures.length + this.queue.meshes.length;
+        let totalFiles = this.queue.textures.length + this.queue.meshes.length + this.queue.music.length;
         let filesDone = 0;
 
         this.queue.meshes.forEach(pair => {
@@ -91,11 +103,34 @@ export default class AssetManager {
         });
     }
 
+    loadMusic(progress: Function, done: Function) {
+        let totalFiles = this.queue.textures.length + this.queue.meshes.length + this.queue.music.length;
+        let filesDone = 0;
+
+        this.queue.music.forEach(pair => {
+            let [name, url] = pair;
+
+            let el = document.createElement('audio');
+            el.setAttribute('src', url);
+            el.load();
+            el.addEventListener('canplaythrough', (evt) => {
+                this.assets.music.set(name, el);
+                filesDone++;
+                progress(filesDone / totalFiles);
+                if (filesDone == this.queue.music.length) done();
+            });
+        });
+    }
+
     getTexture(name): Texture {
         return this.assets.textures.get(name);
     }
 
     getMesh(name): Mesh | SkinnedMesh {
         return this.assets.meshes.get(name);
+    }
+
+    getMusic(name): HTMLAudioElement {
+        return this.assets.music.get(name);
     }
 }

@@ -1,3 +1,4 @@
+import {TextEncoder} from "text-encoding";
 import {System} from "../../../shared/System";
 import EntityManager from "../../../shared/EntityManager";
 import {Server} from "../Server";
