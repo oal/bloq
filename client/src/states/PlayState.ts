@@ -85,6 +85,8 @@ export default class PlayState extends State {
         assets.addMusic('music', require('file!../../assets/sound/music.ogg'));
 
         assets.addSound('walk', require('file!../../assets/sound/walk.ogg'));
+        assets.addSound('dig', require('file!../../assets/sound/dig.ogg'));
+        assets.addSound('pickup', require('file!../../assets/sound/pickup.ogg'));
 
         assets.load(progress => {
             // TODO: Show loading progress in GUI.
