@@ -40,7 +40,7 @@ export default class PlayerInitializer extends Initializer {
             let blockEntity = em.createEntity();
             let block = new BlockComponent();
             block.kind = i + 1;
-            block.count = 1;
+            block.count = 99;
 
             em.addComponent(blockEntity, block);
             let pos = new PositionComponent();

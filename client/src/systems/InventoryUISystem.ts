@@ -61,7 +61,6 @@ export default class InventoryUISystem extends System {
                 newSlot.className = 'active';
             }
 
-            // TODO: Add / remove elements or update background image instead of just hiding and displaying like this.
             inventory.slots.forEach((entity, index) => {
                 let domBlock = ((this.inventoryElements[index] as HTMLElement).children[0] as HTMLElement);
                 if(!domBlock) return; // If inventory slot is not filled, skip.
@@ -69,7 +68,12 @@ export default class InventoryUISystem extends System {
                 domBlock.style.display = entity ? 'block' : 'none';
                 if (entity) {
                     let block = this.entityManager.getComponent<BlockComponent>(entity, ComponentId.Block);
-                    if (!block) return;
+                    if (!block) {
+                        // Block was removed from game / inventory this tick, so update view right away.
+                        inventory.slots[index] = null;
+                        domBlock.style.display = 'none';
+                        return;
+                    }
 
                     // Workaround for Firefox. It attempts to refetch 404s every tick even though value didn't change.
                     let newBg = `url("${textureImages[block.kind]}")`;

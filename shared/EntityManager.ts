@@ -4,12 +4,8 @@ import {Component, SerializableComponent} from "./components";
 import {ComponentId} from "./constants";
 
 let componentProxyHandler = {
-    // get: (target, name) => {
-    //     return target[name];
-    // },
     set: (obj, prop, value) => {
         if (prop !== 'dirtyFields' && obj[prop] !== value) {
-            if (prop === 'primaryAction') console.log('New: ', value, "Old: ", obj[prop]);
             (obj as Component).dirtyFields.add(prop);
             obj[prop] = value;
         }
@@ -38,7 +34,7 @@ export default class EntityManager {
         this.components = new Map<ComponentId, Map<string, Component>>();
         this.componentConstructors = new Map<ComponentId, Function>();
 
-        for(let i = 0; i < EntityManagerEvent.NumEvents; i++) {
+        for (let i = 0; i < EntityManagerEvent.NumEvents; i++) {
             this.eventHandlers.push([]);
         }
     }
@@ -74,7 +70,7 @@ export default class EntityManager {
             let component = this.components.get(typeName).get(entity);
             if (component instanceof SerializableComponent) {
                 components.push(`"${typeName}":${component.serialize()}`);
-            } else if(component) {
+            } else if (component) {
                 console.warn(`Tried to serialize non-serializeable component: "${component.typeName()}"`)
             }
         });
@@ -95,7 +91,7 @@ export default class EntityManager {
 
     getFirstEntity<T>(componentType: ComponentId): [string, T] {
         let ec = this.components.get(componentType).entries().next();
-        if(!ec.done) return (ec.value as any) as [string, T]; // Double cast to make TS compiler understand.
+        if (!ec.done) return (ec.value as any) as [string, T]; // Double cast to make TS compiler understand.
         return [null, null];
     }
 
@@ -118,9 +114,9 @@ export default class EntityManager {
         return component;
     }
 
-    addComponentFromObject(entity:string, componentType: ComponentId, componentData: Object): Component {
+    addComponentFromObject(entity: string, componentType: ComponentId, componentData: Object): Component {
         let componentConstructor = this.componentConstructors.get(componentType);
-        if(!componentConstructor) {
+        if (!componentConstructor) {
             console.warn('Tried to add non-registered component type from object:', componentType);
             return;
         }
@@ -158,10 +154,6 @@ export default class EntityManager {
         this.components.forEach(entityComponent => {
             entityComponent.forEach((component) => {
                 component.dirtyFields.clear();
-                /*Object.keys(component.dirtyFields).forEach(key => {
-                    if (component.dirtyFields[key]) component.dirtyFields[key] = false;
-                });
-                */
             });
         });
     }

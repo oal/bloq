@@ -27,7 +27,7 @@ export class ActionManager {
 }
 
 export class Action {
-    serialize(): Uint8Array {
+    serialize(): ArrayBuffer {
         let str = JSON.stringify(this);
         let encoder = new TextEncoder();
         return encoder.encode(str);

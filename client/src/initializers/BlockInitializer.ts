@@ -17,25 +17,33 @@ export default class BlockInitializer extends Initializer {
     }
 
     initialize(entity: string, components: Object) {
-        this.entityManager.addComponentFromObject(
-            entity,
-            ComponentId.Position,
-            components[ComponentId.Position]
-        );
-
         let blockComponent = this.entityManager.addComponentFromObject(
             entity,
             ComponentId.Block,
             components[ComponentId.Block]
         ) as BlockComponent;
 
-        let geom = buildBlockGeometry(blockComponent.kind);
+        if(blockComponent.count === 0) {
+            this.entityManager.removeEntity(entity);
+        }
 
-        let meshComponent = new MeshComponent();
-        meshComponent.mesh = new Mesh(geom, this.material);
-        meshComponent.mesh.scale.set(0.25, 0.25, 0.25);
+        // If block has position, it will be shown in the world.
+        // Otherwise it's in a player's inventory.
+        if (components[ComponentId.Position]) {
+            this.entityManager.addComponentFromObject(
+                entity,
+                ComponentId.Position,
+                components[ComponentId.Position]
+            );
 
-        this.entityManager.addComponent(entity, meshComponent);
-        this.entityManager.addComponent(entity, new RotationComponent());
+            let geom = buildBlockGeometry(blockComponent.kind);
+
+            let meshComponent = new MeshComponent();
+            meshComponent.mesh = new Mesh(geom, this.material);
+            meshComponent.mesh.scale.set(0.25, 0.25, 0.25);
+
+            this.entityManager.addComponent(entity, meshComponent);
+            this.entityManager.addComponent(entity, new RotationComponent());
+        }
     }
 }

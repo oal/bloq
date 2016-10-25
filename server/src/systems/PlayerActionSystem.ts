@@ -1,13 +1,15 @@
 import {System} from "../../../shared/System";
 import {ServerActionManager} from "../actions";
 import EntityManager from "../../../shared/EntityManager";
-import {ComponentId, Side, ActionId} from "../../../shared/constants";
+import {ComponentId, Side, ActionId, MessageType} from "../../../shared/constants";
 import {InputComponent, InventoryComponent, BlockComponent} from "../../../shared/components";
-import {SetBlocksAction} from "../../../shared/actions";
+import {SetBlocksAction, RemoveEntitiesAction} from "../../../shared/actions";
 import {globalToChunk} from "../../../shared/helpers";
 import {broadcastAction} from "../helpers";
 import {initBlockEntity} from "../entities";
 import {getValueGlobal} from "../terrain";
+import {NetworkComponent} from "../components";
+import Server from "../Server";
 
 
 export default class PlayerActionSystem extends System {
@@ -59,9 +61,24 @@ export default class PlayerActionSystem extends System {
 
                 // TODO: Subtract from inventory when building.
                 let inventory = this.entityManager.getComponent<InventoryComponent>(entity, ComponentId.Inventory);
-                let block = this.entityManager.getComponent<BlockComponent>(inventory.slots[inventory.activeSlot], ComponentId.Block);
+                let inventoryBlockEntity = inventory.slots[inventory.activeSlot];
+                let block = this.entityManager.getComponent<BlockComponent>(inventoryBlockEntity, ComponentId.Block);
                 if (block) {
                     modifiedBlocks.push([target[0] + add[0], target[1] + add[1], target[2] + add[2], block.kind]);
+                    block.count--;
+
+                    let netComponent = this.entityManager.getComponent<NetworkComponent>(entity, ComponentId.Network);
+                    netComponent.pushBuffer(MessageType.Entity, this.entityManager.serializeEntity(inventoryBlockEntity, [ComponentId.Block]));
+
+                    if (block.count <= 0) {
+                        this.entityManager.removeEntity(inventoryBlockEntity);
+                        inventory.slots[inventory.activeSlot] = null;
+                        netComponent.pushBuffer(MessageType.Entity, this.entityManager.serializeEntity(entity, [ComponentId.Inventory]));
+
+                        let action = new RemoveEntitiesAction([inventoryBlockEntity]);
+                        Server.sendAction(netComponent, ActionId.RemoveEntities, action);
+                        this.actionManager.queueAction(action); // Queue on server as well.
+                    }
                 }
 
             }
