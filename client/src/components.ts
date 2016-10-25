@@ -11,7 +11,7 @@ export class MeshComponent extends Component {
     mesh: Mesh = null;
 
     dispose(entityManager: EntityManager): void {
-        if(this.mesh && this.mesh.parent) {
+        if (this.mesh && this.mesh.parent) {
             this.mesh.geometry.dispose();
             this.mesh.parent.remove(this.mesh);
         }
@@ -47,4 +47,3 @@ export function registerClientComponents(manager: EntityManager) {
     manager.registerComponentType(new PlayerSelectionComponent());
     manager.registerComponentType(new PlayerChunkComponent());
 }
-

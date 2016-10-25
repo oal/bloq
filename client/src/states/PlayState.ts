@@ -39,9 +39,10 @@ export default class PlayState extends State {
                 this.world = new World(this);
                 this.isRunning = true;
 
-                let m = this.assetManager.getMusic('music');
-                m.loop = true;
-                m.play();
+                // let m = this.assetManager.getMusic('music');
+                // m.loop = true;
+                // m.volume = 0.25;
+                // m.play();
             });
         });
     }
@@ -51,7 +52,7 @@ export default class PlayState extends State {
     }
 
     tick(dt: number): State|null {
-        if(!this.isRunning) return null;
+        if (!this.isRunning) return null;
 
         stats.begin();
         this.world.tick(dt);
@@ -78,8 +79,13 @@ export default class PlayState extends State {
         let assets = new AssetManager();
         assets.addTexture('terrain', require('../../assets/textures.png'));
         assets.addTexture('player', require('../../assets/player.png'));
+
         assets.addMesh('player', require('../../assets/player.json'));
+
         assets.addMusic('music', require('file!../../assets/sound/music.ogg'));
+
+        assets.addSound('walk', require('file!../../assets/sound/walk.ogg'));
+
         assets.load(progress => {
             // TODO: Show loading progress in GUI.
             console.log(progress);
@@ -99,7 +105,7 @@ export default class PlayState extends State {
         overlay.onclick = () => {
             let canvas = this.renderer.domElement;
             canvas.requestPointerLock = canvas.requestPointerLock || (canvas as any).mozRequestPointerLock;
-            if(canvas.requestPointerLock) canvas.requestPointerLock();
+            if (canvas.requestPointerLock) canvas.requestPointerLock();
         };
 
         let registerEvent = (eventName, method, target?) => (target || document).addEventListener(eventName, method.bind(this), false);

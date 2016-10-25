@@ -28,6 +28,7 @@ export const enum ComponentId {
     PlayerSelection,
     Player,
     PlayerChunk,
+    PlayerSound,
 
     // Server
     Network,

@@ -34,6 +34,7 @@ import ChatSystem from "./systems/ChatSystem";
 import ChatMessageInitializer from "./initializers/ChatMessageInitializer";
 import InitializerSystem from "../../shared/systems/InitializerSystem";
 import ChunkSystem from "./systems/ChunkSystem";
+import SoundSystem from "./systems/SoundSystem";
 
 
 export default class World extends BaseWorld {
@@ -105,9 +106,9 @@ export default class World extends BaseWorld {
             ComponentId.Player,
             new PlayerInitializer(
                 this.entityManager,
+                this.game.assetManager,
                 netSystem,
                 this.camera,
-                this.game.assetManager.getMesh('player') as AnimatedMesh,
                 this.selectionMaterial
             )
         );
@@ -133,6 +134,7 @@ export default class World extends BaseWorld {
         this.addSystem(new PlayerSelectionSystem(this.entityManager, this.scene), 13);
         this.addSystem(new ChunkSystem(this.entityManager, netSystem), 14);
 
+        this.addSystem(new SoundSystem(this.entityManager, this.game.assetManager), 998);
         this.addSystem(new InventoryUISystem(this.entityManager), 999);
         this.addSystem(new DebugTextSystem(this.entityManager, this.game.renderer), 1000);
         this.addSystem(netSystem, 1001);

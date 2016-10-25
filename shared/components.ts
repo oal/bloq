@@ -17,7 +17,7 @@ export class Component {
     }
 
     isDirty(field?: string): boolean {
-        if(field) return this.dirtyFields.has(field);
+        if (field) return this.dirtyFields.has(field);
         else return this.dirtyFields.size > 0;
     }
 
@@ -69,6 +69,10 @@ export class PhysicsComponent extends SerializableComponent {
     velX: number = 0;
     velY: number = 0;
     velZ: number = 0;
+
+    isMovingHorizontally() {
+        return Math.abs(this.velX) > 0.01 || Math.abs(this.velZ) > 0.01;
+    }
 }
 
 export class OnGroundComponent extends Component {
@@ -109,7 +113,6 @@ export class InputComponent extends SerializableComponent {
 }
 
 
-
 export class CurrentPlayerComponent extends SerializableComponent {
     static ID = ComponentId.CurrentPlayer;
 }
@@ -132,18 +135,18 @@ export class TerrainChunkComponent extends Component {
 
     // Used when block just next to this chunk is changed, to force refresh of this chunk's mesh.
     forceDirtyData(state: boolean) {
-        if(state) this.dirtyFields.add('data');
+        if (state) this.dirtyFields.add('data');
         else this.dirtyFields.delete('data');
     }
 
     getValue(x: number, y: number, z: number) {
         if (x < 0 || y < 0 || z < 0 || x >= TERRAIN_CHUNK_SIZE || y >= TERRAIN_CHUNK_SIZE || z >= TERRAIN_CHUNK_SIZE) return 0;
-        return this.data[(y|0) * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE + (z|0) * TERRAIN_CHUNK_SIZE + (x|0)];
+        return this.data[(y | 0) * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE + (z | 0) * TERRAIN_CHUNK_SIZE + (x | 0)];
     }
 
     setValue(x: number, y: number, z: number, mat: number): boolean {
         if (x < 0 || y < 0 || z < 0 || x >= TERRAIN_CHUNK_SIZE || y >= TERRAIN_CHUNK_SIZE || z >= TERRAIN_CHUNK_SIZE) return false;
-        this.data[(y|0) * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE + (z|0) * TERRAIN_CHUNK_SIZE + (x|0)] = mat;
+        this.data[(y | 0) * TERRAIN_CHUNK_SIZE * TERRAIN_CHUNK_SIZE + (z | 0) * TERRAIN_CHUNK_SIZE + (x | 0)] = mat;
 
         // Implicit dirty detection only works when setting attributes, not mutating child structures like an array.
         this.dirtyFields.add('data');
@@ -158,7 +161,7 @@ export class TerrainChunkComponent extends Component {
         let coordView = new DataView(arr.buffer);
         coordView.setInt32(0, this.x);
         coordView.setInt32(Int32Array.BYTES_PER_ELEMENT, this.y);
-        coordView.setInt32(Int32Array.BYTES_PER_ELEMENT*2, this.z);
+        coordView.setInt32(Int32Array.BYTES_PER_ELEMENT * 2, this.z);
 
         // Return as buffer for Node to transfer it correctly.
         return arr;
@@ -173,8 +176,8 @@ export class InventoryComponent extends SerializableComponent {
 
     setEntity(entity: string, position?: number): number {
         // No position specified, so find first available.
-        if(!position) position = this.slots.indexOf(null);
-        if(position === -1) return -1; // inventory is full.
+        if (!position) position = this.slots.indexOf(null);
+        if (position === -1) return -1; // inventory is full.
 
         this.slots[position] = entity;
         this.dirtyFields.add('slots'); // Force dirty because we're mutating an array.
@@ -188,9 +191,9 @@ export class InventoryComponent extends SerializableComponent {
     dispose(entityManager: EntityManager): void {
         // When inventory is deleted, remove all its contents to avoid unused junk.
         // This will probably change when players' data is saved between play sessions.
-        for(let i = 0; i < this.slots.length; i++) {
+        for (let i = 0; i < this.slots.length; i++) {
             let entity = this.slots[i];
-            if(entity !== null) {
+            if (entity !== null) {
                 entityManager.removeEntity(entity);
             }
         }

@@ -22,7 +22,7 @@ export default class PlayerMeshSystem extends System {
     update(dt: number) {
         this.entityManager.getEntities(ComponentId.Player).forEach((component, entity) => {
             let animMeshComponent = this.entityManager.getComponent<AnimatedMeshComponent>(entity, ComponentId.AnimatedMesh);
-            if(!animMeshComponent) return;
+            if (!animMeshComponent) return;
 
             let mesh = animMeshComponent.mesh;
 
@@ -44,8 +44,8 @@ export default class PlayerMeshSystem extends System {
                 camera.rotation.x = rot.x;
 
                 // Head / camera moving up and down when player is walking.
-                if (Math.abs(physComponent.velX) > 0.01 || Math.abs(physComponent.velZ) > 0.01) {
-                    camera.position.y = 2.5 + Math.sin(this.walkCounter) / 7.5;
+                if (physComponent.isMovingHorizontally()) {
+                    camera.position.y = 2.5 + Math.cos(this.walkCounter) / 7.5;
                     this.walkCounter += dt * 12.5;
                 } else {
                     this.walkCounter = 0;
