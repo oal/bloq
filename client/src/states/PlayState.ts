@@ -27,23 +27,26 @@ export default class PlayState extends State {
     renderer: WebGLRenderer;
     isRunning: boolean = false;
 
-    constructor(server: string) {
+    constructor(assetManager: AssetManager, server: string) {
         super();
+
+        // Preloaded with all assets.
+        this.assetManager = assetManager;
+
+        // Server passed in from menu state.
         this.serverAddress = server;
     }
 
     onEnter() {
-        this.loadAssets(() => {
-            this.server = new Server(this, this.serverAddress, () => {
-                this.initRenderer();
-                this.world = new World(this);
-                this.isRunning = true;
+        this.server = new Server(this, this.serverAddress, () => {
+            this.initRenderer();
+            this.world = new World(this);
+            this.isRunning = true;
 
-                // let m = this.assetManager.getMusic('music');
-                // m.loop = true;
-                // m.volume = 0.25;
-                // m.play();
-            });
+            // let m = this.assetManager.getMusic('music');
+            // m.loop = true;
+            // m.volume = 0.25;
+            // m.play();
         });
     }
 
@@ -73,30 +76,6 @@ export default class PlayState extends State {
 
         document.body.appendChild(this.renderer.domElement);
         this.registerEvents();
-    }
-
-    loadAssets(callback: Function) {
-        let assets = new AssetManager();
-        assets.addTexture('terrain', require('../../assets/textures.png'));
-        assets.addTexture('player', require('../../assets/player.png'));
-
-        assets.addMesh('player', require('../../assets/player.json'));
-
-        assets.addMusic('music', require('file!../../assets/sound/music.ogg'));
-
-        assets.addSound('walk', require('file!../../assets/sound/walk.ogg'));
-        assets.addSound('dig', require('file!../../assets/sound/dig.ogg'));
-        assets.addSound('pickup', require('file!../../assets/sound/pickup.ogg'));
-
-        assets.load(progress => {
-            // TODO: Show loading progress in GUI.
-            console.log(progress);
-
-            // Continue setup when everything is loaded.
-            if (progress === 1) callback();
-        });
-
-        this.assetManager = assets;
     }
 
 

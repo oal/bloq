@@ -1,7 +1,7 @@
 import StateManager from "./states/StateManager";
-import MenuState from "./states/MenuState";
 
 import '../assets/stylesheets/base.scss';
+import AssetLoadingState from "./states/AssetLoadingState";
 
 let stateManager = new StateManager();
-stateManager.setState(new MenuState());
+stateManager.setState(new AssetLoadingState());

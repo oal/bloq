@@ -1,12 +1,13 @@
-import {TextureLoader, JSONLoader, AudioLoader, NearestFilter, Texture, MeshBasicMaterial, SkinnedMesh, Mesh} from 'three';
+import {TextureLoader, JSONLoader, NearestFilter, Texture, MeshBasicMaterial, SkinnedMesh, Mesh} from 'three';
 import AnimatedMesh from "./AnimatedMesh";
 
 
 export default class AssetManager {
     private isLoaded: boolean;
+    private filesDone: number = 0;
+    private totalFiles: number = 0;
     private textureLoader: TextureLoader = new TextureLoader();
     private meshLoader: JSONLoader = new JSONLoader();
-    private soundLoader: AudioLoader = new AudioLoader();
 
     private queue: {
         textures: Array<[string, string]>,
@@ -60,19 +61,19 @@ export default class AssetManager {
     load(callback: Function) {
         if (this.isLoaded) return;
 
+        this.filesDone = 0;
+        this.totalFiles = this.getQueueLength() + 1;
+
         this.loadTextures(callback, () => {
-            console.log('Textures loaded');
             this.queue.textures = [];
             this.loadMeshes(callback, () => {
-                console.log('Meshes loaded.');
                 this.queue.meshes = [];
                 this.loadMusic(callback, () => {
-                    console.log('Music loaded.');
                     this.queue.music = [];
                     this.loadSounds(callback, () => {
-                        console.log('Sounds loaded.');
                         this.queue.sounds = [];
                         this.isLoaded = true;
+                        callback('complete', 1.0);
                     });
                 });
             });
@@ -80,7 +81,6 @@ export default class AssetManager {
     }
 
     private loadTextures(progress: Function, done: Function) {
-        let totalFiles = this.getQueueLength();
         let filesDone = 0;
 
         this.queue.textures.forEach(pair => {
@@ -89,15 +89,17 @@ export default class AssetManager {
                 texture.minFilter = NearestFilter;
                 texture.magFilter = NearestFilter;
                 this.assets.textures.set(name, texture);
+
                 filesDone++;
-                progress(filesDone / totalFiles);
+                this.filesDone++;
+                progress('textures', this.filesDone / this.totalFiles);
+
                 if (filesDone == this.queue.textures.length) done();
             });
         });
     }
 
     private loadMeshes(progress: Function, done: Function) {
-        let totalFiles = this.getQueueLength();
         let filesDone = 0;
 
         this.queue.meshes.forEach(pair => {
@@ -115,14 +117,15 @@ export default class AssetManager {
                 }
 
                 filesDone++;
-                progress(filesDone / totalFiles);
+                this.filesDone++;
+                progress('models', this.filesDone / this.totalFiles);
+
                 if (filesDone == this.queue.meshes.length) done();
             });
         });
     }
 
     private loadMusic(progress: Function, done: Function) {
-        let totalFiles = this.getQueueLength();
         let filesDone = 0;
 
         this.queue.music.forEach(pair => {
@@ -133,17 +136,18 @@ export default class AssetManager {
             el.load();
             el.addEventListener('canplaythrough', (evt) => {
                 this.assets.music.set(name, el);
+
                 filesDone++;
-                progress(filesDone / totalFiles);
+                this.filesDone++;
+                progress('music', this.filesDone / this.totalFiles);
+
                 if (filesDone == this.queue.music.length) done();
             });
         });
     }
 
     private loadSounds(progress: Function, done: Function) {
-        let totalFiles = this.getQueueLength();
         let filesDone = 0;
-
         let audioCtx = new AudioContext();
 
         this.queue.sounds.forEach(pair => {
@@ -152,12 +156,14 @@ export default class AssetManager {
             req.responseType = 'arraybuffer';
             req.addEventListener('load', () => {
                 let data = req.response;
-                console.log(data, 123)
                 audioCtx.decodeAudioData(data, (buffer) => {
                     this.assets.sounds.set(name, buffer);
+
                     filesDone++;
-                    progress(filesDone / totalFiles);
-                    if (filesDone == this.queue.textures.length) done();
+                    this.filesDone++;
+                    progress('sounds', this.filesDone / this.totalFiles);
+
+                    if (filesDone == this.queue.sounds.length) done();
                 });
             });
             req.open('GET', url);

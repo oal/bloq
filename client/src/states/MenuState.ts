@@ -3,6 +3,7 @@ import {State} from "./State";
 import PlayState from "./PlayState";
 
 import '../../assets/stylesheets/menu.scss';
+import AssetManager from "../../lib/AssetManager";
 let Modernizr = require('../.modernizrrc');
 
 const html = `
@@ -35,12 +36,18 @@ const html = `
 
 
 export default class MenuState extends State {
+    private assetManager: AssetManager;
+
     private menuNode: Element;
     private playerName: string;
     private serverAddress: string;
 
-    constructor() {
+    constructor(assetManager: AssetManager) {
         super();
+
+        // Keep reference to pass to play state.
+        this.assetManager = assetManager;
+
         let parser = new HTMLParser();
         this.menuNode = parser.parse(html);
     }
@@ -62,7 +69,7 @@ export default class MenuState extends State {
 
     tick(dt: number): State|null {
         if (this.playerName && this.serverAddress) {
-            return new PlayState(this.serverAddress);
+            return new PlayState(this.assetManager, this.serverAddress);
         }
         return null;
     }
