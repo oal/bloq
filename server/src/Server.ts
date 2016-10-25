@@ -68,18 +68,19 @@ export default class Server {
     }
 
     static sendAction(netComponent: NetworkComponent, actionId: ActionId, action: Action) {
-        let bytes = action.serialize();
+        let buffer = action.serialize();
+        let bytes = new Uint8Array(buffer);
 
         // Give room for message type and action ID.
         const extraSpace = Uint16Array.BYTES_PER_ELEMENT;
-        let packet = new ArrayBuffer(bytes.length + extraSpace);
+        let packet = new ArrayBuffer(bytes.byteLength + extraSpace);
         let packetView = new DataView(packet);
 
         // Set header data
         packetView.setUint16(0, actionId);
 
         // Copy over message data.
-        for (let i = 0; i < bytes.length; i++) {
+        for (let i = 0; i < bytes.byteLength; i++) {
             packetView.setUint8(i + extraSpace, bytes[i]);
         }
 
@@ -112,12 +113,12 @@ export default class Server {
             pos += Uint16Array.BYTES_PER_ELEMENT;
 
             // Get message contents and decode JSON
-            let msg = buffer.slice(pos, pos + msgLength);
+            let msg = new Uint8Array(buffer.slice(pos, pos + msgLength));
             pos += msgLength;
             let text = textDecoder.decode(msg);
             let obj = JSON.parse(text);
 
-            // Noone should be able to send data on behalf of others.
+            // No one should be able to send data on behalf of others.
             // Really "obj" doesn't need an "entity" property, but might need it in the future.
             // Also, keeps interface between server and client in line.
             if (obj.entity != playerEntity) continue;

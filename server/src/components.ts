@@ -8,8 +8,8 @@ export class NetworkComponent extends Component {
     static ID = ComponentId.Network;
 
     websocket: WebSocket;
-    private bufferPos: number = 0;
-    private buffer: ArrayBuffer = new ArrayBuffer(Math.pow(TERRAIN_CHUNK_SIZE, 3) * 3);
+    bufferPos: number = 0;
+    buffer: ArrayBuffer = new ArrayBuffer(Math.pow(TERRAIN_CHUNK_SIZE, 3) * 3);
 
     bytesLeft(): number {
         return this.buffer.byteLength - this.bufferPos;

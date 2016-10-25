@@ -1,7 +1,7 @@
 import BaseWorld from "../../shared/BaseWorld";
 import {registerServerComponents} from "./components";
 import {ServerActionManager} from "./actions";
-import {ComponentId} from "../../shared/constants";
+import {ComponentId, SystemOrder} from "../../shared/constants";
 import Server from "./Server";
 
 import ActionExecutionSystem from "../../shared/systems/ActionExecutionSystem";
@@ -32,7 +32,7 @@ export default class World extends BaseWorld {
 
         registerServerComponents(this.entityManager);
 
-        this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), -1000); // Always process first
+        this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), SystemOrder.ActionExecution); // Always process first
 
         let initializerSystem = new InitializerSystem(this.entityManager, server.eventEmitter);
         initializerSystem.addInitializer(ComponentId.Player, new PlayerInitializer(this.entityManager));
@@ -42,26 +42,25 @@ export default class World extends BaseWorld {
         initializerSystem.addInitializer(ComponentId.Inventory, new InventoryInitializer(this.entityManager));
         initializerSystem.addInitializer(ComponentId.ChatMessage, new ChatMessageInitializer(this.entityManager));
         initializerSystem.addInitializer(ComponentId.ChunkRequest, new ChunkRequestInitializer(this.entityManager));
-        this.addSystem(initializerSystem, -999);
+        this.addSystem(initializerSystem, SystemOrder.Initializer);
 
-        this.addSystem(new ChatSystem(this.entityManager), -998);
-        this.addSystem(new InformNewPlayersSystem(this.entityManager), -9);
-        this.addSystem(new BroadcastPlayerInputSystem(this.entityManager), -8);
-        this.addSystem(new ChunkRequestSystem(this.entityManager), 100);
-        this.addSystem(new PlayerActionSystem(this.entityManager, this.actionManager), 101);
-        this.addSystem(new PickUpSystem(this.entityManager), 102);
-        this.addSystem(new BroadcastEntitySystem(this.entityManager), 103);
+        this.addSystem(new ChatSystem(this.entityManager), SystemOrder.Chat);
+        this.addSystem(new InformNewPlayersSystem(this.entityManager), SystemOrder.InformNewPlayers);
+        this.addSystem(new BroadcastPlayerInputSystem(this.entityManager), SystemOrder.BroadcastPlayerInput);
+        this.addSystem(new ChunkRequestSystem(this.entityManager), SystemOrder.ChunkRequest);
+        this.addSystem(new PlayerActionSystem(this.entityManager, this.actionManager), SystemOrder.PlayerAction);
+        this.addSystem(new PickUpSystem(this.entityManager), SystemOrder.PickUp);
+        this.addSystem(new BroadcastEntitySystem(this.entityManager), SystemOrder.BroadcastEntity);
 
-        this.addSystem(new NetworkSystem(this.entityManager, server), 409);
+        this.addSystem(new NetworkSystem(this.entityManager, server), SystemOrder.Network);
 
         // Create DB system, restore world / entity manager, and then start listening for changes.
         let dbSystem = new DatabaseSystem(this.entityManager);
-        this.addSystem(dbSystem, 500);
+        this.addSystem(dbSystem, SystemOrder.Database);
         dbSystem.restore(() => {
             console.log('Loaded entities from database.');
             dbSystem.registerEntityEvents();
         });
-
 
         console.log(this.systems);
         console.log(this.systemsOrder)

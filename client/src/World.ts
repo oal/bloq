@@ -23,11 +23,10 @@ import MouseManager from "../lib/MouseManager";
 import KeyboardManager from "../lib/KeyboardManager";
 import InventoryUISystem from "./systems/InventoryUISystem";
 import BlockSystem from "./systems/BlockSystem";
-import {ComponentId} from "../../shared/constants";
+import {ComponentId, SystemOrder} from "../../shared/constants";
 import BlockInitializer from "./initializers/BlockInitializer";
 import TerrainChunkInitializer from "./initializers/TerrainChunkInitializer";
 import PlayerInitializer from "./initializers/PlayerInitializer";
-import AnimatedMesh from "../lib/AnimatedMesh";
 import InputInitializer from "./initializers/InputInitializer";
 import NetworkSystem from "./systems/NetworkSystem";
 import ChatSystem from "./systems/ChatSystem";
@@ -98,7 +97,7 @@ export default class World extends BaseWorld {
     addSystems() {
         let netSystem = new NetworkSystem(this.entityManager, this.game.server);
         // TODO: Store system orders as constants in one place.
-        this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), -1000); // Always process first
+        this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), SystemOrder.ActionExecution); // Always process first
 
         let initializerSystem = new InitializerSystem(this.entityManager, this.game.server.eventEmitter);
         initializerSystem.addInitializer(ComponentId.TerrainChunk, new TerrainChunkInitializer(this.entityManager));
@@ -117,27 +116,26 @@ export default class World extends BaseWorld {
         initializerSystem.addInitializer(ComponentId.Input, inputInitializer);
         initializerSystem.addInitializer(ComponentId.Rotation, inputInitializer);
         initializerSystem.addInitializer(ComponentId.ChatMessage, new ChatMessageInitializer(this.entityManager));
-        this.addSystem(initializerSystem, -11);
+        this.addSystem(initializerSystem, SystemOrder.Initializer);
 
-        this.addSystem(new TerrainChunkSystem(this.entityManager, this.scene, this.terrainMaterial), -10);
-        this.addSystem(new BlockSystem(this.entityManager), -9);
-
+        this.addSystem(new TerrainChunkSystem(this.entityManager, this.scene, this.terrainMaterial), SystemOrder.TerrainChunk);
+        this.addSystem(new BlockSystem(this.entityManager), SystemOrder.Block);
 
         let keyboardManager = new KeyboardManager(this.game.renderer.domElement);
-        this.addSystem(new ChatSystem(this.entityManager, keyboardManager, netSystem), -8);
         let mouseManager = new MouseManager(this.game.renderer.domElement);
-        this.addSystem(new PlayerInputSystem(this.entityManager, mouseManager, keyboardManager), -7);
+        this.addSystem(new ChatSystem(this.entityManager, keyboardManager, netSystem), SystemOrder.Chat);
+        this.addSystem(new PlayerInputSystem(this.entityManager, mouseManager, keyboardManager), SystemOrder.PlayerInput);
 
-        this.addSystem(new PlayerInputSyncSystem(this.entityManager, netSystem), 10);
-        this.addSystem(new MeshSystem(this.entityManager, this.scene), 11);
-        this.addSystem(new PlayerMeshSystem(this.entityManager, this.scene), 12);
-        this.addSystem(new PlayerSelectionSystem(this.entityManager, this.scene), 13);
-        this.addSystem(new ChunkSystem(this.entityManager, netSystem), 14);
+        this.addSystem(new PlayerInputSyncSystem(this.entityManager, netSystem), SystemOrder.PlayerInputSync);
+        this.addSystem(new MeshSystem(this.entityManager, this.scene), SystemOrder.Mesh);
+        this.addSystem(new PlayerMeshSystem(this.entityManager, this.scene), SystemOrder.PlayerMesh);
+        this.addSystem(new PlayerSelectionSystem(this.entityManager, this.scene), SystemOrder.PlayerSelection);
+        this.addSystem(new ChunkSystem(this.entityManager, netSystem), SystemOrder.Chunk);
 
-        this.addSystem(new SoundSystem(this.entityManager, this.game.assetManager), 998);
-        this.addSystem(new InventoryUISystem(this.entityManager), 999);
-        this.addSystem(new DebugTextSystem(this.entityManager, this.game.renderer), 1000);
-        this.addSystem(netSystem, 1001);
+        this.addSystem(new SoundSystem(this.entityManager, this.game.assetManager), SystemOrder.Sound);
+        this.addSystem(new InventoryUISystem(this.entityManager), SystemOrder.InventoryUI);
+        this.addSystem(new DebugTextSystem(this.entityManager, this.game.renderer), SystemOrder.DebugText);
+        this.addSystem(netSystem, SystemOrder.Network);
     }
 
     tick(dt) {

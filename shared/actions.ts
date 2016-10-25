@@ -30,7 +30,7 @@ export class Action {
     serialize(): ArrayBuffer {
         let str = JSON.stringify(this);
         let encoder = new TextEncoder();
-        return encoder.encode(str);
+        return encoder.encode(str).buffer;
     }
 
     execute(entityManager: EntityManager) {

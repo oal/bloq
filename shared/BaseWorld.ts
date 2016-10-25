@@ -9,6 +9,7 @@ import PhysicsSystem from "./systems/PhysicsSystem";
 import TerrainCollisionSystem from "./systems/TerrainCollisionSystem";
 import PositionSystem from "./systems/PositionSystem";
 import {CleanComponentsSystem} from "./systems/CleanComponentsSystem";
+import {SystemOrder} from "./constants";
 
 
 export default class BaseWorld {
@@ -26,12 +27,12 @@ export default class BaseWorld {
 
         this.entityManager = em;
 
-        this.addSystem(new PhysicsSystem(em), 1);
-        this.addSystem(new TerrainCollisionSystem(em), 2);
-        this.addSystem(new PositionSystem(em), 4);
+        this.addSystem(new PhysicsSystem(em), SystemOrder.Physics);
+        this.addSystem(new TerrainCollisionSystem(em), SystemOrder.TerrainCollision);
+        this.addSystem(new PositionSystem(em), SystemOrder.Position);
 
         // Cleaning is the last thing we do in each tick.
-        this.addSystem(new CleanComponentsSystem(em), 10000);
+        this.addSystem(new CleanComponentsSystem(em), SystemOrder.CleanComponents);
     }
 
     addSystem(system: System, order: number = 0.0) {
