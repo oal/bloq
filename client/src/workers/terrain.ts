@@ -227,7 +227,7 @@ function buildChunkArrays(data: Uint8Array, neighbors: Array<Array<Array<Uint8Ar
         colors[colorIdx++] = shadowVal;
     };
 
-    let transparentMaterials = new Set([0, 7]);
+    let transparentMaterials = new Set([0, 7, 9]);
 
     // Low level, and kind of ugly, but it should not need to be changed very often.
     for (let z = 0; z < size; z++) {

@@ -14,7 +14,9 @@ const textureImages = [
     require('../../assets/blocks/4.png'),
     require('../../assets/blocks/5.png'),
     require('../../assets/blocks/6.png'),
-    require('../../assets/blocks/7.png')
+    require('../../assets/blocks/7.png'),
+    require('../../assets/blocks/8.png'),
+    require('../../assets/blocks/9.png')
 ];
 
 const html = `

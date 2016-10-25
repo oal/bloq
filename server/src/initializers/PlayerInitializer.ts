@@ -36,7 +36,7 @@ export default class PlayerInitializer extends Initializer {
         let netComponent = em.getComponent<NetworkComponent>(entity, ComponentId.Network);
         let inventory = new InventoryComponent();
         // This should be done elsewhere:
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < 9; i++) {
             let blockEntity = em.createEntity();
             let block = new BlockComponent();
             block.kind = i + 1;
