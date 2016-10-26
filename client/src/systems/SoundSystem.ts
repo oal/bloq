@@ -75,13 +75,16 @@ export default class SoundSystem extends System {
              this.digSound.stop(); // TODO: Enable if digging animation / delay is added
              }
              */
+        });
 
-            // Pick up
-            let inventoryComponent = this.entityManager.getComponent<InventoryComponent>(entity, ComponentId.Inventory);
-            inventoryComponent.slots.forEach((blockEntity) => {
-                let block = this.entityManager.getComponent<BlockComponent>(blockEntity, ComponentId.Block);
-                if (block && block.isDirty()) this.pickupSound.play();
-            });
+        // Get current player and check their inventory, play "pick up" sound if changed..
+        let [playerEntity, _] = this.entityManager.getFirstEntity(ComponentId.CurrentPlayer);
+        if(!playerEntity) return; // Player is in init state, not fully joined yet.
+
+        let inventoryComponent = this.entityManager.getComponent<InventoryComponent>(playerEntity, ComponentId.Inventory);
+        inventoryComponent.slots.forEach((blockEntity) => {
+            let block = this.entityManager.getComponent<BlockComponent>(blockEntity, ComponentId.Block);
+            if (block && block.isDirty()) this.pickupSound.play();
         });
     }
 }

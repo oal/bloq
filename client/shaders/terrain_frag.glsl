@@ -20,5 +20,17 @@ void main() {
 
     vec4 color = texture2D(texture, tex_pos(int(mat+0.1), uv));
     if(color.a == 0.0) discard;
-    gl_FragColor = vec4(color.rgb * col, 1.0);
+
+    // Fog (based on code from this tutorial: http://www.ozone3d.net/tutorials/glsl_fog/p04.php)
+    vec4 fogColor = vec4(0.7, 0.8, 0.85, 1.0);
+    float fogDensity = 0.0025;
+    const float LOG2 = 1.442695;
+    float z = gl_FragCoord.z / gl_FragCoord.w;
+
+    float fogFactor = exp2(-fogDensity *  fogDensity *  z *  z * z * LOG2);
+    fogFactor = clamp(fogFactor, 0.0, 1.0);
+
+    // Mix fog and color
+    vec4 finalColor = vec4(color.rgb * col, 1.0);
+    gl_FragColor = mix(fogColor, finalColor, fogFactor);
 }
