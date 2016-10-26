@@ -7,40 +7,61 @@ export default function () {
     let groundSampler = new FastSimplexNoise({
         min: -12,
         max: 12,
-        frequency: 0.008,
+        frequency: 0.010,
+        octaves: 2,
     });
     let groundDetailSampler = new FastSimplexNoise({
-        min: -2,
-        max: 2,
-        frequency: 0.04,
+        frequency: 0.014,
+        min: -10,
+        max: 10,
     });
 
     let caveSampler = new FastSimplexNoise({
+        frequency: 0.075,
+        persistence: 0.6,
+    });
+
+    let bigCaveSampler = new FastSimplexNoise({
         frequency: 0.03,
+        octaves: 2,
+        persistence: 0.3,
+        min: 0,
+        max: 1,
     });
 
     let mountainSampler = new FastSimplexNoise({
-        frequency: 0.01,
-        min: -48,
-        max: 24,
+        frequency: 0.0075,
+        octaves: 3,
+        min: -20,
+        max: 5,
+    });
+
+    let bottomSampler = new FastSimplexNoise({
+        frequency: 0.02,
+        min: -92,
+        max: -64,
     });
 
     let sample3d = (x: number, y: number, z: number): number => {
-        if (caveSampler.in3D(x, y, z) - (y / 50) > 0.7) {
+        if(y < bottomSampler.in2D(x, z)) return 3;
+
+        if (caveSampler.in3D(x, y, z) + bigCaveSampler.in3D(x, y, z) - Math.max(-0.1, y/10) > 0.45 + 0.4) {
             return 0;
         }
 
-        if (mountainSampler.in2D(x, z) > y) {
+        let groundLevel = (groundSampler.in2D(x, z) + groundDetailSampler.in3D(x, y, z));
+        if(y < groundLevel + mountainSampler.in2D(x, z)) {
             return 3;
         }
+        if (y < groundLevel) {
+            // -5 gives us grass near the surface, and dirt on the ground in caves.
+            if(y > groundLevel-5 && sample3d(x, y+1, z) === 0) return 2;
 
-        let groundLevel = groundSampler.in2D(x, z) + groundDetailSampler.in2D(x, z);
-        if (groundLevel - 1 > y) {
             return 1;
-        } else if (groundLevel > y) {
-            return 2;
         }
 
+
+        // Air.
         return 0;
     };
 

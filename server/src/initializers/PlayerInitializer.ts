@@ -25,9 +25,9 @@ export default class PlayerInitializer extends Initializer {
 
         // Add new components
         let pos = new PositionComponent();
-        pos.y = 15;
-        pos.x = 5;
-        pos.z = 5;
+        pos.y = 24;
+        pos.x = 8;
+        pos.z = 8;
         em.addComponent(entity, pos); // Position tracking
 
         em.addComponent(entity, new PhysicsComponent());
