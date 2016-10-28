@@ -36,7 +36,7 @@ export default class PlayerInitializer extends Initializer {
         let netComponent = em.getComponent<NetworkComponent>(entity, ComponentId.Network);
         let inventory = new InventoryComponent();
         // This should be done elsewhere:
-        for (let i = 0; i < 9; i++) {
+        for (let i = 0; i < 10; i++) {
             let blockEntity = em.createEntity();
             let block = new BlockComponent();
             block.kind = i + 1;
@@ -44,9 +44,9 @@ export default class PlayerInitializer extends Initializer {
 
             em.addComponent(blockEntity, block);
             let pos = new PositionComponent();
-            pos.y = 15;
-            pos.x = 5;
-            pos.z = 5;
+            pos.y = 0;
+            pos.x = 0;
+            pos.z = 0;
             em.addComponent(blockEntity, pos);
 
             inventory.slots[i] = blockEntity;

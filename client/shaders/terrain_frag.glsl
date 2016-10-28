@@ -1,7 +1,7 @@
 uniform sampler2D texture;
 varying vec3 pos;
 varying float mat;
-varying vec3 col;
+varying float shd;
 
 vec2 tex_pos(int mat, vec2 pos) {
     mat--;
@@ -14,7 +14,7 @@ vec2 tex_pos(int mat, vec2 pos) {
 void main() {
     // I should try to avoid ifs in shaders for branch prediction, but let's see if it becomes a problem:
     vec2 uv;
-    if(abs(fract(pos.x) - 0.5) < 0.0001) uv = fract(pos.yz)-0.5;
+    if(abs(fract(pos.x) - 0.5) < 0.0001) uv = fract(pos.zy)-0.5;
     else if(abs(fract(pos.y) - 0.5) < 0.0001) uv = fract(pos.xz)-0.5;
     else uv = fract(pos.xy)-0.5;
 
@@ -31,6 +31,6 @@ void main() {
     fogFactor = clamp(fogFactor, 0.0, 1.0);
 
     // Mix fog and color
-    vec4 finalColor = vec4(color.rgb * col, 1.0);
+    vec4 finalColor = vec4(color.rgb * shd, 1.0);
     gl_FragColor = mix(fogColor, finalColor, fogFactor);
 }
