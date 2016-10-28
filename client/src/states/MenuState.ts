@@ -19,16 +19,16 @@ const html = `
         <ul>
             <li>
                 <span>Player name:</span>
-                <input type="text" id="name" placeholder="Name">
+                <input type="text" class="input" id="name" placeholder="Name">
             </li>
     
             <li>
                 <span>Server:</span>
-                <input type="text" id="server" placeholder="Server address and port">
+                <input type="text" class="input" id="server" placeholder="Server address and port">
             </li>
     
             <li>
-                <button id="play">Join server</button>
+                <button id="play" class="button">Join server</button>
             </li>
         </ul>
     </div>

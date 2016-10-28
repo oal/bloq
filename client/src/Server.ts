@@ -25,6 +25,10 @@ export class Server {
         this.ws.onerror = this.onError.bind(this);
     }
 
+    close() {
+        this.ws.close();
+    }
+
     private onClose(evt: MessageEvent) {
         console.log('close');
     }

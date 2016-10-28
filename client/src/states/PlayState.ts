@@ -4,28 +4,53 @@ import World from "../World";
 import {WebGLRenderer} from 'three';
 import Stats = require('stats.js');
 import {State} from "./State";
+import HTMLParser from "../../lib/HTMLParser";
+import MenuState from "./MenuState";
 
 // Debug performance. TODO: Should go in DebugTextSystem.
 var stats = new Stats();
 stats.showPanel(1); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
 
-const enum GameState {
-    Active,
-    Inactive
-}
+const html = `
+    <div id="gui">
+        <div id="overlay">
+            <div class="overlay-wrapper">
+                <div class="overlay-info">
+                    <div class="overlay-info-image"></div>
+                    <ul>
+                        <li>Select blocks: Number keys</li>
+                        <li>Move: W/A/S/D</li>
+                        <li>Jump: Space</li>
+                        <li>Chat: T</li>
+                        <li>Dig: Left click</li>
+                        <li>Place block: Right click</li>
+                    </ul>
+                    <h3>Click to start playing</h3>
+                </div>
+    
+                <div class="overlay-buttons">
+                    <button class="button btn-settings">Settings</button>
+                    <button class="button btn-leave">Leave game</button>
+                </div>
+            </div>
+        </div>
+        <div id="crosshair"></div>
+    </div>
+`;
 
 export default class PlayState extends State {
-    state: GameState = GameState.Inactive;
+    private guiNode: Element;
+    private nextState: State;
 
     assetManager: AssetManager;
 
     world: World;
-    serverAddress: string; // TODO: Create Server instance in constructor, but don't connect until onEnter.
+    private serverAddress: string;
     server: Server;
 
     renderer: WebGLRenderer;
-    isRunning: boolean = false;
+    private isRunning: boolean = false;
 
     constructor(assetManager: AssetManager, server: string) {
         super();
@@ -35,6 +60,13 @@ export default class PlayState extends State {
 
         // Server passed in from menu state.
         this.serverAddress = server;
+
+        let parser = new HTMLParser();
+        this.guiNode = parser.parse(html);
+
+        this.guiNode.querySelector('.btn-leave').addEventListener('click', () => {
+            this.nextState = new MenuState(this.assetManager);
+        })
     }
 
     onEnter() {
@@ -43,6 +75,8 @@ export default class PlayState extends State {
             this.world = new World(this);
             this.isRunning = true;
 
+            document.body.appendChild(this.guiNode);
+
             let m = this.assetManager.getMusic('music');
             m.loop = true;
             m.play();
@@ -50,11 +84,25 @@ export default class PlayState extends State {
     }
 
     onExit() {
-        // Possibly cleanup. We never leave the PlayState at the moment, though.
+        // Remove DOM elements.
+        document.body.removeChild(this.guiNode);
+        document.body.removeChild(this.renderer.domElement);
+
+        // Stop music.
+        let m = this.assetManager.getMusic('music');
+        m.currentTime = 0;
+        m.pause();
+
+        // Disconnect and clean up.
+        this.server.close();
+        this.server = null;
+        this.world = null;
+        this.isRunning = false;
     }
 
     tick(dt: number): State|null {
         if (!this.isRunning) return null;
+        if (!!this.nextState) return this.nextState;
 
         stats.begin();
         this.world.tick(dt);
@@ -74,15 +122,14 @@ export default class PlayState extends State {
         this.renderer.setClearColor(0xBFF0FF);
 
         document.body.appendChild(this.renderer.domElement);
-        this.registerEvents();
+        this.registerCanvasEvents();
     }
 
 
     // Events
-    private registerEvents() {
+    private registerCanvasEvents() {
         // Show darkened overlay when game is not in focus.
-        let overlay = document.querySelector('#overlay');
-        (overlay.querySelector('.overlay-info') as HTMLDivElement).onclick = () => {
+        (this.guiNode.querySelector('.overlay-info') as HTMLDivElement).onclick = () => {
             let canvas = this.renderer.domElement;
             canvas.requestPointerLock = canvas.requestPointerLock || (canvas as any).mozRequestPointerLock;
             if (canvas.requestPointerLock) canvas.requestPointerLock();
@@ -94,14 +141,12 @@ export default class PlayState extends State {
     }
 
     private onPointerLockChange(event: Event) {
-        let overlay = document.getElementById('overlay');
+        let overlay = this.guiNode.querySelector('#overlay') as HTMLDivElement;
 
         let canvas = this.renderer.domElement;
         if (document.pointerLockElement === canvas || (document as any).mozPointerLockElement === canvas) {
-            this.state = GameState.Active;
             overlay.style.display = 'none';
         } else {
-            this.state = GameState.Inactive;
             overlay.style.display = 'flex';
         }
     }

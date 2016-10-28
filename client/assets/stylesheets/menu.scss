@@ -40,26 +40,7 @@
   flex-direction: column;
 }
 
-#mainmenu input, #mainmenu button {
-  font-family: 'Skranji', sans-serif;
-  font-size: 1.5vw;
-  padding: 0.5vw 1vw;
-  border-radius: 3px;
-  border: 0;
-  box-shadow: 0 -2px 2px #000;
-  background-color: rgba(255, 255, 255, 0.75);
-}
-
-#mainmenu button {
-  background-color: #ECEC7A;
-  transition: all 0.25s;
-  cursor: pointer;
-  width: 100%;
-  box-shadow: 0 -2px 2px #000 inset;
-  text-align: center;
-}
-
-#mainmenu button:hover {
+button:hover {
   background-color: #fff;
 }
 
