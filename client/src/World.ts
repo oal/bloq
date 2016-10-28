@@ -134,7 +134,7 @@ export default class World extends BaseWorld {
 
         this.addSystem(new SoundSystem(this.entityManager, this.game.assetManager), SystemOrder.Sound);
         this.addSystem(new InventoryUISystem(this.entityManager), SystemOrder.InventoryUI);
-        this.addSystem(new DebugTextSystem(this.entityManager, this.game.renderer), SystemOrder.DebugText);
+        // this.addSystem(new DebugTextSystem(this.entityManager, this.game.renderer), SystemOrder.DebugText);
         this.addSystem(netSystem, SystemOrder.Network);
     }
 

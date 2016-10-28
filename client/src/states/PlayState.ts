@@ -43,10 +43,9 @@ export default class PlayState extends State {
             this.world = new World(this);
             this.isRunning = true;
 
-            // let m = this.assetManager.getMusic('music');
-            // m.loop = true;
-            // m.volume = 0.25;
-            // m.play();
+            let m = this.assetManager.getMusic('music');
+            m.loop = true;
+            m.play();
         });
     }
 
@@ -82,8 +81,8 @@ export default class PlayState extends State {
     // Events
     private registerEvents() {
         // Show darkened overlay when game is not in focus.
-        let overlay = document.getElementById('overlay');
-        overlay.onclick = () => {
+        let overlay = document.querySelector('#overlay');
+        (overlay.querySelector('.overlay-info') as HTMLDivElement).onclick = () => {
             let canvas = this.renderer.domElement;
             canvas.requestPointerLock = canvas.requestPointerLock || (canvas as any).mozRequestPointerLock;
             if (canvas.requestPointerLock) canvas.requestPointerLock();
@@ -103,7 +102,7 @@ export default class PlayState extends State {
             overlay.style.display = 'none';
         } else {
             this.state = GameState.Inactive;
-            overlay.style.display = 'block';
+            overlay.style.display = 'flex';
         }
     }
 
