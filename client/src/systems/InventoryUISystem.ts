@@ -41,13 +41,13 @@ export default class InventoryUISystem extends System {
     private domNode: Element;
     private inventoryElements: NodeListOf<Element>;
 
-    constructor(em: EntityManager) {
+    constructor(em: EntityManager, guiNode) {
         super(em);
 
         // Parse and show in GUI.
         let parser = new HTMLParser();
         this.domNode = parser.parse(html);
-        document.body.appendChild(this.domNode);
+        guiNode.appendChild(this.domNode);
 
         // Set up selectors.
         this.inventoryElements = this.domNode.querySelectorAll('.inventory-row:first-child li');

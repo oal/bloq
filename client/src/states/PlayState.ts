@@ -1,4 +1,3 @@
-import AssetManager from "../../lib/AssetManager";
 import {Server} from "../Server";
 import World from "../World";
 import {WebGLRenderer} from 'three';
@@ -6,11 +5,7 @@ import Stats = require('stats.js');
 import {State} from "./State";
 import HTMLParser from "../../lib/HTMLParser";
 import MenuState from "./MenuState";
-
-// Debug performance. TODO: Should go in DebugTextSystem.
-var stats = new Stats();
-stats.showPanel(1); // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild(stats.dom);
+import SettingsState from "./SettingsState";
 
 const html = `
     <div id="gui">
@@ -41,9 +36,7 @@ const html = `
 
 export default class PlayState extends State {
     private guiNode: Element;
-    private nextState: State;
-
-    assetManager: AssetManager;
+    private stats: Stats;
 
     world: World;
     private serverAddress: string;
@@ -52,11 +45,8 @@ export default class PlayState extends State {
     renderer: WebGLRenderer;
     private isRunning: boolean = false;
 
-    constructor(assetManager: AssetManager, server: string) {
+    constructor(server: string) {
         super();
-
-        // Preloaded with all assets.
-        this.assetManager = assetManager;
 
         // Server passed in from menu state.
         this.serverAddress = server;
@@ -65,21 +55,25 @@ export default class PlayState extends State {
         this.guiNode = parser.parse(html);
 
         this.guiNode.querySelector('.btn-leave').addEventListener('click', () => {
-            this.nextState = new MenuState(this.assetManager);
-        })
+            this.transitionTo(new MenuState());
+        });
+        this.guiNode.querySelector('.btn-settings').addEventListener('click', () => {
+            this.transitionTo(new SettingsState());
+        });
+
+        // Debug performance. TODO: Should go in DebugTextSystem.
+        this.stats = new Stats();
+        this.stats.showPanel(1); // 0: fps, 1: ms, 2: mb, 3+: custom
+        this.guiNode.appendChild(this.stats.dom);
     }
 
     onEnter() {
         this.server = new Server(this, this.serverAddress, () => {
             this.initRenderer();
-            this.world = new World(this);
+            this.world = new World(this, this.guiNode);
             this.isRunning = true;
 
             document.body.appendChild(this.guiNode);
-
-            let m = this.assetManager.getMusic('music');
-            m.loop = true;
-            m.play();
         });
     }
 
@@ -88,36 +82,23 @@ export default class PlayState extends State {
         document.body.removeChild(this.guiNode);
         document.body.removeChild(this.renderer.domElement);
 
-        // Stop music.
-        let m = this.assetManager.getMusic('music');
-        m.currentTime = 0;
-        m.pause();
-
         // Disconnect and clean up.
         this.server.close();
-        this.server = null;
-        this.world = null;
-        this.isRunning = false;
     }
 
-    tick(dt: number): State|null {
-        if (!this.isRunning) return null;
-        if (!!this.nextState) return this.nextState;
+    tick(dt: number) {
+        if (!this.isRunning) return;
 
-        stats.begin();
+        this.stats.begin();
         this.world.tick(dt);
-        stats.end();
 
         // Render
         this.renderer.render(this.world.scene, this.world.camera);
-        return null;
+        this.stats.end();
     }
 
     // Init
     initRenderer() {
-        this.renderer = new WebGLRenderer({
-            antialias: false // TODO: Handle in a settings menu.
-        });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setClearColor(0xBFF0FF);
 
@@ -134,13 +115,10 @@ export default class PlayState extends State {
             canvas.requestPointerLock = canvas.requestPointerLock || (canvas as any).mozRequestPointerLock;
             if (canvas.requestPointerLock) canvas.requestPointerLock();
         };
-
-        let registerEvent = (eventName, method, target?) => (target || document).addEventListener(eventName, method.bind(this), false);
-        registerEvent('resize', this.onResize, window);
-        registerEvent('pointerlockchange', this.onPointerLockChange);
     }
 
-    private onPointerLockChange(event: Event) {
+    // Override event handlers on "State".
+    onPointerLockChange(event: Event) {
         let overlay = this.guiNode.querySelector('#overlay') as HTMLDivElement;
 
         let canvas = this.renderer.domElement;
@@ -151,7 +129,7 @@ export default class PlayState extends State {
         }
     }
 
-    private onResize(event: Event) {
+    onResize(event: Event) {
         let width = window.innerWidth;
         let height = window.innerHeight;
 

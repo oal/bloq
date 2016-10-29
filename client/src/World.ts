@@ -45,7 +45,7 @@ export default class World extends BaseWorld {
 
     game: PlayState;
 
-    constructor(game: PlayState) {
+    constructor(game: PlayState, guiNode: Element) {
         super();
         this.actionManager = new ClientActionManager();
         this.game = game;
@@ -91,10 +91,10 @@ export default class World extends BaseWorld {
             vertexColors: VertexColors
         });
 
-        this.addSystems();
+        this.addSystems(guiNode);
     }
 
-    addSystems() {
+    addSystems(guiNode: Element) {
         let netSystem = new NetworkSystem(this.entityManager, this.game.server);
         // TODO: Store system orders as constants in one place.
         this.addSystem(new ActionExecutionSystem(this.entityManager, this.actionManager), SystemOrder.ActionExecution); // Always process first
@@ -123,7 +123,7 @@ export default class World extends BaseWorld {
 
         let keyboardManager = new KeyboardManager(this.game.renderer.domElement);
         let mouseManager = new MouseManager(this.game.renderer.domElement);
-        this.addSystem(new ChatSystem(this.entityManager, keyboardManager, netSystem), SystemOrder.Chat);
+        this.addSystem(new ChatSystem(this.entityManager, guiNode, keyboardManager, netSystem), SystemOrder.Chat);
         this.addSystem(new PlayerInputSystem(this.entityManager, mouseManager, keyboardManager), SystemOrder.PlayerInput);
 
         this.addSystem(new PlayerInputSyncSystem(this.entityManager, netSystem), SystemOrder.PlayerInputSync);
@@ -133,7 +133,7 @@ export default class World extends BaseWorld {
         this.addSystem(new ChunkSystem(this.entityManager, netSystem), SystemOrder.Chunk);
 
         this.addSystem(new SoundSystem(this.entityManager, this.game.assetManager), SystemOrder.Sound);
-        this.addSystem(new InventoryUISystem(this.entityManager), SystemOrder.InventoryUI);
+        this.addSystem(new InventoryUISystem(this.entityManager, guiNode), SystemOrder.InventoryUI);
         // this.addSystem(new DebugTextSystem(this.entityManager, this.game.renderer), SystemOrder.DebugText);
         this.addSystem(netSystem, SystemOrder.Network);
     }

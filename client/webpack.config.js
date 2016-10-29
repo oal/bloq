@@ -37,6 +37,10 @@ module.exports = {
                 loader: 'raw'
             },
             {
+                test: /\.css$/,
+                loaders: ['style', 'css']
+            },
+            {
                 test: /\.scss$/,
                 loaders: ['style', 'css', 'sass']
             },

@@ -21,7 +21,7 @@ export default class ChatSystem extends System {
     private keyboardManager: KeyboardManager;
     private netSystem: NetworkSystem;
 
-    constructor(em: EntityManager, km: KeyboardManager, netSystem: NetworkSystem) {
+    constructor(em: EntityManager, guiNode: Element, km: KeyboardManager, netSystem: NetworkSystem) {
         super(em);
         this.keyboardManager = km;
         this.netSystem = netSystem;
@@ -29,7 +29,7 @@ export default class ChatSystem extends System {
         // Parse and show in GUI.
         let parser = new HTMLParser();
         this.domNode = parser.parse(html);
-        document.body.appendChild(this.domNode);
+        guiNode.appendChild(this.domNode);
 
         // Set up selectors.
         this.messageInput = this.domNode.querySelector('#chat-input') as HTMLInputElement;

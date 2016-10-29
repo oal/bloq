@@ -11,8 +11,6 @@ const html = `
 `;
 
 export default class AssetLoadingState extends State {
-    private assetManager: AssetManager = new AssetManager();
-
     private progressDescription: string;
     private progress: number = 0;
 
@@ -38,11 +36,7 @@ export default class AssetLoadingState extends State {
         document.body.removeChild(this.loaderNode);
     }
 
-    tick(dt: number): State|null {
-        if (this.progress >= 1.0) {
-            return new MenuState(this.assetManager);
-        }
-
+    tick(dt: number) {
         // Update progress bar.
         if (this.progress != this.progressNode.value) {
             this.progressNode.value = this.progress;
@@ -53,8 +47,6 @@ export default class AssetLoadingState extends State {
                 content: 'Loading ${this.progressDescription} (${percent}%)'
             }`;
         }
-
-        return null;
     }
 
     private loadAssets() {
@@ -76,6 +68,10 @@ export default class AssetLoadingState extends State {
         this.assetManager.load((description, progress) => {
             this.progressDescription = description;
             this.progress = progress;
+
+            if (this.progress >= 1.0) {
+                this.transitionTo(new MenuState());
+            }
         });
     }
 }
