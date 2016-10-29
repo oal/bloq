@@ -1,43 +1,12 @@
 import {System} from "../../../shared/System";
 import {ComponentId} from "../../../shared/constants";
 import AssetManager from "../../lib/AssetManager";
+import Sound from "../../lib/Sound";
 import EntityManager from "../../../shared/EntityManager";
 import {
     PhysicsComponent, OnGroundComponent, InputComponent, InventoryComponent,
     BlockComponent
 } from "../../../shared/components";
-
-
-class Sound {
-    ctx: AudioContext;
-    buffer: AudioBuffer;
-    source: AudioBufferSourceNode;
-
-    constructor(ctx: AudioContext, buffer: AudioBuffer) {
-        this.ctx = ctx;
-        this.buffer = buffer;
-    }
-
-    play() {
-        if (this.source) return;
-
-        let source = this.ctx.createBufferSource();
-        source.buffer = this.buffer;
-        source.connect(this.ctx.destination);
-        source.onended = () => {
-            this.source = null;
-        };
-        source.start();
-        this.source = source;
-    }
-
-    stop() {
-        if (this.source) {
-            this.source.stop();
-            this.source = null;
-        }
-    }
-}
 
 
 export default class SoundSystem extends System {
@@ -48,10 +17,9 @@ export default class SoundSystem extends System {
     constructor(em: EntityManager, am: AssetManager) {
         super(em);
 
-        let audioContext = new AudioContext();
-        this.walkSound = new Sound(audioContext, am.getSound('walk'));
-        this.digSound = new Sound(audioContext, am.getSound('dig'));
-        this.pickupSound = new Sound(audioContext, am.getSound('pickup'));
+        this.walkSound = am.getSound('walk');
+        this.digSound = am.getSound('dig');
+        this.pickupSound = am.getSound('pickup');
     }
 
     update(dt: number): void {

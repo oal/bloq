@@ -1,5 +1,6 @@
 import {TextureLoader, JSONLoader, NearestFilter, Texture, MeshBasicMaterial, SkinnedMesh, Mesh} from 'three';
 import AnimatedMesh from "./AnimatedMesh";
+import Sound from "./Sound";
 
 
 export default class AssetManager {
@@ -8,6 +9,7 @@ export default class AssetManager {
     private totalFiles: number = 0;
     private textureLoader: TextureLoader = new TextureLoader();
     private meshLoader: JSONLoader = new JSONLoader();
+    private audioContext: AudioContext = new AudioContext();
 
     private queue: {
         textures: Array<[string, string]>,
@@ -20,7 +22,7 @@ export default class AssetManager {
         textures: Map<string, Texture>,
         meshes: Map<string, Mesh | AnimatedMesh>,
         music: Map<string, HTMLAudioElement>,
-        sounds: Map<string, AudioBuffer>
+        sounds: Map<string, Sound>
     };
 
     constructor() {
@@ -34,7 +36,7 @@ export default class AssetManager {
             textures: new Map<string, Texture>(),
             meshes: new Map<string, Mesh | SkinnedMesh>(),
             music: new Map<string, HTMLAudioElement>(),
-            sounds: new Map<string, AudioBuffer>()
+            sounds: new Map<string, Sound>()
         };
     }
 
@@ -157,7 +159,7 @@ export default class AssetManager {
             req.addEventListener('load', () => {
                 let data = req.response;
                 audioCtx.decodeAudioData(data, (buffer) => {
-                    this.assets.sounds.set(name, buffer);
+                    this.assets.sounds.set(name, new Sound(this.audioContext, buffer));
 
                     filesDone++;
                     this.filesDone++;
@@ -183,7 +185,7 @@ export default class AssetManager {
         return this.assets.music.get(name);
     }
 
-    getSound(name): AudioBuffer {
+    getSound(name): Sound {
         return this.assets.sounds.get(name);
     }
 }

@@ -11,6 +11,10 @@ export class State {
         return this.stateManager.renderer;
     }
 
+    get settings() {
+        return this.stateManager.settings;
+    }
+
     tick(dt: number) {
     }
 
