@@ -2,35 +2,42 @@ import {WebGLRenderer} from 'three';
 import {State} from "./State";
 import AssetManager from "../../lib/AssetManager";
 
+
+let settingsProxyHandler = {
+    set: (obj, prop, value) => {
+        if (obj[prop] !== value) {
+            obj[prop] = value;
+            localStorage.setItem('settings', JSON.stringify(obj));
+        }
+        return true;
+    }
+};
+
 class Settings {
+    antialias: boolean;
+    musicVolume: number;
     private _soundVolume: number;
-    private _musicVolume: number;
-    private _antialias: boolean;
 
     get soundVolume() {
         return this._soundVolume;
     }
-
-    get musicVolume() {
-        return this._soundVolume;
+    set soundVolume(vol) {
+        this._soundVolume = vol;
+        this.gain.gain.value = this.soundVolume;
     }
 
-    get antialias() {
-        return this._soundVolume;
-    }
+    private audioContext: AudioContext;
+    private gain: GainNode;
 
-    constructor() {
+    constructor(audioContext: AudioContext, gain: GainNode) {
+        this.audioContext = audioContext;
+        this.gain = gain;
+
+        // Parse existing config, and init values.
         let json = JSON.parse(localStorage.getItem('settings') || '{}');
-        this._soundVolume = json['soundVolume'] || 0.5;
-        this._musicVolume = json['musicVolume'] || 0.5;
-        this._antialias = json['antialias'] || false;
-    }
-
-    set(key: string, value: any) {
-        if(!this.hasOwnProperty(key)) return;
-        this[key] = value;
-
-        localStorage.setItem('settings', JSON.stringify(this));
+        this.antialias = json['antialias'] || false;
+        this.soundVolume = json['soundVolume']+0.0001 || 0.5;
+        this.musicVolume = json['musicVolume']+0.0001 || 0.5;
     }
 }
 
@@ -39,14 +46,25 @@ export default class StateManager {
     private nextState: State;
     private currentTime: number = performance.now();
 
-    assetManager: AssetManager = new AssetManager();
-    renderer: WebGLRenderer = new WebGLRenderer({
-        antialias: false // TODO: Handle in a settings menu.
-    });
+    assetManager: AssetManager;
+    renderer: WebGLRenderer;
 
-    settings: Settings = new Settings();
+    settings: Settings;
 
     constructor() {
+        // One audio context and gain node is passed to all sounds.
+        let audioContext = new AudioContext();
+        let gain = audioContext.createGain();
+        gain.connect(audioContext.destination);
+
+        // Asset manager and settings object need these.
+        this.assetManager = new AssetManager(audioContext, gain);
+        this.settings = new Proxy(new Settings(audioContext, gain), settingsProxyHandler);
+
+        this.renderer = new WebGLRenderer({
+            antialias: this.settings.antialias
+        });
+
         this.update();
         this.registerEvents();
     }

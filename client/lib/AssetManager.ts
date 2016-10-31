@@ -7,9 +7,14 @@ export default class AssetManager {
     private isLoaded: boolean;
     private filesDone: number = 0;
     private totalFiles: number = 0;
+
+    // Type specific loaders
     private textureLoader: TextureLoader = new TextureLoader();
     private meshLoader: JSONLoader = new JSONLoader();
-    private audioContext: AudioContext = new AudioContext();
+
+    // Where and how to direct sounds to
+    private audioContext: AudioContext;
+    private gain: GainNode;
 
     private queue: {
         textures: Array<[string, string]>,
@@ -25,7 +30,10 @@ export default class AssetManager {
         sounds: Map<string, Sound>
     };
 
-    constructor() {
+    constructor(audioContext: AudioContext, gain: GainNode) {
+        this.audioContext = audioContext;
+        this.gain = gain;
+
         this.queue = {
             textures: [],
             meshes: [],
@@ -136,15 +144,19 @@ export default class AssetManager {
             let el = document.createElement('audio');
             el.setAttribute('src', url);
             el.load();
-            el.addEventListener('canplaythrough', (evt) => {
+
+            let canPlayThrough = (evt) => {
                 this.assets.music.set(name, el);
 
                 filesDone++;
                 this.filesDone++;
                 progress('music', this.filesDone / this.totalFiles);
+                el.removeEventListener('canplaythrough', canPlayThrough, false);
 
                 if (filesDone == this.queue.music.length) done();
-            });
+            };
+
+            el.addEventListener('canplaythrough', canPlayThrough, false);
         });
     }
 
@@ -159,7 +171,7 @@ export default class AssetManager {
             req.addEventListener('load', () => {
                 let data = req.response;
                 audioCtx.decodeAudioData(data, (buffer) => {
-                    this.assets.sounds.set(name, new Sound(this.audioContext, buffer));
+                    this.assets.sounds.set(name, new Sound(this.audioContext, buffer, this.gain));
 
                     filesDone++;
                     this.filesDone++;

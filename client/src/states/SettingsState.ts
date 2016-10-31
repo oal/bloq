@@ -9,6 +9,19 @@ const html = `
         <div class="box animated bounceIn">
             <ul>
                 <li>
+                    <h3>Graphics settings</h3>
+                </li>
+                
+                <li>
+                    <label><input class="settings-antialias" type="checkbox"> Antialias</label> <br>
+                    <small>Enabling / disabling antialiasing requires a page refresh to take effect.</small>
+                </li>
+                
+                <li>
+                    <h3>Audio settings</h3>
+                </li>
+                
+                <li>
                     <span>Sound effect volume:</span>
                     <input class="settings-sound" type="range" min="0" max="1" step="0.05">
                 </li>
@@ -43,7 +56,9 @@ export default class SettingsState extends State {
     onEnter() {
         document.body.appendChild(this.guiNode);
 
-        (this.guiNode.querySelector('.settings-music') as HTMLInputElement).value = ''+this.settings.musicVolume;
+        (this.guiNode.querySelector('.settings-antialias') as HTMLInputElement).checked = this.settings.antialias;
+        (this.guiNode.querySelector('.settings-sound') as HTMLInputElement).value = '' + this.settings.soundVolume;
+        (this.guiNode.querySelector('.settings-music') as HTMLInputElement).value = '' + this.settings.musicVolume;
     }
 
     onExit() {
@@ -54,12 +69,16 @@ export default class SettingsState extends State {
     }
 
     private registerEvents() {
+        let antialiasNode = this.guiNode.querySelector('.settings-antialias');
+        antialiasNode.addEventListener('change', (evt) => {
+            this.settings.antialias = (antialiasNode as HTMLInputElement).checked;
+        });
         this.guiNode.querySelector('.settings-sound').addEventListener('change', (evt) => {
-            this.settings.set('soundVolume', parseFloat((evt.target as HTMLInputElement).value));
+            this.settings.soundVolume = parseFloat((evt.target as HTMLInputElement).value);
         });
         this.guiNode.querySelector('.settings-music').addEventListener('change', (evt) => {
             let musicVolume = parseFloat((evt.target as HTMLInputElement).value);
-            this.settings.set('musicVolume', musicVolume);
+            this.settings.musicVolume = musicVolume;
             this.assetManager.getMusic('music').volume = musicVolume;
         });
     }

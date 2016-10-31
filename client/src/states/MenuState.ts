@@ -66,6 +66,7 @@ export default class MenuState extends State {
 
         let m = this.assetManager.getMusic('music');
         m.loop = true;
+        m.volume = this.settings.musicVolume;
         m.play();
     }
 
