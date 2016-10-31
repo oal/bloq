@@ -36,8 +36,13 @@ class Settings {
         // Parse existing config, and init values.
         let json = JSON.parse(localStorage.getItem('settings') || '{}');
         this.antialias = json['antialias'] || false;
-        this.soundVolume = json['soundVolume']+0.0001 || 0.5;
-        this.musicVolume = json['musicVolume']+0.0001 || 0.5;
+
+        // If undefined, will be NaN and default is set, otherwise, set to stored volume.
+        let soundVolume = json['soundVolume'];
+        this.soundVolume = soundVolume+1 ? soundVolume : 0.5;
+
+        let musicVolume = json['musicVolume'];
+        this.musicVolume = musicVolume+1 ? musicVolume : 0.5;
     }
 }
 
