@@ -5,6 +5,7 @@ It's written in Typescript, and uses Three.js for rendering.
 The game was made by Olav Lindekleiv for the course DAT215 ICT Project at the University of Agder,
 in the fall semester of 2016.
 
+![Screenshot](/../master/screenshots/1.jpg?raw=true "Screenshot")
 
 ## How to build / run
 Install the typescript compiler.
@@ -29,5 +30,5 @@ npm run serve
 
 Go to [http://localhost:8080](http://localhost:8080)
 
-### License
+## License
 Mozilla Public License 2.0 (see the LICENSE file)
